@@ -1,0 +1,15 @@
+*.bak
+*.vcd
+*.vvp
+.bsp
+VexRiscvWithCrossbar.v_toplevel_cpu_RegFilePlugin_regFile.bin
+hardware/endeavour-backups
+mbftdi
+rtl/.qsys_edit
+rtl/VexRiscvGen/project
+rtl/VexRiscvGen/target
+rtl/db
+rtl/incremental_db
+rtl/output_files
+rtl/simulation
+software/bootloader/*.{bin,elf}

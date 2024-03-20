@@ -1,0 +1,283 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 2021  Intel Corporation. All rights reserved.
+# Your use of Intel Corporation's design tools, logic functions 
+# and other software and tools, and any partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Intel Program License 
+# Subscription Agreement, the Intel Quartus Prime License Agreement,
+# the Intel FPGA IP License Agreement, or other applicable license
+# agreement, including, without limitation, that your use is for
+# the sole purpose of programming logic devices manufactured by
+# Intel and sold by Intel or its authorized distributors.  Please
+# refer to the applicable agreement for further details, at
+# https://fpgasoftware.intel.com/eula.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus Prime
+# Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
+# Date created = 13:50:47  February 25, 2024
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		endeavour_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Intel recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus Prime software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+set_global_assignment -name FAMILY "MAX 10"
+set_global_assignment -name DEVICE 10M50SAE144C8G
+set_global_assignment -name TOP_LEVEL_ENTITY Endeavour
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 21.1.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "13:50:47  FEBRUARY 25, 2024"
+set_global_assignment -name LAST_QUARTUS_VERSION "21.1.0 Lite Edition"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
+set_location_assignment PIN_26 -to clk100mhz
+
+set_location_assignment PIN_10 -to dvi_interface.TMDSCm -comment 21
+set_location_assignment PIN_8 -to dvi_interface.TMDSCp -comment 25
+set_location_assignment PIN_125 -to ethernet_interface.rj45_1
+set_location_assignment PIN_120 -to ethernet_interface.rj45_2
+set_location_assignment PIN_124 -to ethernet_interface.rj45_3
+set_location_assignment PIN_123 -to ethernet_interface.rj45_6
+set_location_assignment PIN_126 -to keys[2]
+set_location_assignment PIN_130 -to keys[1]
+set_location_assignment PIN_128 -to keys[0]
+set_location_assignment PIN_134 -to leds[2]
+set_location_assignment PIN_136 -to leds[1]
+set_location_assignment PIN_138 -to leds[0]
+set_location_assignment PIN_13 -to sdcard_interface.clk
+set_location_assignment PIN_14 -to sdcard_interface.cmd
+set_location_assignment PIN_15 -to sdcard_interface.data[3]
+set_location_assignment PIN_20 -to sdcard_interface.data[2]
+set_location_assignment PIN_11 -to sdcard_interface.data[1]
+set_location_assignment PIN_12 -to sdcard_interface.data[0]
+set_location_assignment PIN_127 -to sound_interface.enable
+set_location_assignment PIN_106 -to sound_interface.i2c_scl
+set_location_assignment PIN_105 -to sound_interface.i2c_sda
+set_location_assignment PIN_29 -to uart_rx
+set_location_assignment PIN_30 -to uart_tx
+set_location_assignment PIN_110 -to usb_dev_dm
+set_location_assignment PIN_111 -to usb_dev_dp
+set_location_assignment PIN_116 -to usb_host1_dm
+set_location_assignment PIN_117 -to usb_host1_dp
+set_location_assignment PIN_118 -to usb_host2_dm
+set_location_assignment PIN_119 -to usb_host2_dp
+set_global_assignment -name ENABLE_OCT_DONE OFF
+set_global_assignment -name ENABLE_CONFIGURATION_PINS OFF
+set_global_assignment -name ENABLE_BOOT_SEL_PIN OFF
+set_global_assignment -name USE_CONFIGURATION_DEVICE OFF
+set_global_assignment -name CRC_ERROR_OPEN_DRAIN OFF
+set_global_assignment -name GENERATE_SVF_FILE OFF
+set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -rise
+set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -fall
+set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -rise
+set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -fall
+set_global_assignment -name NUM_PARALLEL_PROCESSORS 6
+
+set_location_assignment PIN_22 -to dvi_interface.TMDS0m
+set_location_assignment PIN_23 -to dvi_interface.TMDS0p
+set_location_assignment PIN_27 -to dvi_interface.TMDS1m
+set_location_assignment PIN_28 -to dvi_interface.TMDS1p
+set_location_assignment PIN_32 -to dvi_interface.TMDS2m
+set_location_assignment PIN_33 -to dvi_interface.TMDS2p
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL TYPICAL
+set_global_assignment -name FLOW_ENABLE_POWER_ANALYZER ON
+set_global_assignment -name POWER_DEFAULT_INPUT_IO_TOGGLE_RATE "12.5 %"
+set_global_assignment -name VCCA_USER_VOLTAGE 3.3V
+set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 3.3V
+set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
+set_global_assignment -name FLOW_ENABLE_IO_ASSIGNMENT_ANALYSIS ON
+set_global_assignment -name EXTERNAL_FLASH_FALLBACK_ADDRESS 00000000
+set_global_assignment -name INTERNAL_FLASH_UPDATE_MODE "SINGLE COMP IMAGE WITH ERAM"
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clk100mhz
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_CK
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[13]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[12]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[11]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[10]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[9]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[8]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[7]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[6]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[5]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[4]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[3]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[2]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[1]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_A[0]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_BA[1]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_BA[0]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_nCK
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_CKE
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[15]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[14]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[13]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[12]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[11]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[10]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[9]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[8]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[7]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[6]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[5]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[4]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[3]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[2]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[1]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQ[0]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DM[0]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQS[0]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DM[1]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_DQS[1]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_nCAS
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_nCS[3]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_nCS[2]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_nCS[1]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_nCS[0]
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_nRAS
+set_instance_assignment -name IO_STANDARD "SSTL-2 CLASS I" -to DDR_nWE
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to dvi_interface.TMDSCm
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to dvi_interface.TMDSCp
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ethernet_interface.rj45_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ethernet_interface.rj45_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ethernet_interface.rj45_3
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ethernet_interface.rj45_6
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to keys[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to keys[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to keys[0]
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to keys[2]
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to keys[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to leds[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to leds[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to leds[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdcard_interface.clk
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdcard_interface.cmd
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdcard_interface.data[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdcard_interface.data[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdcard_interface.data[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdcard_interface.data[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sound_interface.enable
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to sound_interface.i2c_scl
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to sound_interface.i2c_sda
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to uart_rx
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to uart_tx
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to usb_dev_dm
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to usb_dev_dp
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to usb_host1_dm
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to usb_host1_dp
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to usb_host2_dm
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to usb_host2_dp
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to uart_rx
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to uart_tx
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to usb_dev_dm
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to usb_dev_dp
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to usb_host1_dm
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to usb_host1_dp
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to usb_host2_dm
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to usb_host2_dp
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to dvi_interface.TMDS0m
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to dvi_interface.TMDS0p
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to dvi_interface.TMDS1m
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to dvi_interface.TMDS1p
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to dvi_interface.TMDS2m
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to dvi_interface.TMDS2p
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to sound_interface.enable
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to keys[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to keys[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to keys[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to leds[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to leds[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 8MA -to leds[0]
+set_global_assignment -name EDA_SIMULATION_TOOL "Questa Intel FPGA (SystemVerilog)"
+set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
+set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "SYSTEMVERILOG HDL" -section_id eda_simulation
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_timing
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_symbol
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_signal_integrity
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_boundary_scan
+set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH testbench -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_NAME testbench -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id testbench
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME testbench -section_id testbench
+set_global_assignment -name EDA_TEST_BENCH_FILE testbench.sv -section_id testbench
+
+set_global_assignment -name VERILOG_FILE controllers/ddr_sdram_ctrl.v
+set_global_assignment -name SYSTEMVERILOG_FILE endeavour.sv
+set_global_assignment -name VERILOG_FILE VexRiscvGen/VexRiscvWithCrossbar.v
+set_global_assignment -name SDC_FILE endeavour.sdc
+set_global_assignment -name SYSTEMVERILOG_FILE interfaces.sv
+set_global_assignment -name QIP_FILE generated_ip/PLL.qip
+set_global_assignment -name SYSTEMVERILOG_FILE controllers/uart.sv
+set_global_assignment -name QIP_FILE generated_ip/OnChipRAM.qip
+set_global_assignment -name SYSTEMVERILOG_FILE internal_ram.sv
+set_location_assignment PIN_46 -to DDR_nCAS
+set_location_assignment PIN_49 -to DDR_nRAS
+set_location_assignment PIN_43 -to DDR_nWE
+set_location_assignment PIN_84 -to DDR_DQ[15]
+set_location_assignment PIN_85 -to DDR_DQ[14]
+set_location_assignment PIN_86 -to DDR_DQ[13]
+set_location_assignment PIN_87 -to DDR_DQ[12]
+set_location_assignment PIN_82 -to DDR_DQ[11]
+set_location_assignment PIN_80 -to DDR_DQ[10]
+set_location_assignment PIN_77 -to DDR_DQ[9]
+set_location_assignment PIN_64 -to DDR_DQ[7]
+set_location_assignment PIN_63 -to DDR_DQ[6]
+set_location_assignment PIN_62 -to DDR_DQ[5]
+set_location_assignment PIN_61 -to DDR_DQ[4]
+set_location_assignment PIN_83 -to DDR_DQ[3]
+set_location_assignment PIN_60 -to DDR_DQ[2]
+set_location_assignment PIN_69 -to DDR_DQ[1]
+set_location_assignment PIN_66 -to DDR_DQ[0]
+set_location_assignment PIN_76 -to DDR_DQ[8]
+set_location_assignment PIN_38 -to DDR_nCS[0]
+set_location_assignment PIN_50 -to DDR_nCS[1]
+set_location_assignment PIN_65 -to DDR_nCS[2]
+set_location_assignment PIN_75 -to DDR_nCS[3]
+set_location_assignment PIN_42 -to DDR_DM[0]
+set_location_assignment PIN_70 -to DDR_DM[1]
+set_location_assignment PIN_96 -to DDR_DQS[0]
+set_location_assignment PIN_98 -to DDR_DQS[1]
+#set_location_assignment PIN_99 -to DDR_A[13] -comment unused
+set_location_assignment PIN_88 -to DDR_A[12]
+set_location_assignment PIN_89 -to DDR_A[11]
+set_location_assignment PIN_53 -to DDR_A[10]
+set_location_assignment PIN_90 -to DDR_A[9]
+set_location_assignment PIN_91 -to DDR_A[8]
+set_location_assignment PIN_100 -to DDR_A[7]
+set_location_assignment PIN_92 -to DDR_A[6]
+set_location_assignment PIN_101 -to DDR_A[5]
+set_location_assignment PIN_93 -to DDR_A[4]
+set_location_assignment PIN_102 -to DDR_A[3]
+set_location_assignment PIN_74 -to DDR_A[2]
+set_location_assignment PIN_58 -to DDR_A[1]
+set_location_assignment PIN_55 -to DDR_A[0]
+set_location_assignment PIN_52 -to DDR_BA[1]
+set_location_assignment PIN_51 -to DDR_BA[0]
+set_location_assignment PIN_40 -to DDR_CK
+set_location_assignment PIN_41 -to DDR_nCK
+set_location_assignment PIN_39 -to DDR_CKE
+
+set_global_assignment -name QIP_FILE generated_ip/DDR_IO8.qip
+set_global_assignment -name SIP_FILE generated_ip/DDR_IO8.sip
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
