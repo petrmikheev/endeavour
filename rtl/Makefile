@@ -1,4 +1,5 @@
 sources = endeavour.sv internal_ram.sv VexRiscvGen/VexRiscvWithCrossbar.v controllers/*.sv controllers/*.v
+testbench_sources = testbench/quartus_ip_sim.sv testbench/micron_ddr_sdram_model.v
 
 build: output_files/endeavour.sof endeavour.svf endeavour_flash.svf
 
@@ -27,14 +28,14 @@ write_flash: endeavour_flash.svf
 	sudo modprobe ftdi_sio
 
 .PHONY: runbench
-runbench: sim/testbench.vvp
-	./sim/testbench.vvp
+runbench: testbench/testbench.vvp
+	./testbench/testbench.vvp
 
-sim/testbench.vvp: sim/testbench.sv sim/micron_ddr_sdram_model.v $(sources)
+testbench/testbench.vvp: testbench/testbench.sv $(sources) $(testbench_sources)
 	l_sources="" ; \
-	for x in $(sources); do l_sources="$$l_sources -l $$x"; done ; \
-	iverilog -g2012 sim/testbench.sv $$l_sources -o sim/testbench.vvp -DIVERILOG
+	for x in $(sources) $(testbench_sources); do l_sources="$$l_sources -l $$x"; done ; \
+	iverilog -g2012 testbench/testbench.sv $$l_sources -o testbench/testbench.vvp -DIVERILOG
 
 .PHONY: clean
 clean:
-	rm -f sim/testbench.vvp sim/testbench.vcd endeavour.svf endeavour_flash.svf
+	rm -f testbench/testbench.vvp testbench/dump.vcd endeavour.svf endeavour_flash.svf

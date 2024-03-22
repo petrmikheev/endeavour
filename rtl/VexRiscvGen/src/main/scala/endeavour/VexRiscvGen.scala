@@ -125,7 +125,7 @@ class VexRiscvWithCrossbar extends Component{
     ),
     new RegFilePlugin(
       regFileReadyKind = plugin.SYNC,
-      zeroBoot = true
+      zeroBoot = false
     ),
     new IntAluPlugin,
     new SrcPlugin(
@@ -157,8 +157,8 @@ class VexRiscvWithCrossbar extends Component{
   val cpu = new VexRiscv(VexRiscvConfig(cpuPlugins))
   var iBus : Axi4ReadOnly = null
   var dBus : Axi4Shared = null
-  val timerInterrupt = False
-  val externalInterrupt = False
+  val timerInterrupt = False // TODO
+  val externalInterrupt = False // TODO
   for(plugin <- cpu.plugins) plugin match{
     case plugin : IBusSimplePlugin => iBus = plugin.iBus.toAxi4ReadOnly()
     case plugin : IBusCachedPlugin => iBus = plugin.iBus.toAxi4ReadOnly()

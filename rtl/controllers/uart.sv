@@ -7,6 +7,8 @@ module UART (
   output [31:0] apb_rdata
 );
 
+  parameter SIMULATION = 0;
+
   reg selbuf_divisor;
   reg selbuf_receiver;
   reg selbuf_transmitter;
@@ -51,7 +53,9 @@ module UART (
       selbuf_receiver <= sel_receiver;
       selbuf_transmitter <= sel_transmitter;
       if (selbuf_divisor) begin
-        if (apb_write & apb_enable) divisor <= apb_wdata[15:0];
+        // Note: in simulation we ignore the value and use a very high baud rate,
+        // otherwise simulation takes too lot of time.
+        if (apb_write & apb_enable) divisor <= SIMULATION ? 16'd9 : apb_wdata[15:0];
       end else if (selbuf_receiver) begin
         if (apb_enable) read_buf_empty <= 1;
       end else if (selbuf_transmitter) begin

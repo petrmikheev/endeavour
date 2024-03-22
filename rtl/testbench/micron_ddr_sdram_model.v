@@ -74,14 +74,13 @@
 // DO NOT CHANGE THE TIMESCALE, MAKE SURE YOUR SIMULATOR USE "PS" RESOLUTION
 `timescale 1ps/1ps
 
-module micron_ddr_sdram_model #(
-    parameter BA_BITS          =       2,
-    parameter ROW_BITS         =      13,
-    parameter COL_BITS         =      11,
-    parameter DQ_LEVEL         =       1
-) (
+module micron_ddr_sdram_model (
     Clk, Clk_n, Cke, Cs_n, Ras_n, Cas_n, We_n, Ba , Addr, Dm, Dq, Dqs
 );
+    parameter BA_BITS          =       2;
+    parameter ROW_BITS         =      13;
+    parameter COL_BITS         =      11;
+    parameter DQ_LEVEL         =       1;
 
     parameter no_halt          =       1; // If set to 1, the model won't halt on command sequence/major errors
     parameter DEBUG            =       1; // Turn on DEBUG message
@@ -159,7 +158,8 @@ module micron_ddr_sdram_model #(
     parameter tRP              =    20.0; // tRP    ns    Precharge command period
     parameter tRRD             =    15.0; // tRRD   ns    Active bank a to Active bank b command time
     parameter tWR              =    15.0; // tWR    ns    Write recovery time
-`else `define sg75                        //              Timing Parameters for -75 (CL = 2.5)
+`else
+`define sg75                        //              Timing Parameters for -75 (CL = 2.5)
     parameter tCK              =     7.5; // tCK    ns    Nominal Clock Cycle Time
     parameter tDQSQ            =     0.5; // tDQSQ  ns    DQS-DQ skew, DQS to last DQ valid, per group, per access
     parameter tMRD             =    15.0; // tMRD   ns    Load Mode Register command cycle time
@@ -1500,7 +1500,8 @@ module micron_ddr_sdram_model #(
         specparam tIS              =   0.900; // tIS    ns    Input Setup Time
         specparam tDQSH            =   2.625; // tDQSH  ns    DQS input High Pulse Width = 0.35*tCK
         specparam tDQSL            =   2.625; // tDQSL  ns    DQS input Low Pulse Width = 0.35*tCK
-`else `define sg75Z                           //              specparams for -75Z (CL = 2)
+`else
+`define sg75Z                           //              specparams for -75Z (CL = 2)
         specparam tDSS             =     1.5; // tDSS   ns    DQS falling edge to CLK rising (setup time) = 0.2*tCK
         specparam tDSH             =     1.5; // tDSH   ns    DQS falling edge from CLK rising (hold time) = 0.2*tCK
         specparam tIH              =   0.900; // tIH    ns    Input Hold Time

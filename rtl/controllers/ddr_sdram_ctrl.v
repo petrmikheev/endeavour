@@ -1,5 +1,9 @@
-// Original source (modified): https://github.com/WangXuan95/FPGA-DDR-SDRAM/blob/main/RTL/ddr_sdram_ctrl.v
+// Based on https://github.com/WangXuan95/FPGA-DDR-SDRAM/blob/main/RTL/ddr_sdram_ctrl.v
 // License: GPL-3.0
+// Modifications:
+// - Instead of extra high frequency clock `drv_clk` using DDR IO buffer "DDR_IO8" (instance of altera_gpio_lite)
+//   and shifted clock `dqs_clk` = `clk` with tCK/4 delay.
+// - EMR is initialized with 0x2 (weak drive strength).
 
 //--------------------------------------------------------------------------------------------------------
 // Module  : ddr_sdram_ctrl
@@ -23,7 +27,7 @@ module ddr_sdram_ctrl #(
     parameter [7:0] tR2I      = 8'd7
 ) (
     input clk,
-    input dqs_clk,
+    input dqs_clk,  // should be same rate as `clk` with 1/4 period delay
     input reset,
     // user interface (AXI4)
     input  wire                                           awvalid,
@@ -45,7 +49,7 @@ module ddr_sdram_ctrl #(
     output wire                                           rlast,
     output wire                       [(8<<DQ_LEVEL)-1:0] rdata,
     // DDR-SDRAM interface
-    output wire                                           ddr_ck_p, ddr_ck_n,  // freq = F(drv_clk)/4
+    output wire                                           ddr_ck_p, ddr_ck_n,
     output wire                                           ddr_cke,
     output reg                                            ddr_cs_n,
     output reg                                            ddr_ras_n,
@@ -94,35 +98,12 @@ end endgenerate
 wire read_accessible, read_respdone;
 reg  output_enable=1'b0, output_enable_d1=1'b0, output_enable_d2=1'b0;
 
-reg                      o_v_a = 1'b0;
-reg  [(4<<DQ_LEVEL)-1:0] o_dh_a = 0;
-reg  [(4<<DQ_LEVEL)-1:0] o_dl_a = 0;
-reg                      o_v_b = 1'b0;
-reg  [(4<<DQ_LEVEL)-1:0] o_dh_b = 0;
-reg                      o_dqs_c = 1'b0;
-reg  [(4<<DQ_LEVEL)-1:0] o_d_c = 0;
-reg  [(4<<DQ_LEVEL)-1:0] o_d_d = 0;
-
-reg                      i_v_a = 1'b0;
-reg                      i_l_a = 1'b0;
-reg                      i_v_b = 1'b0;
-reg                      i_l_b = 1'b0;
-reg                      i_v_c = 1'b0;
-reg                      i_l_c = 1'b0;
-reg                      i_dqs_c = 1'b0;
-reg  [(4<<DQ_LEVEL)-1:0] i_d_c = 0;
-reg                      i_v_d = 1'b0;
-reg                      i_l_d = 1'b0;
-reg  [(8<<DQ_LEVEL)-1:0] i_d_d = 0;
-reg                      i_v_e = 1'b0;
-reg                      i_l_e = 1'b0;
-reg  [(8<<DQ_LEVEL)-1:0] i_d_e = 0;
-
 // -------------------------------------------------------------------------------------
 //   constants defination and assignment
 // -------------------------------------------------------------------------------------
 localparam [ROW_BITS-1:0] DDR_A_DEFAULT      = 'b0100_0000_0000;
-localparam [ROW_BITS-1:0] DDR_A_MR0          = 'b0001_0010_1001;
+localparam [ROW_BITS-1:0] DDR_A_EMR          = 'b0000_0000_0010;  // 0x2  -> weak drive strength
+localparam [ROW_BITS-1:0] DDR_A_MR0          = 'b0001_0010_1001;  // 0x29 -> CL2, burst length 2, interleave
 localparam [ROW_BITS-1:0] DDR_A_MR_CLEAR_DLL = 'b0000_0010_1001;
 
 
@@ -152,45 +133,11 @@ always @ (posedge clk)
     end
 
 // -------------------------------------------------------------------------------------
-//   generate DDR clock
+//   DDR clock
 // -------------------------------------------------------------------------------------
 assign ddr_ck_p = ~clk;
 assign ddr_ck_n = clk;
 assign ddr_cke = ~ddr_cs_n;
-
-// -------------------------------------------------------------------------------------
-//   generate DDR DQ output behavior
-// -------------------------------------------------------------------------------------
-
-wire [31:0] ddr_in_buf;
-wire [31:0] ddr_out_buf;
-
-DDR_IO8 io_l(
-  .outclock(clk),
-  .inclock(ddr_dqs[0]),
-  .inclocken(~output_enable),
-  .outclocken(output_enable),
-  .oe(output_enable ? 8'hff : 8'h0),
-  .pad_io(ddr_dq[7:0]),
-  .din({ddr_out_buf[7:0], ddr_out_buf[23:16]}),
-  .dout({ddr_in_buf[7:0], ddr_in_buf[23:16]})
-);
-
-DDR_IO8 io_h(
-  .outclock(clk),
-  .inclock(ddr_dqs[1]),
-  .inclocken(~output_enable),
-  .outclocken(output_enable),
-  .oe(output_enable ? 8'hff : 8'h0),
-  .pad_io(ddr_dq[15:8]),
-  .din({ddr_out_buf[15:8], ddr_out_buf[31:24]}),
-  .dout({ddr_in_buf[15:8], ddr_in_buf[31:24]})
-);
-
-assign ddr_dm  = output_enable ? {DQS_BITS{1'b0}}    : {DQS_BITS{1'bz}};
-assign ddr_dqs = {DQS_BITS{output_enable ? ddr_ck_p : 1'bz}};
-//assign ddr_dqs = output_enable ? {DQS_BITS{o_dqs_c}} : {DQS_BITS{1'bz}};
-//assign ddr_dq  = output_enable ?               o_d_d : {(4<<DQ_LEVEL){1'bz}};
 
 // -------------------------------------------------------------------------------------
 //  assignment for user interface (AXI4)
@@ -235,7 +182,7 @@ always @ (posedge clk)
                     ddr_cas_n <= 1'b0;
                     ddr_we_n <= 1'b0;
                     ddr_ba <= 1;
-                    ddr_a <= 0;
+                    ddr_a <= DDR_A_EMR;
                 end else begin
                     ddr_ba <= 0;
                     ddr_a <= DDR_A_MR0;
@@ -381,53 +328,51 @@ always @ (posedge clk)
     end
 
 // -------------------------------------------------------------------------------------
-//   output data latches --- stage A
+//   DDR DQ
+// -------------------------------------------------------------------------------------
+
+wire [31:0] ddr_in;
+reg [31:0] ddr_out;
+reg [31:0] ddr_out_buf;
+reg ddr_out_valid = 0;
+reg ddr_out_valid_buf = 0;
+
+DDR_IO8 io_l(
+  .outclock(clk),
+  .inclock(ddr_dqs[0]),
+  .oe(output_enable ? 8'hff : 8'h0),
+  .pad_io(ddr_dq[7:0]),
+  .din({ddr_out[7:0], ddr_out[23:16]}),
+  .dout({ddr_in[7:0], ddr_in[23:16]})
+);
+
+DDR_IO8 io_h(
+  .outclock(clk),
+  .inclock(ddr_dqs[1]),
+  .oe(output_enable ? 8'hff : 8'h0),
+  .pad_io(ddr_dq[15:8]),
+  .din({ddr_out[15:8], ddr_out[31:24]}),
+  .dout({ddr_in[15:8], ddr_in[31:24]})
+);
+
+assign ddr_dm  = output_enable ? {DQS_BITS{1'b0}}   : {DQS_BITS{1'bz}};
+assign ddr_dqs = {DQS_BITS{output_enable ? (dqs_clk & ddr_out_valid) : 1'bz}};
+
+// -------------------------------------------------------------------------------------
+//   output data latches
 // -------------------------------------------------------------------------------------
 always @ (posedge clk)
     if(reset) begin
-        o_v_a <= 1'b0;
-        {o_dh_a, o_dl_a} <= 0;
+        ddr_out_valid <= 1'b0;
+        ddr_out_valid_buf <= 1'b0;
+        ddr_out <= 32'b0;
+        ddr_out_buf <= 32'b0;
     end else begin
-        o_v_a <= (stat==WRITE && wvalid);
-        {o_dh_a, o_dl_a} <= wdata;
+        ddr_out_valid_buf <= (stat==WRITE && wvalid);
+        ddr_out_buf <= wdata;
+        ddr_out_valid <= ddr_out_valid_buf;
+        ddr_out <= ddr_out_buf;
     end
-
-// -------------------------------------------------------------------------------------
-//   output data latches --- stage B
-// -------------------------------------------------------------------------------------
-always @ (posedge clk)
-    if(reset) begin
-        o_v_b <= 1'b0;
-        o_dh_b <= 0;
-    end else begin
-        o_v_b <= o_v_a;
-        o_dh_b <= o_dh_a;
-    end
-
-// -------------------------------------------------------------------------------------
-//   dq and dqs generate for output (write)
-// -------------------------------------------------------------------------------------
-/*always @ (posedge clk2)
-    if (~clk) begin
-        o_dqs_c <= 1'b0;
-        if (o_v_a)
-            o_d_c <= o_dl_a;
-        else
-            o_d_c <= 0;
-    end else begin
-        o_dqs_c <= o_v_b;
-        if (o_v_b)
-            o_d_c <= o_dh_b;
-        else
-            o_d_c <= 0;
-    end*/
-assign ddr_out_buf = {o_dl_a, o_dh_b};
-
-// -------------------------------------------------------------------------------------
-//   dq delay for output (write)
-// -------------------------------------------------------------------------------------
-//always @ (posedge drv_clk)
-//    o_d_d <= o_d_c;
 
 // -------------------------------------------------------------------------------------
 //   dq sampling for input (read)
@@ -441,7 +386,22 @@ always @ (posedge clk2)
     if(i_dqs_c)
         i_d_d <= {ddr_dq, i_d_c};*/
 
-/*always @ (posedge clk)
+reg                      i_v_a = 1'b0;
+reg                      i_l_a = 1'b0;
+reg                      i_v_b = 1'b0;
+reg                      i_l_b = 1'b0;
+reg                      i_v_c = 1'b0;
+reg                      i_l_c = 1'b0;
+reg                      i_dqs_c = 1'b0;
+//reg  [(4<<DQ_LEVEL)-1:0] i_d_c = 0;
+reg                      i_v_d = 1'b0;
+reg                      i_l_d = 1'b0;
+//reg  [(8<<DQ_LEVEL)-1:0] i_d_d = 0;
+reg                      i_v_e = 1'b0;
+reg                      i_l_e = 1'b0;
+reg  [(8<<DQ_LEVEL)-1:0] i_d_e = 0;
+
+always @ (posedge clk)
     if(reset) begin
         {i_v_a, i_v_b, i_v_c, i_v_d} <= 0;
         {i_l_a, i_l_b, i_l_c, i_l_d} <= 0;
@@ -454,17 +414,17 @@ always @ (posedge clk2)
         i_l_c <= i_l_b;
         i_v_d <= i_v_c;
         i_l_d <= i_l_c;
-    end*/
+    end
 
 always @ (posedge clk)
     if(reset) begin
         i_v_e <= 1'b0;
         i_l_e <= 1'b0;
-        i_d_e <= 0;
+        //i_d_e <= 0;
     end else begin
         i_v_e <= i_v_d;
         i_l_e <= i_l_d;
-        i_d_e <= ddr_in_buf; //i_d_d;
+        i_d_e <= ddr_in; //i_d_d;
     end
 
 // -------------------------------------------------------------------------------------

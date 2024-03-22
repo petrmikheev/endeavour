@@ -12,9 +12,8 @@
 # or its authorized distributors. Please refer to the applicable 
 # agreement for further details.
 
-# ACDS 21.1 842 linux 2024.03.18.22:10:58
 # ----------------------------------------
-# Auto-generated simulation script rivierapro_setup.tcl
+# Auto-generated simulation script msim_setup.tcl
 # ----------------------------------------
 # This script provides commands to simulate the following IP detected in
 # your Quartus project:
@@ -27,7 +26,7 @@
 # To write a top-level script that compiles Altera simulation libraries and
 # the Quartus-generated IP in your project, along with your design and
 # testbench files, copy the text from the TOP-LEVEL TEMPLATE section below
-# into a new file, e.g. named "aldec.do", and modify the text as directed.
+# into a new file, e.g. named "mentor.do", and modify the text as directed.
 # 
 # ----------------------------------------
 # # TOP-LEVEL TEMPLATE - BEGIN
@@ -43,7 +42,7 @@
 # set QSYS_SIMDIR <script generation output directory>
 # #
 # # Source the generated IP simulation script.
-# source $QSYS_SIMDIR/aldec/rivierapro_setup.tcl
+# source $QSYS_SIMDIR/mentor/msim_setup.tcl
 # #
 # # Set any compilation options you require (this is unusual).
 # set USER_DEFINED_COMPILE_OPTIONS <compilation options>
@@ -60,7 +59,7 @@
 # # the top level. (These are all the files required for simulation other
 # # than the files compiled by the Quartus-generated IP simulation script)
 # #
-# vlog -sv2k5 <your compilation options> <design and testbench files>
+# vlog <compilation options> <design and testbench files>
 # #
 # # Set the top-level simulation or testbench module/entity name, which is
 # # used by the elab command to elaborate the top level.
@@ -74,7 +73,7 @@
 # elab
 # #
 # # Run the simulation.
-# run
+# run -a
 # #
 # # Report success to the shell.
 # exit -code 0
@@ -95,6 +94,7 @@
 # within the Quartus project, and generate a unified
 # script which supports all the Altera IP within the design.
 # ----------------------------------------
+# ACDS 21.1 842 linux 2024.03.21.23:38:34
 
 # ----------------------------------------
 # Initialize variables
@@ -137,17 +137,6 @@ if ![ string match "*-64 vsim*" [ vsim -version ] ] {
 } else {
 }
 
-set Aldec "Riviera"
-if { [ string match "*Active-HDL*" [ vsim -version ] ] } {
-  set Aldec "Active"
-}
-
-if { [ string match "Active" $Aldec ] } {
-  scripterconf -tcl
-  createdesign "$TOP_LEVEL_NAME"  "."
-  opendesign "$TOP_LEVEL_NAME"
-}
-
 # ----------------------------------------
 # Copy ROM/RAM files to simulation directory
 alias file_copy {
@@ -157,57 +146,62 @@ alias file_copy {
 # ----------------------------------------
 # Create compilation libraries
 proc ensure_lib { lib } { if ![file isdirectory $lib] { vlib $lib } }
-ensure_lib      ./libraries     
-ensure_lib      ./libraries/work
-vmap       work ./libraries/work
-ensure_lib                  ./libraries/altera_ver      
-vmap       altera_ver       ./libraries/altera_ver      
-ensure_lib                  ./libraries/lpm_ver         
-vmap       lpm_ver          ./libraries/lpm_ver         
-ensure_lib                  ./libraries/sgate_ver       
-vmap       sgate_ver        ./libraries/sgate_ver       
-ensure_lib                  ./libraries/altera_mf_ver   
-vmap       altera_mf_ver    ./libraries/altera_mf_ver   
-ensure_lib                  ./libraries/altera_lnsim_ver
-vmap       altera_lnsim_ver ./libraries/altera_lnsim_ver
-ensure_lib                  ./libraries/fiftyfivenm_ver 
-vmap       fiftyfivenm_ver  ./libraries/fiftyfivenm_ver 
-ensure_lib         ./libraries/DDR_IO8
-vmap       DDR_IO8 ./libraries/DDR_IO8
+ensure_lib          ./libraries/     
+ensure_lib          ./libraries/work/
+vmap       work     ./libraries/work/
+vmap       work_lib ./libraries/work/
+if ![ string match "*Intel*FPGA*" [ vsim -version ] ] {
+  ensure_lib                  ./libraries/altera_ver/      
+  vmap       altera_ver       ./libraries/altera_ver/      
+  ensure_lib                  ./libraries/lpm_ver/         
+  vmap       lpm_ver          ./libraries/lpm_ver/         
+  ensure_lib                  ./libraries/sgate_ver/       
+  vmap       sgate_ver        ./libraries/sgate_ver/       
+  ensure_lib                  ./libraries/altera_mf_ver/   
+  vmap       altera_mf_ver    ./libraries/altera_mf_ver/   
+  ensure_lib                  ./libraries/altera_lnsim_ver/
+  vmap       altera_lnsim_ver ./libraries/altera_lnsim_ver/
+  ensure_lib                  ./libraries/fiftyfivenm_ver/ 
+  vmap       fiftyfivenm_ver  ./libraries/fiftyfivenm_ver/ 
+}
+ensure_lib         ./libraries/DDR_IO8/
+vmap       DDR_IO8 ./libraries/DDR_IO8/
 
 # ----------------------------------------
 # Compile device library files
 alias dev_com {
   echo "\[exec\] dev_com"
-  eval vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_primitives.v"              -work altera_ver      
-  vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/220model.v"                       -work lpm_ver         
-  vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/sgate.v"                          -work sgate_ver       
-  vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_mf.v"                      -work altera_mf_ver   
-  vlog  $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS      "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_lnsim.sv"                  -work altera_lnsim_ver
-  vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/fiftyfivenm_atoms.v"              -work fiftyfivenm_ver 
-  vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/aldec/fiftyfivenm_atoms_ncrypt.v" -work fiftyfivenm_ver 
+  if ![ string match "*Intel*FPGA*" [ vsim -version ] ] {
+    eval  vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS     "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_primitives.v"               -work altera_ver      
+    eval  vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS     "$QUARTUS_INSTALL_DIR/eda/sim_lib/220model.v"                        -work lpm_ver         
+    eval  vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS     "$QUARTUS_INSTALL_DIR/eda/sim_lib/sgate.v"                           -work sgate_ver       
+    eval  vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS     "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_mf.v"                       -work altera_mf_ver   
+    eval  vlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QUARTUS_INSTALL_DIR/eda/sim_lib/altera_lnsim.sv"                   -work altera_lnsim_ver
+    eval  vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS     "$QUARTUS_INSTALL_DIR/eda/sim_lib/fiftyfivenm_atoms.v"               -work fiftyfivenm_ver 
+    eval  vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS     "$QUARTUS_INSTALL_DIR/eda/sim_lib/mentor/fiftyfivenm_atoms_ncrypt.v" -work fiftyfivenm_ver 
+  }
 }
 
 # ----------------------------------------
 # Compile the design files in correct order
 alias com {
   echo "\[exec\] com"
-  eval  vlog  $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS      "$QSYS_SIMDIR/altera_gpio_lite/altera_gpio_lite.sv" -work DDR_IO8
-  eval  vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/DDR_IO8.v"                                         
+  eval  vlog -sv $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS "$QSYS_SIMDIR/altera_gpio_lite/altera_gpio_lite.sv" -work DDR_IO8
+  eval  vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS     "$QSYS_SIMDIR/DDR_IO8.v"                                         
 }
 
 # ----------------------------------------
 # Elaborate top level design
 alias elab {
   echo "\[exec\] elab"
-  eval vsim +access +r -t ps $ELAB_OPTIONS -L work -L DDR_IO8 -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L fiftyfivenm_ver $TOP_LEVEL_NAME
+  eval vsim -t ps $ELAB_OPTIONS $USER_DEFINED_ELAB_OPTIONS -L work -L work_lib -L DDR_IO8 -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L fiftyfivenm_ver $TOP_LEVEL_NAME
 }
 
 # ----------------------------------------
-# Elaborate the top level design with -dbg -O2 option
+# Elaborate the top level design with -voptargs=+acc option
 alias elab_debug {
   echo "\[exec\] elab_debug"
-  eval vsim -dbg -O2 +access +r -t ps $ELAB_OPTIONS -L work -L DDR_IO8 -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L fiftyfivenm_ver $TOP_LEVEL_NAME
+  eval vsim -voptargs=+acc -t ps $ELAB_OPTIONS $USER_DEFINED_ELAB_OPTIONS -L work -L work_lib -L DDR_IO8 -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L fiftyfivenm_ver $TOP_LEVEL_NAME
 }
 
 # ----------------------------------------
@@ -219,7 +213,7 @@ alias ld "
 "
 
 # ----------------------------------------
-# Compile all the design files and elaborate the top level design with -dbg -O2
+# Compile all the design files and elaborate the top level design with -voptargs=+acc
 alias ld_debug "
   dev_com
   com
@@ -239,11 +233,11 @@ alias h {
   echo
   echo "elab                                              -- Elaborate top level design"
   echo
-  echo "elab_debug                                        -- Elaborate the top level design with -dbg -O2 option"
+  echo "elab_debug                                        -- Elaborate the top level design with -voptargs=+acc option"
   echo
   echo "ld                                                -- Compile all the design files and elaborate the top level design"
   echo
-  echo "ld_debug                                          -- Compile all the design files and elaborate the top level design with -dbg -O2"
+  echo "ld_debug                                          -- Compile all the design files and elaborate the top level design with -voptargs=+acc"
   echo
   echo 
   echo

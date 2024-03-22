@@ -6,14 +6,12 @@
 
 `timescale 1 ps / 1 ps
 module DDR_IO8 (
-		input  wire        inclock,    //    inclock.export
-		input  wire        inclocken,  //  inclocken.export
-		input  wire        outclock,   //   outclock.export
-		input  wire        outclocken, // outclocken.export
-		output wire [15:0] dout,       //       dout.export
-		input  wire [15:0] din,        //        din.export
-		inout  wire [7:0]  pad_io,     //     pad_io.export
-		input  wire [7:0]  oe          //         oe.export
+		input  wire        inclock,  //  inclock.export
+		input  wire        outclock, // outclock.export
+		output wire [15:0] dout,     //     dout.export
+		input  wire [15:0] din,      //      din.export
+		inout  wire [7:0]  pad_io,   //   pad_io.export
+		input  wire [7:0]  oe        //       oe.export
 	);
 
 	altera_gpio_lite #(
@@ -27,10 +25,10 @@ module DDR_IO8 (
 		.OPEN_DRAIN_OUTPUT                        ("false"),
 		.ENABLE_OE_PORT                           ("true"),
 		.ENABLE_NSLEEP_PORT                       ("false"),
-		.ENABLE_CLOCK_ENA_PORT                    ("true"),
+		.ENABLE_CLOCK_ENA_PORT                    ("false"),
 		.SET_REGISTER_OUTPUTS_HIGH                ("false"),
 		.INVERT_OUTPUT                            ("false"),
-		.INVERT_INPUT_CLOCK                       ("false"),
+		.INVERT_INPUT_CLOCK                       ("true"),
 		.USE_ONE_REG_TO_DRIVE_OE                  ("false"),
 		.USE_DDIO_REG_TO_DRIVE_OE                 ("false"),
 		.USE_ADVANCED_DDR_FEATURES                ("false"),
@@ -43,14 +41,14 @@ module DDR_IO8 (
 		.INVERT_OE_INCLOCK                        ("false"),
 		.ENABLE_PHASE_DETECTOR_FOR_CK             ("false")
 	) ddr_io8_inst (
-		.inclock         (inclock),     //    inclock.export
-		.inclocken       (inclocken),   //  inclocken.export
-		.outclock        (outclock),    //   outclock.export
-		.outclocken      (outclocken),  // outclocken.export
-		.dout            (dout),        //       dout.export
-		.din             (din),         //        din.export
-		.pad_io          (pad_io),      //     pad_io.export
-		.oe              (oe),          //         oe.export
+		.inclock         (inclock),     //  inclock.export
+		.outclock        (outclock),    // outclock.export
+		.dout            (dout),        //     dout.export
+		.din             (din),         //      din.export
+		.pad_io          (pad_io),      //   pad_io.export
+		.oe              (oe),          //       oe.export
+		.inclocken       (1'b1),        // (terminated)
+		.outclocken      (1'b1),        // (terminated)
 		.fr_clock        (),            // (terminated)
 		.hr_clock        (),            // (terminated)
 		.invert_hr_clock (1'b0),        // (terminated)
@@ -109,9 +107,9 @@ endmodule
 // Retrieval info: 	<generic name="gui_enable_aset_port" value="false" />
 // Retrieval info: 	<generic name="gui_enable_sclr_port" value="false" />
 // Retrieval info: 	<generic name="gui_set_registers_to_power_up_high" value="false" />
-// Retrieval info: 	<generic name="gui_clock_enable" value="true" />
+// Retrieval info: 	<generic name="gui_clock_enable" value="false" />
 // Retrieval info: 	<generic name="gui_invert_output" value="false" />
-// Retrieval info: 	<generic name="gui_invert_input_clock" value="false" />
+// Retrieval info: 	<generic name="gui_invert_input_clock" value="true" />
 // Retrieval info: 	<generic name="gui_use_register_to_drive_obuf_oe" value="false" />
 // Retrieval info: 	<generic name="gui_use_ddio_reg_to_drive_oe" value="false" />
 // Retrieval info: 	<generic name="gui_use_advanced_ddr_features" value="false" />

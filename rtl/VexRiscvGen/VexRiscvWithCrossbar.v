@@ -1,5 +1,6 @@
 // Generator : SpinalHDL v1.10.1    git head : 2527c7c6b0fb0f95e5e1a5722a0be732b364ce43
 // Component : VexRiscvWithCrossbar
+// Git hash  : 2f0ba061043b6e3fcdc2394d2dd9df7d5662b7e6
 
 `timescale 1ns/1ps
 
@@ -4976,9 +4977,6 @@ module VexRiscv (
   assign _zz_execute_BranchPlugin_branch_src2_8 = execute_INSTRUCTION[20];
   assign _zz_execute_BranchPlugin_branch_src2_9 = execute_INSTRUCTION[31];
   assign _zz_execute_BranchPlugin_branch_src2_10 = execute_INSTRUCTION[7];
-  initial begin
-    $readmemb("VexRiscvWithCrossbar.v_toplevel_cpu_RegFilePlugin_regFile.bin",RegFilePlugin_regFile);
-  end
   always @(posedge clk) begin
     if(_zz_decode_RegFilePlugin_rs1Data) begin
       _zz_RegFilePlugin_regFile_port0 <= RegFilePlugin_regFile[decode_RegFilePlugin_regFileReadAddress1];

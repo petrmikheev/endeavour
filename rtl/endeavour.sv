@@ -8,15 +8,15 @@ module Endeavour(
   inout  [15:0] DDR_DQ,
   inout  [1:0]  DDR_DQS,
   output [12:0] DDR_A,
-	output [1:0]  DDR_BA,
-	output [3:0]  DDR_nCS,
-	output        DDR_CK,
-	output        DDR_nCK,
-	output        DDR_CKE,
-	output        DDR_nWE,
-	output        DDR_nCAS,
-	output        DDR_nRAS,
-	output [1:0]  DDR_DM,
+  output [1:0]  DDR_BA,
+  output [3:0]  DDR_nCS,
+  output        DDR_CK,
+  output        DDR_nCK,
+  output        DDR_CKE,
+  output        DDR_nWE,
+  output        DDR_nCAS,
+  output        DDR_nRAS,
+  output [1:0]  DDR_DM,
   /*DVI_D.I dvi_interface,
   SDCARD.I sdcard_interface,
   ETH.I ethernet_interface,
@@ -30,22 +30,23 @@ module Endeavour(
   inout usb_host2_dp
 );
   
-  wire clk;
+  wire clk, ram_dqs_clk;
   reg reset = 1;
   
-  PLL pll(.inclk0(clk100mhz), .c0(clk));
+  PLL pll(.inclk0(clk100mhz), .c0(clk), .c1(ram_dqs_clk));
 
-`ifndef IVERILOG
-  reg [15:0] reset_counter = '0;
-`else
-  reg [3:0] reset_counter = '0;
-`endif
+  parameter SIMULATION = 0;
+  defparam uart_ctrl.SIMULATION = SIMULATION;
+
+  reg [SIMULATION ? 3 : 15:0] reset_counter = '0;
 
   always @(posedge clk) begin
     if (keys[0]) begin
       reset_counter <= '0;
       reset <= 1;
     end else begin
+      // reset_counter adds a delay about 0.6-0.7ms to prevent reset button jitter
+      // and to give time for PLL to stabilize frequency. In simulation delay is reduced.
       reset_counter <= reset_counter + 1'b1;
       if (&reset_counter) reset <= 0;
     end
@@ -113,6 +114,11 @@ module Endeavour(
   wire          axi4_ram_r_ready;
   wire [31:0]   axi4_ram_r_payload_data;
   wire          axi4_ram_r_payload_last;
+  reg     axi4_ram_payload_id;
+
+  always @(posedge clk) begin
+    if (axi4_ram_arw_valid & axi4_ram_arw_ready) axi4_ram_payload_id <= axi4_ram_arw_payload_id;
+  end
 
   VexRiscvWithCrossbar core(
     .clk(clk), .reset(reset),
@@ -131,7 +137,7 @@ module Endeavour(
     .io_axi4_ram_arw_payload_addr(axi4_ram_arw_payload_addr),
     .io_axi4_ram_arw_payload_id(axi4_ram_arw_payload_id),
     .io_axi4_ram_arw_payload_len(axi4_ram_arw_payload_len),
-    .io_axi4_ram_arw_payload_write(ram_arw_payload_write),
+    .io_axi4_ram_arw_payload_write(axi4_ram_arw_payload_write),
     .io_axi4_ram_arw_payload_size(axi4_ram_arw_payload_size),    // expected to be always 3'b010 (4 bytes transfer)
     .io_axi4_ram_arw_payload_burst(axi4_ram_arw_payload_burst),  // expected to be always 2'b01  (INCR)
     .io_axi4_ram_w_valid(axi4_ram_w_valid),
@@ -141,11 +147,11 @@ module Endeavour(
     .io_axi4_ram_w_payload_last(axi4_ram_w_payload_last),
     .io_axi4_ram_b_valid(axi4_ram_b_valid),
     .io_axi4_ram_b_ready(axi4_ram_b_ready),
-    .io_axi4_ram_b_payload_id('0),
+    .io_axi4_ram_b_payload_id(axi4_ram_payload_id),
     .io_axi4_ram_r_valid(axi4_ram_r_valid),
-    .io_axi4_ram_r_ready(aix4_ram_r_ready),
+    .io_axi4_ram_r_ready(axi4_ram_r_ready),
     .io_axi4_ram_r_payload_data(axi4_ram_r_payload_data),
-    .io_axi4_ram_r_payload_id('0),
+    .io_axi4_ram_r_payload_id(axi4_ram_payload_id),
     .io_axi4_ram_r_payload_last(axi4_ram_r_payload_last)
   );
   
@@ -157,7 +163,7 @@ module Endeavour(
   assign DDR_nCS = {3'b0, ram_nCS};
 
   ddr_sdram_ctrl #(
-    .READ_BUFFER(1),
+    .READ_BUFFER(0),
     .BA_BITS(2),
     .ROW_BITS(13),
     .COL_BITS(10),
@@ -167,7 +173,7 @@ module Endeavour(
     .tR2I(8'd2)
   ) ram_ctrl (
     .clk(clk),
-    .dqs_clk(clk),
+    .dqs_clk(ram_dqs_clk),
     .reset(reset),
     // AXI4 interface
     .awvalid(axi4_ram_arw_valid & axi4_ram_arw_payload_write),
@@ -186,9 +192,9 @@ module Endeavour(
     .bvalid(axi4_ram_b_valid),
     .bready(axi4_ram_b_ready),
     .rvalid(axi4_ram_r_valid),
-    .rready(axi4_ram_rready),
+    .rready(axi4_ram_r_ready),
     .rlast(axi4_ram_r_payload_last),
-    .rdata(aix4_ram_r_payload_data),
+    .rdata(axi4_ram_r_payload_data),
     // DDR SDRAM interface
     .ddr_ras_n(DDR_nRAS),
     .ddr_cas_n(DDR_nCAS),
