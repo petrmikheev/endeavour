@@ -1,6 +1,9 @@
 *.bak
 *.vcd
 *.vvp
+*.elf
+*.bin
+~*
 .bsp
 VexRiscvWithCrossbar.v_toplevel_cpu_RegFilePlugin_regFile.bin
 hardware/endeavour-backups
@@ -12,4 +15,4 @@ rtl/db
 rtl/incremental_db
 rtl/output_files
 rtl/simulation
-software/bootloader/*.{bin,elf}
+software/.clangd
