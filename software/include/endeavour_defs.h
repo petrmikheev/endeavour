@@ -3,26 +3,36 @@
 
 #define CPU_FREQ 96000000
 
-#define BOOTLOADER_ROM_ADDR 0x40000000
-#define BOOTLOADER_ROM_SIZE 0x1000
+#define BIOS_ROM_ADDR 0x40000000
+#define BIOS_ROM_SIZE 0x1000
 
 #define INTERNAL_RAM_ADDR 0x40001000
 #define INTERNAL_RAM_SIZE 0x3000
 
 #define EXTERNAL_RAM_ADDR 0x80000000
-#define EXTERNAL_RAM_SIZE 0x10000000
+#define EXTERNAL_RAM_SIZE 0x08000000
 
-#define GPIO_ADDR 0x100000
-#define KEY0 1
-#define KEY1 2
-#define KEY2 4
-#define LED0 8
-#define LED1 16
-#define LED2 32
+// IO registers
 
-#define UART_RX_ADDR 0x100010
-#define UART_TX_ADDR 0x100014
-#define UART_DIVISOR_ADDR 0x100018
+#define UART_RX 0x100
+#define UART_TX 0x104
+#define UART_DIVISOR 0x108
+
+#define SDCARD_CMD 0x200
+#define SDCARD_ARG 0x204
+#define SDCARD_FIFO0 0x208
+#define SDCARD_FIFO1 0x20C
+#define SDCARD_PHY 0x210
+
+#define BOARD_LEDS 0x300
+#define BOARD_KEYS 0x304
+
+#define IO_PORT(X) (*(volatile int*)(X))
+
+#define bios_reset  ((void (*)())                (BIOS_ROM_ADDR + 0x0))
+#define bios_putc   ((void (*)(char))            (BIOS_ROM_ADDR + 0x4))
+#define bios_printf ((void (*)(const char*, ...))(BIOS_ROM_ADDR + 0x8))
+#define bios_sscanf ((int  (*)(const char*, ...))(BIOS_ROM_ADDR + 0xC))
 
 #endif  // ENDEAVOUR_DEFS_H
 

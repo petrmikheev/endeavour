@@ -3,10 +3,10 @@
 .section .text.startup
 .global _start
 _start:
-    li t0, CPU_FREQ / 115200 - 1
-    li t1, UART_DIVISOR_ADDR
-    sw t0, 0(t1) // set UART baud rate to 115200
+    j start       # bios_reset
+    j putc_impl   # bios_putc
+    j printf_impl # bios_printf
+    j sscanf_impl # bios_sscanf
+start:
     li sp, INTERNAL_RAM_ADDR + INTERNAL_RAM_SIZE
-    jal ra, main
-inf_loop:
-    j inf_loop
+    j main
