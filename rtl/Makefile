@@ -6,8 +6,8 @@ build: output_files/endeavour.sof endeavour.svf endeavour_flash.svf
 VexRiscvGen/VexRiscvWithCrossbar.v: VexRiscvGen/src/main/scala/endeavour/VexRiscvGen.scala
 	cd VexRiscvGen && sbt 'runMain endeavour.VexRiscvGen' && cd ..
 
-output_files/endeavour.sof: endeavour.qpf endeavour.qsf endeavour.sv $(sources) ../software/bootloader/bootloader.hex
-	quartus_sh --flow compile endeavour.qpf
+#output_files/endeavour.sof: endeavour.qpf endeavour.qsf endeavour.sv $(sources) ../software/bootloader/bootloader.hex
+#	quartus_sh --flow compile endeavour.qpf
 
 endeavour.svf: output_files/endeavour.sof
 	quartus_cpf -c -q 10MHz -g 3.3 -n v output_files/endeavour.sof $@

@@ -102,7 +102,7 @@ reg  output_enable=1'b0, output_enable_d1=1'b0, output_enable_d2=1'b0;
 //   constants defination and assignment
 // -------------------------------------------------------------------------------------
 localparam [ROW_BITS-1:0] DDR_A_DEFAULT      = 'b0100_0000_0000;
-localparam [ROW_BITS-1:0] DDR_A_EMR          = 'b0000_0000_0010;  // 0x2  -> weak drive strength
+localparam [ROW_BITS-1:0] DDR_A_EMR          = 'b0000_0000_0000;  // or 0x2  -> weak drive strength
 localparam [ROW_BITS-1:0] DDR_A_MR0          = 'b0001_0010_1001;  // 0x29 -> CL2, burst length 2, interleave
 localparam [ROW_BITS-1:0] DDR_A_MR_CLEAR_DLL = 'b0000_0010_1001;
 
@@ -119,14 +119,14 @@ initial ddr_a = DDR_A_DEFAULT;
 // -------------------------------------------------------------------------------------
 always @ (posedge clk)
     if(reset) begin
-        ref_cnt <= 10'd0;
+        ref_cnt <= tREFC;
         ref_idle <= 3'd1;
     end else begin
         if(init_done) begin
-            if(ref_cnt<tREFC) begin
-                ref_cnt <= ref_cnt + 10'd1;
+            if (|ref_cnt) begin
+                ref_cnt <= ref_cnt - 10'd1;
             end else begin
-                ref_cnt <= 10'd0;
+                ref_cnt <= tREFC;
                 ref_idle <= ref_idle + 3'd1;
             end
         end
@@ -135,8 +135,8 @@ always @ (posedge clk)
 // -------------------------------------------------------------------------------------
 //   DDR clock
 // -------------------------------------------------------------------------------------
-assign ddr_ck_p = ~clk;
-assign ddr_ck_n = clk;
+assign ddr_ck_p = dqs_clk; //~clk;
+assign ddr_ck_n = ~dqs_clk; //clk;
 assign ddr_cke = ~ddr_cs_n;
 
 // -------------------------------------------------------------------------------------
@@ -168,16 +168,16 @@ always @ (posedge clk)
         case(stat)
             RESET: begin
                 cnt <= cnt + 8'd1;
-                if(cnt<8'd13) begin
-                end else if(cnt<8'd50) begin
+                if(cnt[5:0]<8'd13) begin
+                end else if(cnt[5:0]<8'd50) begin
                     ddr_cs_n <= 1'b0;
-                end else if(cnt<8'd51) begin
+                end else if(cnt[5:0]<8'd51) begin
                     ddr_ras_n <= 1'b0;
                     ddr_we_n <= 1'b0;
-                end else if(cnt<8'd53) begin
+                end else if(cnt[5:0]<8'd53) begin
                     ddr_ras_n <= 1'b1;
                     ddr_we_n <= 1'b1;
-                end else if(cnt<8'd54) begin
+                end else if(cnt[5:0]<8'd54) begin
                     ddr_ras_n <= 1'b0;
                     ddr_cas_n <= 1'b0;
                     ddr_we_n <= 1'b0;
@@ -232,13 +232,13 @@ always @ (posedge clk)
                 end else if(cnt<8'd3) begin
                     ddr_ras_n <= 1'b1;
                     ddr_we_n <= 1'b1;
-                end else if(cnt<8'd4) begin
+                end else if(cnt == 8'd4) begin
                     ddr_ras_n <= 1'b0;
                     ddr_cas_n <= 1'b0;
                 end else if(cnt<8'd10) begin
                     ddr_ras_n <= 1'b1;
                     ddr_cas_n <= 1'b1;
-                end else if(cnt<8'd11) begin
+                end else if(cnt == 8'd11) begin
                     ddr_ras_n <= 1'b0;
                     ddr_cas_n <= 1'b0;
                 end else if(cnt<8'd17) begin

@@ -160,7 +160,7 @@ module Endeavour(
   assign axi4_ram_arw_ready = axi4_ram_arw_payload_write ? ddr_awready : ddr_arready;
   
   wire ram_nCS;
-  assign DDR_nCS = {3'b0, ram_nCS};
+  assign DDR_nCS = 4'b0; //{ram_nCS, ram_nCS, ram_nCS, ram_nCS}; //{3'b0, ram_nCS};
 
   ddr_sdram_ctrl #(
     .READ_BUFFER(0),
@@ -168,9 +168,9 @@ module Endeavour(
     .ROW_BITS(13),
     .COL_BITS(10),
     .DQ_LEVEL(2),
-    .tREFC(10'd650),
-    .tW2I(8'd2),
-    .tR2I(8'd2)
+    .tREFC(10'd256),//650),
+    .tW2I(8'd7), // 2
+    .tR2I(8'd7)  // 2
   ) ram_ctrl (
     .clk(clk),
     .dqs_clk(ram_dqs_clk),
