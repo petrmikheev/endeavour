@@ -6,8 +6,15 @@
 *.qws
 ~*
 .bsp
+.qsys_edit
 hardware/endeavour-backups
 mbftdi
+rtl/spinal/target
+rtl/spinal/project
+rtl/board_rev1/db
+rtl/board_rev1/incremental_db
+rtl/board_rev1/output_files
+rtl/board_rev1/simulation
 rtl_old/.qsys_edit
 rtl_old/VexRiscvGen/project
 rtl_old/VexRiscvGen/target
