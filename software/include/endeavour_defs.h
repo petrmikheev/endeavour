@@ -16,7 +16,13 @@
 
 #define UART_RX 0x100
 #define UART_TX 0x104
-#define UART_DIVISOR 0x108
+#define UART_CFG 0x108
+
+#define UART_BAUD_RATE(X) (CPU_FREQ / X - 1)
+#define UART_PARITY_NONE  0
+#define UART_PARITY_EVEN  (1<<16)
+#define UART_PARITY_ODD   (3<<16)
+#define UART_CSTOPB       (4<<16)
 
 #define SDCARD_CMD 0x200
 #define SDCARD_ARG 0x204

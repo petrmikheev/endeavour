@@ -13,7 +13,7 @@ static void wait(volatile int i) {
 char UART_getc() {
   int x;
   do { x = IO_PORT(UART_RX); } while (x < 0);
-  if (x > 0xff) IO_PORT(BOARD_LEDS) |= 0x4;  // third LED means UART framing error
+  if (x > 0xff) IO_PORT(BOARD_LEDS) |= 0x4;  // third LED means UART error
   return (char)x;
 }
 
@@ -22,11 +22,10 @@ void UART_read(char* dst, int size, unsigned expected_crc) {
   for (int i = 0; i < size; ++i) {
     int x;
     do { x = IO_PORT(UART_RX); } while (x < 0);
-    if (x > 0xff) {
-      IO_PORT(BOARD_LEDS) |= 0x4;
+    if (x > 0x1ff) {
       bios_printf("Framing error at pos %d\n", i);
       while (1) {
-        wait(1000);
+        wait(16384);
         if (IO_PORT(UART_RX) < 0) {
           IO_PORT(UART_RX) = 0;
           return;
@@ -34,7 +33,12 @@ void UART_read(char* dst, int size, unsigned expected_crc) {
         while (IO_PORT(UART_RX) >= 0);
       }
     }
-    *(dst++) = (char)x;
+    if (x < 0x100) {
+      *(dst++) = (char)x;
+    } else {
+      bios_printf("Parity error at pos %d\n", i);
+      x = *(dst++);  // use value from memory to calculate CRC
+    }
     for (int j = 0; j < 8; ++j) {
       int b = (x ^ ncrc) & 1;
       ncrc >>= 1;
@@ -42,15 +46,19 @@ void UART_read(char* dst, int size, unsigned expected_crc) {
       if (b) ncrc ^= 0xedb88320;
     }
   }
-  unsigned crc = ~ncrc;
-  if (expected_crc && expected_crc != crc) {
-    bios_printf("CRC error %8x != %8x\n", crc, expected_crc);
+  if (expected_crc) {
+    unsigned crc = ~ncrc;
+    if (expected_crc == crc) {
+      bios_printf("CRC OK\n");
+    } else {
+      bios_printf("CRC error %8x != %8x\n", crc, expected_crc);
+    }
   }
 }
 
 int main() {
   IO_PORT(BOARD_LEDS) = 0x1;  // first LED on, means that bootloader has started
-  IO_PORT(UART_DIVISOR) = CPU_FREQ / 115200 - 1;  // set UART baud rate to 115200
+  IO_PORT(UART_CFG) = UART_BAUD_RATE(115200) | UART_PARITY_EVEN | UART_CSTOPB;
   while (IO_PORT(UART_RX) >= 0);  // clear UART input buffer
   IO_PORT(UART_RX) = 0;  // clear error flag
 

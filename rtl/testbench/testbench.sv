@@ -162,6 +162,7 @@ module testbench;
       for (i = 0; i < 8; i = i + 1) begin
         uart_rx = uart_byte[i]; #UART_BIT_TIME;
       end
+      uart_rx = ^uart_byte; #UART_BIT_TIME;  // parity bit
       /*if (uart_send_count == 57) begin  // simulate framing error
         uart_rx = 0;
         #(UART_BIT_TIME*2/3);
