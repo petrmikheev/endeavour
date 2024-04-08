@@ -4,6 +4,8 @@
 *.elf
 *.bin
 *.qws
+*.svf
+*.hex
 ~*
 .bsp
 .qsys_edit

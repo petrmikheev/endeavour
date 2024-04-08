@@ -22,6 +22,12 @@ void UART_read(char* dst, int size, unsigned expected_crc) {
   for (int i = 0; i < size; ++i) {
     int x;
     do { x = IO_PORT(UART_RX); } while (x < 0);
+    if (x >= 0x100) {
+      unsigned low = IO_PORT(0x10c);
+      unsigned high = IO_PORT(0x10c);
+      unsigned tx = IO_PORT(UART_TX);
+      bios_printf("DBG %4B%4B %d %d\n", high, low, (tx>>8)&0xff, tx&0xff);
+    }
     if (x > 0x1ff) {
       bios_printf("Framing error at pos %d\n", i);
       while (1) {

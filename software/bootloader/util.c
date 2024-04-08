@@ -43,6 +43,7 @@ void printf_impl(const char* fmt, unsigned a1, unsigned a2, unsigned a3, unsigne
     if (f == 0) break;
     unsigned a = *arg;
     switch (f) {
+      case 'B': print_number(a, 2, width * 8); break;
       case 'x': print_number(a, 16, width); break;
       case 'c': putc_impl(a); break;
       case 'd':

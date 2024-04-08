@@ -13,12 +13,11 @@ module testbench;
   reg clk100mhz = 0;
   always #5 clk100mhz = ~clk100mhz;
 
-  //wire [2:0] leds;
-  //reg [2:0] keys = 3'b110;
-  
+  wire [2:0] leds;
+
   reg uart_rx = 1;
   wire uart_tx;
-  
+
   /*wire [15:0] DDR_DQ;
   wire [1:0]  DDR_DQS;
   wire [12:0] DDR_A;
@@ -41,8 +40,8 @@ module testbench;
   EndeavourSoc system(
     .io_clk100mhz(clk100mhz),
     .io_nreset(1'b1),
-    //.keys(keys),
-    //.leds(leds),
+    .io_keys(2'b0),
+    .io_leds(leds),
     .io_uart_rx(uart_rx),
     .io_uart_tx(uart_tx),
     /*.DDR_DQ(DDR_DQ),
@@ -139,7 +138,7 @@ module testbench;
         //testbench.system.ram_ctrl
     //);
 
-    #1000000;
+    #4000000;
     $finish;
   end
   integer uart_send_count = 0;
@@ -162,7 +161,9 @@ module testbench;
       for (i = 0; i < 8; i = i + 1) begin
         uart_rx = uart_byte[i]; #UART_BIT_TIME;
       end
-      uart_rx = ^uart_byte; #UART_BIT_TIME;  // parity bit
+      uart_rx = ^uart_byte;
+      // if (uart_send_count == 40) uart_rx = ~uart_rx;  // simulate parity error
+      #UART_BIT_TIME;  // parity bit
       /*if (uart_send_count == 57) begin  // simulate framing error
         uart_rx = 0;
         #(UART_BIT_TIME*2/3);
