@@ -76,7 +76,7 @@ OnChipRAM internal_ram(
   reg [31:0] data [0:4095];
 
   integer i;
-  integer file = $fopen("../../software/bootloader/bootloader_sim.bin", "rb");
+  integer file = $fopen("../../software/bios/bios_sim.bin", "rb");
   initial begin
     for (i = 0; i < 4096; i = i + 1) data[i] = '0;
     if (!$fread(data, file)) $display("BIOS ROM initialization failed");
