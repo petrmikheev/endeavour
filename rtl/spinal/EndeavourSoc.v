@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.10.1    git head : 2527c7c6b0fb0f95e5e1a5722a0be732b364ce43
 // Component : EndeavourSoc
-// Git hash  : 1ec2f65de6b1815a5dd8a59441e2acc310d030d8
+// Git hash  : 5eee4e67adf412ce31215a38852c5e9ee8befb57
 
 `timescale 1ns/1ps
 
@@ -6712,7 +6712,7 @@ module VexRiscv (
   end
 
   assign CsrPlugin_misa_base = 2'b01;
-  assign CsrPlugin_misa_extensions = 26'h0001000;
+  assign CsrPlugin_misa_extensions = 26'h0001100;
   assign CsrPlugin_mtvec_mode = 2'b00;
   assign _zz_when_CsrPlugin_l1302 = (CsrPlugin_mip_MTIP && CsrPlugin_mie_MTIE);
   assign _zz_when_CsrPlugin_l1302_1 = (CsrPlugin_mip_MSIP && CsrPlugin_mie_MSIE);

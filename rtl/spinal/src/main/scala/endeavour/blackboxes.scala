@@ -5,7 +5,7 @@ import spinal.lib._
 import spinal.lib.bus.amba3.apb.{Apb3, Apb3Config}
 import spinal.lib.bus.amba4.axi._
 
-import endeavour.interfaces.{DVI, UART, SDCARD}
+import endeavour.interfaces._
 
 class Clocking extends BlackBox {
   val io = new Bundle {
@@ -80,6 +80,25 @@ class GpioController extends BlackBox {
   mapClockDomain(clock=io.clk, reset=io.reset)
 }
 
+class DdrSdramController extends BlackBox {
+  val io = new Bundle {
+    val axi = slave(Axi4Shared(Axi4Config(
+      addressWidth = 26,
+      dataWidth = 32,
+      idWidth = 1,
+      useResp = false,
+      useLock = false,
+      useRegion = false,
+      useCache = false,
+      useProt = false,
+      useQos = false,
+      useSize = false
+    )))
+    val ddr = DDR_SDRAM()
+  }
+  noIoPrefix()
+}
+
 class InternalRam(size: BigInt) extends BlackBox {
   val io = new Bundle {
     val clk = in Bool()
@@ -114,6 +133,3 @@ class InternalRam(size: BigInt) extends BlackBox {
   noIoPrefix()
   mapClockDomain(clock=io.clk)
 }*/
-
-/*module Ram_1wrs(
-);*/

@@ -4,7 +4,7 @@ testbench_sources = /home/petya/sdspi/bench/verilog/mdl_*.v
 
 .PHONY: runbench
 runbench: testbench.vvp
-	./testbench.vvp
+	./testbench.vvp $(ARGS)
 
 testbench.vvp: testbench.sv $(sources) $(testbench_sources)
 	l_sources="" ; \

@@ -1,43 +1,37 @@
 #include <endeavour_defs.h>
 
-/*void halt() {
-  IO_PORT(BOARD_LEDS) = 0x0;
-  bios_printf("System halted\n\n");
-  while (1) asm volatile("wfi");
-}*/
+unsigned init_sdcard();  // implemented in sdcard.c
 
 static void wait(volatile int i) {
   while (i > 0) i--;
 }
 
-char UART_getc() {
+void UART_flush() {
+  while (1) {
+    wait(16384);
+    if (IO_PORT(UART_RX) < 0) {
+      IO_PORT(UART_RX) = 0;
+      return;
+    }
+    while (IO_PORT(UART_RX) >= 0);
+  }
+}
+
+int UART_getc() {
   int x;
   do { x = IO_PORT(UART_RX); } while (x < 0);
   if (x > 0xff) IO_PORT(BOARD_LEDS) |= 0x4;  // third LED means UART error
-  return (char)x;
+  return x;
 }
 
 void UART_read(char* dst, int size, unsigned expected_crc) {
   unsigned ncrc = 0xffffffff;
   for (int i = 0; i < size; ++i) {
-    int x;
-    do { x = IO_PORT(UART_RX); } while (x < 0);
-    if (x >= 0x100) {
-      unsigned low = IO_PORT(0x10c);
-      unsigned high = IO_PORT(0x10c);
-      unsigned tx = IO_PORT(UART_TX);
-      bios_printf("DBG %4B%4B %d %d\n", high, low, (tx>>8)&0xff, tx&0xff);
-    }
+    int x = UART_getc();
     if (x > 0x1ff) {
       bios_printf("Framing error at pos %d\n", i);
-      while (1) {
-        wait(16384);
-        if (IO_PORT(UART_RX) < 0) {
-          IO_PORT(UART_RX) = 0;
-          return;
-        }
-        while (IO_PORT(UART_RX) >= 0);
-      }
+      UART_flush();
+      return;
     }
     if (x < 0x100) {
       *(dst++) = (char)x;
@@ -58,30 +52,65 @@ void UART_read(char* dst, int size, unsigned expected_crc) {
       bios_printf("CRC OK\n");
     } else {
       bios_printf("CRC error %8x != %8x\n", crc, expected_crc);
+      UART_flush();
     }
   }
+}
+
+void print_cpu_info() {
+  bios_printf("CPU: rv32im");
+  unsigned isa;
+  asm volatile("csrr %0, 0x301" : "=r" (isa));
+  isa &= ~0x1100;  // exclude 'i', 'm'
+  for (int i = 0; i < 26; ++i) {
+    if (isa & 1) bios_putc('a' + i);
+    isa = isa >> 1;
+  }
+  bios_printf(", 1 core, %uMhz\n", CPU_FREQ / 1000000);
+}
+
+unsigned test_ram_size() {
+  // TODO
+  return 0;
 }
 
 int main() {
   IO_PORT(BOARD_LEDS) = 0x1;  // first LED on, means that bootloader has started
   IO_PORT(UART_CFG) = UART_BAUD_RATE(115200) | UART_PARITY_EVEN | UART_CSTOPB;
   while (IO_PORT(UART_RX) >= 0);  // clear UART input buffer
-  IO_PORT(UART_RX) = 0;  // clear error flag
+  IO_PORT(UART_RX) = 0;  // clear UART framing error flag
 
-  bios_printf("Endeavour\n");
+  RAM_SIZE = test_ram_size();
+  // TODO initialize video in text mode
 
-  if (!(IO_PORT(BOARD_KEYS) & 1)) {
-    // TODO read first 1KB from sdcard
-    bios_printf("Boot from sdcard: not implemented\n");
+  bios_printf(
+      "\n\n"
+      "\t\t\tEndeavour\n"
+      "\t\t\t=========\n\n"
+  );
+  print_cpu_info();
+  bios_printf("RAM: %uMB\n", RAM_SIZE >> 20);
+  SDCARD_SECTOR_COUNT = init_sdcard();
+
+  if ((IO_PORT(BOARD_KEYS) & 1) || SDCARD_SECTOR_COUNT < 2) {
+    // don't boot from sdcard
+  } else if (bios_sdread((unsigned*)BIOS_RAM_ADDR, 0, 2) != 2) {
+    bios_printf("Failed to read SD boot sector\n");
+  } else if (*(unsigned*)(BIOS_RAM_ADDR + 0x3fc) != 0x405a0000) {
+    bios_printf("SD boot sector has no boot signature\n");
+  } else {
+    bios_printf("Boot from SD card\n");
+    IO_PORT(BOARD_LEDS) = 0x2;
+    ((void (*)())BIOS_RAM_ADDR)();
   }
 
   bios_printf(
-    "\nUART console. Commands:\n"
-    "\tW addr val\t\t\t- save 4B to RAM\n"
-    "\tR addr\t\t\t\t- load 4B from RAM\n"
-    "\tSD addr sector\t\t- load sector from sdcard to addr\n"
-    "\tUART addr size crc32  - receive size(decimal) bytes via UART\n"
-    "\tJ addr\t\t\t\t- run code at addr\n\n"
+      "\nUART console. Commands:\n"
+      "\tW addr val\t\t\t- save 4B to RAM\n"
+      "\tR addr\t\t\t\t- load 4B from RAM\n"
+      "\tSD addr sector\t\t- load sector from sdcard to addr\n"
+      "\tUART addr size crc32  - receive size(decimal) bytes via UART\n"
+      "\tJ addr\t\t\t\t- run code at addr\n\n"
   );
 
   while (1) {
@@ -113,7 +142,8 @@ int main() {
         break;
       case 'S':
         if (bios_sscanf(cmd, "SD %x %x", &addr, &val) == 2) {
-          bios_printf("Not implemented\n");
+          int res = bios_sdread((unsigned*)addr, val, 1);
+          if (!res) bios_printf("SD error\n");
           continue;
         }
         break;
@@ -121,8 +151,9 @@ int main() {
         val = 0;
         c = bios_sscanf(cmd, "UART %x %d %x", &addr, &size, &val);
         if (c == 2 || c == 3) {
-          if (addr < INTERNAL_RAM_ADDR || addr + size <= addr) {
+          if (addr < BIOS_RAM_ADDR || addr + size <= addr) {
             bios_printf("Invalid destination\n");
+            UART_flush();
           } else {
             UART_read((char*)addr, size, val);
           }
@@ -138,5 +169,6 @@ int main() {
         break;
     }
     bios_printf("Invalid command\n");
+    UART_flush();
   }
 }

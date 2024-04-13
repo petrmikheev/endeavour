@@ -5,7 +5,7 @@
 module testbench;
 
   parameter CPU_FREQ = 96_000_000;
-  parameter UART_BAUD_RATE = 16_000_000;
+  parameter UART_BAUD_RATE = 48_000_000;
 
   defparam system.clocks.RESET_DELAY = 3;
   defparam system.uart_ctrl.OVERRIDE_DIVISOR = CPU_FREQ / UART_BAUD_RATE - 1;
@@ -61,7 +61,7 @@ module testbench;
     .io_sdcard_data(SD_DATA)
   );
 
-  mdl_sdio sdcard(
+  mdl_sdio #(.OPT_HIGH_CAPACITY(1'b1)) sdcard(
     .sd_clk(SD_CLK),
     .sd_cmd(SD_CMD),
     .sd_dat(SD_DATA)
@@ -93,13 +93,49 @@ module testbench;
     .Dm(DDR_DM), .Dq(DDR_DQ), .Dqs(DDR_DQS)
   );*/
 
-  integer i;
+  wire [31:0] pc_decode = testbench.system.vexRiscv_1.decode_PC;
+  wire [31:0] instr_decode = testbench.system.vexRiscv_1.decode_INSTRUCTION;
+  wire [31:0] instr_execute = testbench.system.vexRiscv_1.execute_INSTRUCTION;
+  wire [31:0] instr_memory = testbench.system.vexRiscv_1.memory_INSTRUCTION;
+  wire [31:0] instr_writeBack = testbench.system.vexRiscv_1.writeBack_INSTRUCTION;
+
+  wire [31:0] reg01_ra = testbench.system.vexRiscv_1.RegFilePlugin_regFile[1];
+  wire [31:0] reg02_sp = testbench.system.vexRiscv_1.RegFilePlugin_regFile[2];
+  wire [31:0] reg03_gp = testbench.system.vexRiscv_1.RegFilePlugin_regFile[3];
+  wire [31:0] reg04_tp = testbench.system.vexRiscv_1.RegFilePlugin_regFile[4];
+  wire [31:0] reg05_t0 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[5];
+  wire [31:0] reg06_t1 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[6];
+  wire [31:0] reg07_t2 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[7];
+  wire [31:0] reg08_s0 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[8];
+  wire [31:0] reg09_s1 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[9];
+  wire [31:0] reg10_a0 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[10];
+  wire [31:0] reg11_a1 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[11];
+  wire [31:0] reg12_a2 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[12];
+  wire [31:0] reg13_a3 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[13];
+  wire [31:0] reg14_a4 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[14];
+  wire [31:0] reg15_a5 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[15];
+  wire [31:0] reg16_a6 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[16];
+  wire [31:0] reg17_a7 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[17];
+  wire [31:0] reg18_s2 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[18];
+  wire [31:0] reg19_s3 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[19];
+  wire [31:0] reg20_s4 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[20];
+  wire [31:0] reg21_s5 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[21];
+  wire [31:0] reg22_s6 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[22];
+  wire [31:0] reg23_s7 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[23];
+  wire [31:0] reg24_s8 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[24];
+  wire [31:0] reg25_s9 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[25];
+  wire [31:0] reg26_s10 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[26];
+  wire [31:0] reg27_s11 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[27];
+  wire [31:0] reg28_t3 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[28];
+  wire [31:0] reg29_t4 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[29];
+  wire [31:0] reg30_t5 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[30];
+  wire [31:0] reg31_t6 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[31];
+
+  integer dump_i;
   initial begin
     $dumpfile("dump.vcd");
     $dumpvars(0, testbench);
     // cpu registers
-    //for (i = 1; i < 32; i = i + 1) $dumpvars(1, testbench.system.core.cpu.RegFilePlugin_regFile[i]);
-    //for (i = 0; i < 32; i = i + 1) $dumpvars(1, testbench.sdcard.mem[i], testbench.sdcard.mem_buf[i]);
     /*$dumpvars(1,
         // cpu instruction
         testbench.system.core.cpu.decode_PC,
@@ -141,25 +177,38 @@ module testbench;
     #4000000;
     $finish;
   end
+
+  // Initialize sdcard content
+  integer sdcard_file;
+  reg [511:0] sdcard_file_path;
+  initial begin
+    if ($value$plusargs("sdcard=%s", sdcard_file_path)) begin
+      sdcard_file = $fopen(sdcard_file_path, "rb");
+      if (!$fread(sdcard.mem, sdcard_file)) $display("Sdcard content initialization failed");
+    end
+  end
+
+  // Send uart
   integer uart_send_count = 0;
   integer uart_file = -1;
+  integer uart_i;
   reg [511:0] uart_file_path;
   initial begin
-    if ($value$plusargs("uart_send=%s", uart_file_path))
+    if ($value$plusargs("uart=%s", uart_file_path))
       uart_file = $fopen(uart_file_path, "rb");
   end
 
   reg [7:0] uart_byte;
   localparam UART_BIT_TIME = 1_000_000_000.0 / UART_BAUD_RATE;
   initial begin
-    #100000;
+    #500000;
     while (uart_file != -1 && !$feof(uart_file)) begin
       uart_send_count = uart_send_count + 1;
       #UART_BIT_TIME;
       uart_rx = 0; #UART_BIT_TIME;
       uart_byte = $fgetc(uart_file);
-      for (i = 0; i < 8; i = i + 1) begin
-        uart_rx = uart_byte[i]; #UART_BIT_TIME;
+      for (uart_i = 0; uart_i < 8; uart_i = uart_i + 1) begin
+        uart_rx = uart_byte[uart_i]; #UART_BIT_TIME;
       end
       uart_rx = ^uart_byte;
       // if (uart_send_count == 40) uart_rx = ~uart_rx;  // simulate parity error

@@ -14,6 +14,7 @@ module GpioController (
 );
 
   reg [2:0] leds_normalized;
+  reg [1:0] keys_normalized;
 
 `ifdef ENDEAVOUR_BOARD_VER1
   assign leds = leds_normalized ^ 3'b011;

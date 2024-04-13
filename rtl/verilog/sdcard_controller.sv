@@ -23,7 +23,13 @@ module SdcardController (
     else if (apb_PREADY) stb_done <= 1'b0;
   end
 
+  wire inverse = &apb_PADDR[4:3];
+  wire [31:0] rdata_be;
+  assign apb_PRDATA = inverse ? {rdata_be[7:0], rdata_be[15:8], rdata_be[23:16], rdata_be[31:24]} : rdata_be;
+
   sdio_top #(
+    //.OPT_LITTLE_ENDIAN(1),
+    .LGFIFO(9),
     .OPT_EMMC(0),
     .OPT_SERDES(0),
     .OPT_DDR(0),
@@ -40,9 +46,9 @@ module SdcardController (
     .i_card_detect(1'b1),
     //.o_int() output wire interrupt
 
-    .i_wb_addr(apb_PADDR[4:2]),
-    .i_wb_data(apb_PWDATA),
-    .o_wb_data(apb_PRDATA),
+    .i_wb_addr({apb_PADDR[4] & ~apb_PADDR[3], apb_PADDR[3:2]}),
+    .i_wb_data(inverse ? {apb_PWDATA[7:0], apb_PWDATA[15:8], apb_PWDATA[23:16], apb_PWDATA[31:24]} : apb_PWDATA),
+    .o_wb_data(rdata_be),
     .o_wb_ack(apb_PREADY),
     .o_wb_stall(stall),
     .i_wb_we(apb_PWRITE),

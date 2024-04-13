@@ -26,17 +26,17 @@ module Clocking(
 
   parameter RESET_DELAY = CLK_FREQ / 1000; // 1ms
 
-  reg [$clog2(RESET_DELAY)-1:0] reset_counter = RESET_DELAY;
+  reg [$clog2(RESET_DELAY)-1:0] reset_counter = $clog2(RESET_DELAY)'(RESET_DELAY);
 
   always @(posedge clk) begin
     if (nreset_in) begin
-      if (|reset_counter)
+      if (reset_counter != 0)
         reset_counter <= reset_counter - 1'b1;
       else
         reset <= 0;
     end else begin
       reset <= 1;
-      reset_counter <= RESET_DELAY;
+      reset_counter <= $clog2(RESET_DELAY)'(RESET_DELAY);
     end
   end
 

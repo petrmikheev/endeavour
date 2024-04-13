@@ -29,6 +29,7 @@ class EndeavourSoc extends Component {
     val uart = UART()
     //val dvi = DVI()
     val sdcard = SDCARD()
+    //val ddr_sdram = DDR_SDRAM()
   }
 
   val clocks = new Clocking()

@@ -3,10 +3,17 @@
 .section .text.startup
 .global _start
 _start:
-    j start       # bios_reset
-    j putc_impl   # bios_putc
-    j printf_impl # bios_printf
-    j sscanf_impl # bios_sscanf
+    j start        # bios_reset
+.align 2
+    j putc_impl    # bios_putc
+.align 2
+    j printf_impl  # bios_printf
+.align 2
+    j sscanf_impl  # bios_sscanf
+.align 2
+    j sdread_impl  # bios_sdread
+.align 2
+    j sdwrite_impl # bios_sdwrite
 start:
-    li sp, INTERNAL_RAM_ADDR + INTERNAL_RAM_SIZE
+    li sp, BIOS_STACK_ADDR
     j main

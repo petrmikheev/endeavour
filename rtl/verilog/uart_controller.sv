@@ -13,8 +13,6 @@ module UartController (
   output [31:0] apb_PRDATA
 );
 
-`define UART_DEBUG
-
   parameter OVERRIDE_DIVISOR = 16'd0;
   parameter FIFO_SIZE = 1024;
   localparam FBITS = $clog2(FIFO_SIZE);
@@ -45,46 +43,6 @@ module UartController (
   reg parity_odd;
   reg cstopb;
 
-`ifdef UART_DEBUG
-  reg selbuf_debug;
-  reg [63:0] debug_buf;
-  reg [31:0] debug_buf_hi;
-  reg [13:0] debug_counter = 0;
-  reg debug_hi;
-  reg www = 0;
-  reg www_buf = 0;
-  reg [7:0] wstart = 8'd255;
-  reg [7:0] wend = 8'd255;
-
-  always @(posedge clk) begin
-    if (debug_counter > 0)
-      debug_counter <= debug_counter - 1'b1;
-    else begin
-      debug_counter <= divisor[15:2];
-      debug_buf <= {debug_buf[62:0], uart_rx};
-    end
-    if (reset) begin
-      selbuf_debug <= 0;
-      debug_hi <= 0;
-    end else begin
-      selbuf_debug <= apb_PSEL & apb_PADDR[3:2] == 2'd3;
-      if (selbuf_debug & apb_PENABLE & ~apb_PWRITE) begin
-        debug_hi <= ~debug_hi;
-        debug_buf_hi <= debug_buf[63:32];
-      end
-    end
-    www_buf <= www;
-    if (www & ~www_buf)
-      wstart <= 0;
-    else if (~&wstart && debug_counter == 0)
-      wstart <= wstart + 1'b1;
-    if (~www & www_buf)
-      wend <= 0;
-    else if (~&wend && debug_counter == 0)
-      wend <= wend + 1'b1;
-  end
-`endif
-
   reg [3:0] read_bit_num = 0;
   reg [15:0] read_state = 0;
   reg [8:0] read_data = 0;
@@ -94,10 +52,7 @@ module UartController (
   assign apb_PREADY = ~selbuf_conf | (tx_empty && write_bit_num == 0);
   assign apb_PRDATA = selbuf_conf     ? {13'b0, cstopb, parity_odd, use_parity, divisor} :
                       selbuf_receiver ? {rx_empty, 21'b0, rx_err, rx_outv} :
-`ifdef UART_DEBUG
-                      selbuf_debug    ? (debug_hi ? debug_buf_hi : debug_buf[31:0]) :
-`endif
-                                        {tx_full, 7'b0, wstart, wend};
+                                        {tx_full, 31'b0};
 
   wire rx_err_clear = selbuf_receiver & apb_PENABLE & apb_PWRITE;
 
@@ -146,8 +101,8 @@ module UartController (
 
       // receive
       if (rx_err_clear) rx_err <= 0;
-      if (|read_bit_num) begin
-        if (|read_state)
+      if (read_bit_num != 0) begin
+        if (read_state != 0)
           read_state <= read_state - 1'b1;
         else begin
           read_bit_num <= read_bit_num - 1'b1;
@@ -156,19 +111,15 @@ module UartController (
             if (uart_rx) begin
               fifo_rx[rx_ina] <= use_parity ? {^{read_data, parity_odd}, read_data[7:0]} : {1'b0, read_data[8:1]};
               rx_ina <= rx_ina + 1'b1;
-              // read_state[13:0] <= {divisor[15:3], 1'b1};
             end else
               if (~rx_err_clear) rx_err <= 1;
           end else read_state <= divisor;
         end
       end else begin
-        if ((read_state == 16'b0) && ~uart_rx) begin
+        if (read_state == 16'b0 && ~uart_rx) begin
           read_state[14:0] <= {divisor[15:3], 2'b01};
-          www <= 1;
-          // read_state[13:0] <= {divisor[15:3], 1'b1};
         end
         if (read_state == 16'b1) begin
-          www <= 0;
           read_state <= divisor;
           read_bit_num <= 4'd9 + use_parity;
           if (~rx_err_clear & uart_rx) rx_err <= 1;
@@ -179,9 +130,9 @@ module UartController (
       end
 
       // transmit
-      if (|write_state) write_state <= write_state - 1'b1;
+      if (write_state != 0) write_state <= write_state - 1'b1;
       else begin
-        if (|write_bit_num) begin
+        if (write_bit_num != 0) begin
           write_bit_num <= write_bit_num - 1'b1;
           {write_data, uart_tx} <= {1'b1, write_data};
           write_state <= divisor;

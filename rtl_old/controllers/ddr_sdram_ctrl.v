@@ -59,7 +59,7 @@ module ddr_sdram_ctrl #(
     output reg                  [           ROW_BITS-1:0] ddr_a,
     output wire                 [((1<<DQ_LEVEL)+1)/2-1:0] ddr_dm,
     inout                       [((1<<DQ_LEVEL)+1)/2-1:0] ddr_dqs,
-    inout                       [      (4<<DQ_LEVEL)-1:0] ddr_dq    
+    inout                       [      (4<<DQ_LEVEL)-1:0] ddr_dq
 );
 
 

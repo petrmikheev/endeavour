@@ -5,7 +5,7 @@ void putc_impl(char c) {
   IO_PORT(UART_TX) = c;
 }
 
-static void print_number(unsigned v, int base, int width) {
+static void print_number(unsigned v, unsigned base, int width) {
   char buf[32];
   char* ptr = buf;
   while (v > 0 || width > 0) {

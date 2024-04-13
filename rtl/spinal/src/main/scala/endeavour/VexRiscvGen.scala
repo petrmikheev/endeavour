@@ -46,7 +46,7 @@ class VexRiscvGen(useCache: Boolean, resetVector: BigInt) {
       marchid        = null,
       mimpid         = null,
       mhartid        = null,
-      misaExtensionsInit = (1<<12 /*M*/),
+      misaExtensionsInit = (1<<8 /*I*/) | (1<<12 /*M*/),
       misaAccess     = CsrAccess.READ_ONLY,
       mtvecAccess    = CsrAccess.WRITE_ONLY,
       mtvecInit      = resetVector,
