@@ -29,7 +29,7 @@ class EndeavourSoc extends Component {
     val uart = UART()
     //val dvi = DVI()
     val sdcard = SDCARD()
-    //val ddr_sdram = DDR_SDRAM()
+    val ddr_sdram = DDR_SDRAM(14)
   }
 
   val clocks = new Clocking()
@@ -54,6 +54,12 @@ class EndeavourSoc extends Component {
   val gpio_ctrl = new GpioController()
   gpio_ctrl.io.leds <> io.leds
   gpio_ctrl.io.keys <> io.keys
+
+  val ram_ctrl = new ddr_sdram_ctrl(rowBits = 14, colBits = 10)
+  ram_ctrl.io.ddr <> io.ddr_sdram
+  ram_ctrl.io.clk <> clocks.io.clk
+  ram_ctrl.io.dqs_clk <> clocks.io.clk_delayed
+  ram_ctrl.io.reset <> clocks.io.reset
 
   val cpu = new VexRiscvGen(useCache=true, resetVector=internalRamBaseAddr)
 
@@ -89,13 +95,13 @@ class EndeavourSoc extends Component {
 
   val axiCrossbar = Axi4CrossbarFactory()
   axiCrossbar.addSlaves(
-    apbBridge.io.axi -> SizeMapping(ioBaseAddr, ioSize),
-    internalRam.io.axi -> SizeMapping(internalRamBaseAddr, internalRamSize)
-    //io.axi4_ram      -> SizeMapping(externalRamBaseAddr, externalRamSize)
+    apbBridge.io.axi   -> SizeMapping(ioBaseAddr, ioSize),
+    internalRam.io.axi -> SizeMapping(internalRamBaseAddr, internalRamSize),
+    ram_ctrl.io.axi    -> SizeMapping(externalRamBaseAddr, externalRamSize)
   )
   axiCrossbar.addConnections(
-    iBus -> List(/*io.axi4_ram,*/ internalRam.io.axi),
-    dBus -> List(/*io.axi4_ram,*/ internalRam.io.axi, apbBridge.io.axi)
+    iBus -> List(ram_ctrl.io.axi, internalRam.io.axi),
+    dBus -> List(ram_ctrl.io.axi, internalRam.io.axi, apbBridge.io.axi)
   )
   axiCrossbar.build()
 

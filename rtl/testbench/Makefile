@@ -1,6 +1,5 @@
-sources = ../verilog/*.sv ../spinal/EndeavourSoc.v /home/petya/sdspi/rtl/sd*.v
-testbench_sources = /home/petya/sdspi/bench/verilog/mdl_*.v
-#testbench_sources = testbench/quartus_ip_sim.sv testbench/micron_ddr_sdram_model.v
+sources = ../verilog/*.sv ../verilog/*.v ../spinal/EndeavourSoc.v /home/petya/sdspi/rtl/sd*.v
+testbench_sources = /home/petya/sdspi/bench/verilog/mdl_*.v micron_ddr_sdram_model.v io_buf.sv
 
 .PHONY: runbench
 runbench: testbench.vvp

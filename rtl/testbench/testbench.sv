@@ -18,18 +18,18 @@ module testbench;
   reg uart_rx = 1;
   wire uart_tx;
 
-  /*wire [15:0] DDR_DQ;
+  wire [15:0] DDR_DQ;
   wire [1:0]  DDR_DQS;
-  wire [12:0] DDR_A;
+  wire [13:0] DDR_A;
   wire [1:0]  DDR_BA;
-  wire [3:0]  DDR_nCS;
+  wire        DDR_nCS;
   wire        DDR_CK;
   wire        DDR_nCK;
   wire        DDR_CKE;
   wire        DDR_nWE;
   wire        DDR_nCAS;
   wire        DDR_nRAS;
-  wire [1:0]  DDR_DM;*/
+  wire [1:0]  DDR_DM;
 
   wire SD_CLK;
   wire SD_CMD;
@@ -44,36 +44,36 @@ module testbench;
     .io_leds(leds),
     .io_uart_rx(uart_rx),
     .io_uart_tx(uart_tx),
-    /*.DDR_DQ(DDR_DQ),
-    .DDR_DQS(DDR_DQS),
-    .DDR_A(DDR_A),
-    .DDR_BA(DDR_BA),
-    .DDR_nCS(DDR_nCS),
-    .DDR_CK(DDR_CK),
-    .DDR_nCK(DDR_nCK),
-    .DDR_CKE(DDR_CKE),
-    .DDR_nWE(DDR_nWE),
-    .DDR_nCAS(DDR_nCAS),
-    .DDR_nRAS(DDR_nRAS),
-    .DDR_DM(DDR_DM)*/
+    .io_ddr_sdram_dq(DDR_DQ),
+    .io_ddr_sdram_dqs(DDR_DQS),
+    .io_ddr_sdram_a(DDR_A),
+    .io_ddr_sdram_ba(DDR_BA),
+    .io_ddr_sdram_cs_n(DDR_nCS),
+    .io_ddr_sdram_ck_p(DDR_CK),
+    .io_ddr_sdram_ck_n(DDR_nCK),
+    .io_ddr_sdram_cke(DDR_CKE),
+    .io_ddr_sdram_we_n(DDR_nWE),
+    .io_ddr_sdram_cas_n(DDR_nCAS),
+    .io_ddr_sdram_ras_n(DDR_nRAS),
+    .io_ddr_sdram_dm(DDR_DM),
     .io_sdcard_clk(SD_CLK),
     .io_sdcard_cmd(SD_CMD),
     .io_sdcard_data(SD_DATA)
   );
 
-  mdl_sdio #(.OPT_HIGH_CAPACITY(1'b1)) sdcard(
+  mdl_sdio #(.OPT_HIGH_CAPACITY(1'b1), .LGMEMSZ(27)) sdcard(
     .sd_clk(SD_CLK),
     .sd_cmd(SD_CMD),
     .sd_dat(SD_DATA)
   );
 
-  // AS4C32M16D1A
-  /*micron_ddr_sdram_model #(
+  // AS4C16M16D1
+  micron_ddr_sdram_model #(
     .DEBUG(0),
     .BA_BITS(2),
-    .ROW_BITS(13),
+    .ROW_BITS(14),
     .COL_BITS(10),
-    .DQ_LEVEL(2)*/
+    .DQ_LEVEL(2)
 /*    .tCK(7.5),     // tCK    ns    Nominal Clock Cycle Time
     .tDQSQ(0.4),   // tDQSQ  ns    DQS-DQ skew, DQS to last DQ valid, per group, per access
     .tMRD(10.0),   // tMRD   ns    Load Mode Register command cycle time
@@ -85,13 +85,13 @@ module testbench;
     .tRP(15.0),    // tRP    ns    Precharge command period
     .tRRD(10.0),   // tRRD   ns    Active bank a to Active bank b command time
     .tWR(15.0)     // tWR    ns    Write recovery time*/
-  /*) ram (
+  ) ram (
     .Clk(DDR_CK), .Clk_n(DDR_nCK), .Cke(DDR_CKE),
-    .Cs_n(DDR_nCS[3]),
+    .Cs_n(DDR_nCS),
     .Ras_n(DDR_nRAS), .Cas_n(DDR_nCAS), .We_n(DDR_nWE),
     .Ba(DDR_BA), .Addr(DDR_A),
     .Dm(DDR_DM), .Dq(DDR_DQ), .Dqs(DDR_DQS)
-  );*/
+  );
 
   wire [31:0] pc_decode = testbench.system.vexRiscv_1.decode_PC;
   wire [31:0] instr_decode = testbench.system.vexRiscv_1.decode_INSTRUCTION;
@@ -131,48 +131,9 @@ module testbench;
   wire [31:0] reg30_t5 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[30];
   wire [31:0] reg31_t6 = testbench.system.vexRiscv_1.RegFilePlugin_regFile[31];
 
-  integer dump_i;
   initial begin
     $dumpfile("dump.vcd");
     $dumpvars(0, testbench);
-    // cpu registers
-    /*$dumpvars(1,
-        // cpu instruction
-        testbench.system.core.cpu.decode_PC,
-        testbench.system.core.cpu.decode_INSTRUCTION,
-        testbench.system.core.cpu.execute_INSTRUCTION,
-        testbench.system.core.cpu.memory_INSTRUCTION,
-        testbench.system.core.cpu.writeBack_INSTRUCTION,
-        // cpu io
-        testbench.system.core.cpu.dBus_cmd_valid,
-        testbench.system.core.cpu.dBus_cmd_ready,
-        testbench.system.core.cpu.dBus_cmd_payload_wr,
-        testbench.system.core.cpu.dBus_cmd_payload_uncached,
-        testbench.system.core.cpu.dBus_cmd_payload_address,
-        testbench.system.core.cpu.dBus_cmd_payload_data,
-        testbench.system.core.cpu.dBus_cmd_payload_mask,
-        testbench.system.core.cpu.dBus_cmd_payload_size,
-        testbench.system.core.cpu.dBus_cmd_payload_last,
-        testbench.system.core.cpu.dBus_rsp_valid,
-        testbench.system.core.cpu.dBus_rsp_payload_last,
-        testbench.system.core.cpu.dBus_rsp_payload_data,
-        testbench.system.core.cpu.dBus_rsp_payload_error,
-        testbench.system.core.cpu.timerInterrupt,
-        testbench.system.core.cpu.externalInterrupt,
-        testbench.system.core.cpu.softwareInterrupt,
-        testbench.system.core.cpu.iBus_cmd_valid,
-        testbench.system.core.cpu.iBus_cmd_ready,
-        testbench.system.core.cpu.iBus_cmd_payload_address,
-        testbench.system.core.cpu.iBus_cmd_payload_size,
-        testbench.system.core.cpu.iBus_rsp_valid,
-        testbench.system.core.cpu.iBus_rsp_payload_data,
-        testbench.system.core.cpu.iBus_rsp_payload_error,*/
-        // ram
-        /*testbench.system.ram_ctrl.ddr_in,
-        testbench.system.ram_ctrl.ddr_out,
-        testbench.system.ram_ctrl.stat*/
-        //testbench.system.ram_ctrl
-    //);
 
     #4000000;
     $finish;

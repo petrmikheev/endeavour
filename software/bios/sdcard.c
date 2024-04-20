@@ -129,6 +129,19 @@ unsigned sdread_impl(unsigned* dst, unsigned sector, unsigned sector_count) {
   return sector_count;
 }*/
 
+static unsigned* receive_sector(unsigned* ptr, long port) {
+  unsigned* end = ptr + 128;
+  while (ptr < end) {
+    /*ptr[0] = IO_PORT(port);
+    ptr[1] = IO_PORT(port);
+    ptr[2] = IO_PORT(port);
+    ptr[3] = IO_PORT(port);
+    ptr += 4;*/
+    *ptr++ = IO_PORT(port);
+  }
+  return ptr;
+}
+
 unsigned sdread_impl(unsigned* dst, unsigned sector, unsigned sector_count) {
   if (sector_count == 0) return 0;
   command(SDIO_CMD | SDIO_R1 | SDIO_MEM | 17, sector);
@@ -140,14 +153,12 @@ unsigned sdread_impl(unsigned* dst, unsigned sector, unsigned sector_count) {
     }
     IO_PORT(SDCARD_DATA) = ++sector;
     IO_PORT(SDCARD_CMD) = (SDIO_CMD | SDIO_R1 | SDIO_MEM | 17) | fifo;
-    fifo ^= SDIO_FIFO;
-    long port = fifo ? SDCARD_FIFO1_LE : SDCARD_FIFO0_LE;
-    for (int i = 0; i < 128; ++i) *dst++ = IO_PORT(port);
+    dst = receive_sector(dst, fifo ? SDCARD_FIFO0_LE : SDCARD_FIFO1_LE);
     while ((cmd=IO_PORT(SDCARD_CMD)) & SDIO_BUSY);
+    fifo ^= SDIO_FIFO;
   }
   if (IO_PORT(SDCARD_CMD) & SDIO_ERR) return sector_count - 1;
-  long port = fifo ? SDCARD_FIFO0_LE : SDCARD_FIFO1_LE;
-  for (int i = 0; i < 128; ++i) *dst++ = IO_PORT(port);
+  receive_sector(dst, fifo ? SDCARD_FIFO0_LE : SDCARD_FIFO1_LE);
   return sector_count;
 }
 

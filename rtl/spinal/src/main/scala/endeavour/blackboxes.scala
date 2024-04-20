@@ -80,10 +80,16 @@ class GpioController extends BlackBox {
   mapClockDomain(clock=io.clk, reset=io.reset)
 }
 
-class DdrSdramController extends BlackBox {
+class ddr_sdram_ctrl(rowBits: Int, colBits: Int) extends BlackBox {
+  addGeneric("ROW_BITS", rowBits)
+  addGeneric("COL_BITS", colBits)
+  addGeneric("DQ_LEVEL", 2)
   val io = new Bundle {
+    val clk = in Bool()
+    val dqs_clk = in Bool()
+    val reset = in Bool()
     val axi = slave(Axi4Shared(Axi4Config(
-      addressWidth = 26,
+      addressWidth = rowBits + colBits + 3,
       dataWidth = 32,
       idWidth = 1,
       useResp = false,
@@ -91,12 +97,28 @@ class DdrSdramController extends BlackBox {
       useRegion = false,
       useCache = false,
       useProt = false,
-      useQos = false,
-      useSize = false
+      useQos = false
     )))
-    val ddr = DDR_SDRAM()
+    val ddr = DDR_SDRAM(rowBits)
   }
   noIoPrefix()
+
+  private def renameIO(): Unit = {
+    io.flatten.foreach(bt => {
+      bt.setName(bt.getName()
+          .replace("axi_w_payload_", "w")
+          .replace("axi_w_", "w")
+          .replace("axi_b_payload_", "b")
+          .replace("axi_b_", "b")
+          .replace("axi_r_payload_", "r")
+          .replace("axi_r_", "r")
+          .replace("axi_arw_payload_", "arw_")
+          .replace("axi_arw_", "arw_")
+      )
+    })
+  }
+
+  addPrePopTask(() => renameIO())
 }
 
 class InternalRam(size: BigInt) extends BlackBox {

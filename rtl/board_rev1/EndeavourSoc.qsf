@@ -126,7 +126,7 @@ set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_keys
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_uart_rx
 set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "6 MHz" -to io_uart_rx
 set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to io_uart_rx
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name VERILOG_FILE ../verilog/ddr_sdram_ctrl.v
 set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/gpio_controller.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../../sdspi/rtl/sdrxframe.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../../sdspi/rtl/sdtxframe.sv
@@ -144,3 +144,97 @@ set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/internal_ram.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/clocking.sv
 set_global_assignment -name QIP_FILE PLL.qip
 set_global_assignment -name QIP_FILE OnChipRAM.qip
+set_global_assignment -name QIP_FILE DDR_IO8.qip
+set_global_assignment -name SIP_FILE DDR_IO8.sip
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[13]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[12]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[11]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[10]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_we_n
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ras_n
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dqs[0]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dqs[1]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dqs
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[0]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[1]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[2]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[3]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[4]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[5]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[6]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[7]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[8]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[10]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[9]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[11]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[12]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[13]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[14]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[15]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dm[0]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dm[1]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dm
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_cs_n
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_cke
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ck_p
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ck_n
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_cas_n
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ba[0]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ba[1]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ba
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[0]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[2]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[1]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[3]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[4]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[5]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[6]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[7]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[8]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[9]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a
+set_location_assignment PIN_46 -to io_ddr_sdram_cas_n
+set_location_assignment PIN_49 -to io_ddr_sdram_ras_n
+set_location_assignment PIN_43 -to io_ddr_sdram_we_n
+set_location_assignment PIN_84 -to io_ddr_sdram_dq[15]
+set_location_assignment PIN_85 -to io_ddr_sdram_dq[14]
+set_location_assignment PIN_86 -to io_ddr_sdram_dq[13]
+set_location_assignment PIN_87 -to io_ddr_sdram_dq[12]
+set_location_assignment PIN_82 -to io_ddr_sdram_dq[11]
+set_location_assignment PIN_80 -to io_ddr_sdram_dq[10]
+set_location_assignment PIN_77 -to io_ddr_sdram_dq[9]
+set_location_assignment PIN_64 -to io_ddr_sdram_dq[7]
+set_location_assignment PIN_63 -to io_ddr_sdram_dq[6]
+set_location_assignment PIN_62 -to io_ddr_sdram_dq[5]
+set_location_assignment PIN_61 -to io_ddr_sdram_dq[4]
+set_location_assignment PIN_83 -to io_ddr_sdram_dq[3]
+set_location_assignment PIN_60 -to io_ddr_sdram_dq[2]
+set_location_assignment PIN_69 -to io_ddr_sdram_dq[1]
+set_location_assignment PIN_66 -to io_ddr_sdram_dq[0]
+set_location_assignment PIN_76 -to io_ddr_sdram_dq[8]
+set_location_assignment PIN_96 -to io_ddr_sdram_dqs[0]
+set_location_assignment PIN_98 -to io_ddr_sdram_dqs[1]
+set_location_assignment PIN_42 -to io_ddr_sdram_dm[0]
+set_location_assignment PIN_70 -to io_ddr_sdram_dm[1]
+set_location_assignment PIN_75 -to io_ddr_sdram_cs_n
+set_location_assignment PIN_39 -to io_ddr_sdram_cke
+set_location_assignment PIN_40 -to io_ddr_sdram_ck_p
+set_location_assignment PIN_41 -to io_ddr_sdram_ck_n
+set_location_assignment PIN_51 -to io_ddr_sdram_ba[0]
+set_location_assignment PIN_52 -to io_ddr_sdram_ba[1]
+set_location_assignment PIN_55 -to io_ddr_sdram_a[0]
+set_location_assignment PIN_58 -to io_ddr_sdram_a[1]
+set_location_assignment PIN_74 -to io_ddr_sdram_a[2]
+set_location_assignment PIN_102 -to io_ddr_sdram_a[3]
+set_location_assignment PIN_93 -to io_ddr_sdram_a[4]
+set_location_assignment PIN_101 -to io_ddr_sdram_a[5]
+set_location_assignment PIN_92 -to io_ddr_sdram_a[6]
+set_location_assignment PIN_100 -to io_ddr_sdram_a[7]
+set_location_assignment PIN_91 -to io_ddr_sdram_a[8]
+set_location_assignment PIN_90 -to io_ddr_sdram_a[9]
+set_location_assignment PIN_53 -to io_ddr_sdram_a[10]
+set_location_assignment PIN_89 -to io_ddr_sdram_a[11]
+set_location_assignment PIN_88 -to io_ddr_sdram_a[12]
+set_location_assignment PIN_99 -to io_ddr_sdram_a[13]
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

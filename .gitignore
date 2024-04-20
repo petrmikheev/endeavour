@@ -9,7 +9,8 @@
 ~*
 .bsp
 .qsys_edit
-hardware/endeavour-backups
+hardware/rev1/endeavour-backups
+hardware/rev2/endeavour-backups
 mbftdi
 rtl/spinal/target
 rtl/spinal/project

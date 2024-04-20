@@ -71,6 +71,7 @@ set_input_delay -clock {clocks|pll|altpll_component|auto_generated|pll1|clk[0]} 
 #**************************************************************
 
 set_output_delay -clock {clocks|pll|altpll_component|auto_generated|pll1|clk[0]} -4.0 [all_outputs]
+set_output_delay -clock {clocks|pll|altpll_component|auto_generated|pll1|clk[0]} 0 [get_ports {io_ddr_*}]
 
 #**************************************************************
 # Set Clock Groups
