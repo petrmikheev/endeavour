@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.10.1    git head : 2527c7c6b0fb0f95e5e1a5722a0be732b364ce43
 // Component : EndeavourSoc
-// Git hash  : 790fafd591e2c6c0fe89ceea970f7747350ae675
+// Git hash  : 69bf9863712751580ef8a4886b341438fe0a43ab
 
 `timescale 1ns/1ps
 
@@ -9,6 +9,9 @@ module EndeavourSoc (
   input  wire          io_nreset,
   output wire [2:0]    io_leds,
   input  wire [1:0]    io_keys,
+  output wire          io_audio_shdn,
+  output wire          io_audio_scl,
+  inout  wire          io_audio_sda,
   input  wire          io_uart_rx,
   output wire          io_uart_tx,
   output wire          io_sdcard_clk,
@@ -32,6 +35,7 @@ module EndeavourSoc (
   wire       [3:0]    uart_ctrl_apb_PADDR;
   wire       [4:0]    sdcard_ctrl_apb_PADDR;
   wire       [2:0]    gpio_ctrl_apb_PADDR;
+  wire       [2:0]    audio_ctrl_apb_PADDR;
   wire                vexRiscv_1_softwareInterrupt;
   reg                 vexRiscv_1_dBus_cmd_ready;
   wire                vexRiscv_1_dBus_rsp_payload_last;
@@ -58,6 +62,7 @@ module EndeavourSoc (
   wire                apb3Router_1_io_outputs_0_PSLVERROR;
   wire                apb3Router_1_io_outputs_1_PSLVERROR;
   wire                apb3Router_1_io_outputs_2_PSLVERROR;
+  wire                apb3Router_1_io_outputs_3_PSLVERROR;
   wire                clocks_clk;
   wire                clocks_clk_delayed;
   wire                clocks_reset;
@@ -72,6 +77,10 @@ module EndeavourSoc (
   wire       [2:0]    gpio_ctrl_leds;
   wire                gpio_ctrl_apb_PREADY;
   wire       [31:0]   gpio_ctrl_apb_PRDATA;
+  wire                audio_ctrl_shdn;
+  wire                audio_ctrl_i2c_scl;
+  wire                audio_ctrl_apb_PREADY;
+  wire       [31:0]   audio_ctrl_apb_PRDATA;
   wire                ram_ctrl_arw_ready;
   wire                ram_ctrl_wready;
   wire                ram_ctrl_bvalid;
@@ -268,7 +277,7 @@ module EndeavourSoc (
   wire       [31:0]   io_apb_decoder_io_input_PRDATA;
   wire                io_apb_decoder_io_input_PSLVERROR;
   wire       [11:0]   io_apb_decoder_io_output_PADDR;
-  wire       [2:0]    io_apb_decoder_io_output_PSEL;
+  wire       [3:0]    io_apb_decoder_io_output_PSEL;
   wire                io_apb_decoder_io_output_PENABLE;
   wire                io_apb_decoder_io_output_PWRITE;
   wire       [31:0]   io_apb_decoder_io_output_PWDATA;
@@ -290,6 +299,11 @@ module EndeavourSoc (
   wire                apb3Router_1_io_outputs_2_PENABLE;
   wire                apb3Router_1_io_outputs_2_PWRITE;
   wire       [31:0]   apb3Router_1_io_outputs_2_PWDATA;
+  wire       [11:0]   apb3Router_1_io_outputs_3_PADDR;
+  wire       [0:0]    apb3Router_1_io_outputs_3_PSEL;
+  wire                apb3Router_1_io_outputs_3_PENABLE;
+  wire                apb3Router_1_io_outputs_3_PWRITE;
+  wire       [31:0]   apb3Router_1_io_outputs_3_PWDATA;
   wire       [2:0]    _zz_dbus_axi_arw_payload_len;
   wire                timerInterrupt;
   wire                externalInterrupt;
@@ -494,6 +508,20 @@ module EndeavourSoc (
     .apb_PWRITE  (apb3Router_1_io_outputs_2_PWRITE      ), //i
     .apb_PWDATA  (apb3Router_1_io_outputs_2_PWDATA[31:0]), //i
     .apb_PRDATA  (gpio_ctrl_apb_PRDATA[31:0]            )  //o
+  );
+  AudioController audio_ctrl (
+    .clk         (clocks_clk                            ), //i
+    .reset       (clocks_reset                          ), //i
+    .shdn        (audio_ctrl_shdn                       ), //o
+    .i2c_scl     (audio_ctrl_i2c_scl                    ), //o
+    .i2c_sda     ({io_audio_sda}),
+    .apb_PADDR   (audio_ctrl_apb_PADDR[2:0]             ), //i
+    .apb_PSEL    (apb3Router_1_io_outputs_3_PSEL        ), //i
+    .apb_PENABLE (apb3Router_1_io_outputs_3_PENABLE     ), //i
+    .apb_PREADY  (audio_ctrl_apb_PREADY                 ), //o
+    .apb_PWRITE  (apb3Router_1_io_outputs_3_PWRITE      ), //i
+    .apb_PWDATA  (apb3Router_1_io_outputs_3_PWDATA[31:0]), //i
+    .apb_PRDATA  (audio_ctrl_apb_PRDATA[31:0]           )  //o
   );
   ddr_sdram_ctrl #(
     .ROW_BITS(14),
@@ -925,7 +953,7 @@ module EndeavourSoc (
     .io_input_PRDATA     (io_apb_decoder_io_input_PRDATA[31:0] ), //o
     .io_input_PSLVERROR  (io_apb_decoder_io_input_PSLVERROR    ), //o
     .io_output_PADDR     (io_apb_decoder_io_output_PADDR[11:0] ), //o
-    .io_output_PSEL      (io_apb_decoder_io_output_PSEL[2:0]   ), //o
+    .io_output_PSEL      (io_apb_decoder_io_output_PSEL[3:0]   ), //o
     .io_output_PENABLE   (io_apb_decoder_io_output_PENABLE     ), //o
     .io_output_PREADY    (apb3Router_1_io_input_PREADY         ), //i
     .io_output_PWRITE    (io_apb_decoder_io_output_PWRITE      ), //o
@@ -935,7 +963,7 @@ module EndeavourSoc (
   );
   Apb3Router apb3Router_1 (
     .io_input_PADDR         (io_apb_decoder_io_output_PADDR[11:0]  ), //i
-    .io_input_PSEL          (io_apb_decoder_io_output_PSEL[2:0]    ), //i
+    .io_input_PSEL          (io_apb_decoder_io_output_PSEL[3:0]    ), //i
     .io_input_PENABLE       (io_apb_decoder_io_output_PENABLE      ), //i
     .io_input_PREADY        (apb3Router_1_io_input_PREADY          ), //o
     .io_input_PWRITE        (io_apb_decoder_io_output_PWRITE       ), //i
@@ -966,6 +994,14 @@ module EndeavourSoc (
     .io_outputs_2_PWDATA    (apb3Router_1_io_outputs_2_PWDATA[31:0]), //o
     .io_outputs_2_PRDATA    (gpio_ctrl_apb_PRDATA[31:0]            ), //i
     .io_outputs_2_PSLVERROR (apb3Router_1_io_outputs_2_PSLVERROR   ), //i
+    .io_outputs_3_PADDR     (apb3Router_1_io_outputs_3_PADDR[11:0] ), //o
+    .io_outputs_3_PSEL      (apb3Router_1_io_outputs_3_PSEL        ), //o
+    .io_outputs_3_PENABLE   (apb3Router_1_io_outputs_3_PENABLE     ), //o
+    .io_outputs_3_PREADY    (audio_ctrl_apb_PREADY                 ), //i
+    .io_outputs_3_PWRITE    (apb3Router_1_io_outputs_3_PWRITE      ), //o
+    .io_outputs_3_PWDATA    (apb3Router_1_io_outputs_3_PWDATA[31:0]), //o
+    .io_outputs_3_PRDATA    (audio_ctrl_apb_PRDATA[31:0]           ), //i
+    .io_outputs_3_PSLVERROR (apb3Router_1_io_outputs_3_PSLVERROR   ), //i
     .clk                    (clocks_clk                            ), //i
     .reset                  (clocks_reset                          )  //i
   );
@@ -973,6 +1009,8 @@ module EndeavourSoc (
   assign io_uart_tx = uart_ctrl_uart_tx;
   assign io_sdcard_clk = sdcard_ctrl_sdcard_clk;
   assign io_leds = gpio_ctrl_leds;
+  assign io_audio_shdn = audio_ctrl_shdn;
+  assign io_audio_scl = audio_ctrl_i2c_scl;
   assign io_ddr_sdram_ck_p = ram_ctrl_ddr_ck_p;
   assign io_ddr_sdram_ck_n = ram_ctrl_ddr_ck_n;
   assign io_ddr_sdram_cke = ram_ctrl_ddr_cke;
@@ -1197,6 +1235,8 @@ module EndeavourSoc (
   assign apb3Router_1_io_outputs_1_PSLVERROR = 1'b0;
   assign gpio_ctrl_apb_PADDR = apb3Router_1_io_outputs_2_PADDR[2:0];
   assign apb3Router_1_io_outputs_2_PSLVERROR = 1'b0;
+  assign audio_ctrl_apb_PADDR = apb3Router_1_io_outputs_3_PADDR[2:0];
+  assign apb3Router_1_io_outputs_3_PSLVERROR = 1'b0;
   assign vexRiscv_1_softwareInterrupt = 1'b0;
   always @(posedge clocks_clk or posedge clocks_reset) begin
     if(clocks_reset) begin
@@ -1307,7 +1347,7 @@ endmodule
 
 module Apb3Router (
   input  wire [11:0]   io_input_PADDR,
-  input  wire [2:0]    io_input_PSEL,
+  input  wire [3:0]    io_input_PSEL,
   input  wire          io_input_PENABLE,
   output wire          io_input_PREADY,
   input  wire          io_input_PWRITE,
@@ -1338,6 +1378,14 @@ module Apb3Router (
   output wire [31:0]   io_outputs_2_PWDATA,
   input  wire [31:0]   io_outputs_2_PRDATA,
   input  wire          io_outputs_2_PSLVERROR,
+  output wire [11:0]   io_outputs_3_PADDR,
+  output wire [0:0]    io_outputs_3_PSEL,
+  output wire          io_outputs_3_PENABLE,
+  input  wire          io_outputs_3_PREADY,
+  output wire          io_outputs_3_PWRITE,
+  output wire [31:0]   io_outputs_3_PWDATA,
+  input  wire [31:0]   io_outputs_3_PRDATA,
+  input  wire          io_outputs_3_PSLVERROR,
   input  wire          clk,
   input  wire          reset
 );
@@ -1347,6 +1395,7 @@ module Apb3Router (
   reg                 _zz_io_input_PSLVERROR;
   wire                _zz_selIndex;
   wire                _zz_selIndex_1;
+  wire                _zz_selIndex_2;
   reg        [1:0]    selIndex;
 
   always @(*) begin
@@ -1361,10 +1410,15 @@ module Apb3Router (
         _zz_io_input_PRDATA = io_outputs_1_PRDATA;
         _zz_io_input_PSLVERROR = io_outputs_1_PSLVERROR;
       end
-      default : begin
+      2'b10 : begin
         _zz_io_input_PREADY = io_outputs_2_PREADY;
         _zz_io_input_PRDATA = io_outputs_2_PRDATA;
         _zz_io_input_PSLVERROR = io_outputs_2_PSLVERROR;
+      end
+      default : begin
+        _zz_io_input_PREADY = io_outputs_3_PREADY;
+        _zz_io_input_PRDATA = io_outputs_3_PRDATA;
+        _zz_io_input_PSLVERROR = io_outputs_3_PSLVERROR;
       end
     endcase
   end
@@ -1384,13 +1438,19 @@ module Apb3Router (
   assign io_outputs_2_PSEL[0] = io_input_PSEL[2];
   assign io_outputs_2_PWRITE = io_input_PWRITE;
   assign io_outputs_2_PWDATA = io_input_PWDATA;
-  assign _zz_selIndex = io_input_PSEL[1];
-  assign _zz_selIndex_1 = io_input_PSEL[2];
+  assign io_outputs_3_PADDR = io_input_PADDR;
+  assign io_outputs_3_PENABLE = io_input_PENABLE;
+  assign io_outputs_3_PSEL[0] = io_input_PSEL[3];
+  assign io_outputs_3_PWRITE = io_input_PWRITE;
+  assign io_outputs_3_PWDATA = io_input_PWDATA;
+  assign _zz_selIndex = io_input_PSEL[3];
+  assign _zz_selIndex_1 = (io_input_PSEL[1] || _zz_selIndex);
+  assign _zz_selIndex_2 = (io_input_PSEL[2] || _zz_selIndex);
   assign io_input_PREADY = _zz_io_input_PREADY;
   assign io_input_PRDATA = _zz_io_input_PRDATA;
   assign io_input_PSLVERROR = _zz_io_input_PSLVERROR;
   always @(posedge clk) begin
-    selIndex <= {_zz_selIndex_1,_zz_selIndex};
+    selIndex <= {_zz_selIndex_2,_zz_selIndex_1};
   end
 
 
@@ -1406,7 +1466,7 @@ module Apb3Decoder (
   output wire [31:0]   io_input_PRDATA,
   output reg           io_input_PSLVERROR,
   output wire [11:0]   io_output_PADDR,
-  output reg  [2:0]    io_output_PSEL,
+  output reg  [3:0]    io_output_PSEL,
   output wire          io_output_PENABLE,
   input  wire          io_output_PREADY,
   output wire          io_output_PWRITE,
@@ -1425,6 +1485,7 @@ module Apb3Decoder (
     io_output_PSEL[0] = (((io_input_PADDR & (~ 12'h00f)) == 12'h100) && io_input_PSEL[0]);
     io_output_PSEL[1] = (((io_input_PADDR & (~ 12'h01f)) == 12'h200) && io_input_PSEL[0]);
     io_output_PSEL[2] = (((io_input_PADDR & (~ 12'h007)) == 12'h300) && io_input_PSEL[0]);
+    io_output_PSEL[3] = (((io_input_PADDR & (~ 12'h007)) == 12'h900) && io_input_PSEL[0]);
   end
 
   always @(*) begin
@@ -1442,7 +1503,7 @@ module Apb3Decoder (
     end
   end
 
-  assign when_Apb3Decoder_l88 = (io_input_PSEL[0] && (io_output_PSEL == 3'b000));
+  assign when_Apb3Decoder_l88 = (io_input_PSEL[0] && (io_output_PSEL == 4'b0000));
 
 endmodule
 

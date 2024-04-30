@@ -126,26 +126,6 @@ set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_keys
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_uart_rx
 set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "6 MHz" -to io_uart_rx
 set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to io_uart_rx
-set_global_assignment -name VERILOG_FILE ../verilog/ddr_sdram_ctrl.v
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/gpio_controller.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../../sdspi/rtl/sdrxframe.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../../sdspi/rtl/sdtxframe.sv
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdwb.v
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdio_top.v
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdio.v
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdfrontend.v
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdcmd.v
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdckgen.v
-set_global_assignment -name VERILOG_FILE ../spinal/EndeavourSoc.v
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/video_controller.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/uart_controller.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/sdcard_controller.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/internal_ram.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/clocking.sv
-set_global_assignment -name QIP_FILE PLL.qip
-set_global_assignment -name QIP_FILE OnChipRAM.qip
-set_global_assignment -name QIP_FILE DDR_IO8.qip
-set_global_assignment -name SIP_FILE DDR_IO8.sip
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[13]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[12]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[11]
@@ -237,4 +217,32 @@ set_location_assignment PIN_53 -to io_ddr_sdram_a[10]
 set_location_assignment PIN_89 -to io_ddr_sdram_a[11]
 set_location_assignment PIN_88 -to io_ddr_sdram_a[12]
 set_location_assignment PIN_99 -to io_ddr_sdram_a[13]
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/audio_controller.sv
+set_global_assignment -name VERILOG_FILE ../verilog/ddr_sdram_ctrl.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/gpio_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../../sdspi/rtl/sdrxframe.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../../sdspi/rtl/sdtxframe.sv
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdwb.v
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdio_top.v
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdio.v
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdfrontend.v
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdcmd.v
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdckgen.v
+set_global_assignment -name VERILOG_FILE ../spinal/EndeavourSoc.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/video_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/uart_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/sdcard_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/internal_ram.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/clocking.sv
+set_global_assignment -name QIP_FILE PLL.qip
+set_global_assignment -name QIP_FILE OnChipRAM.qip
+set_global_assignment -name QIP_FILE DDR_IO8.qip
+set_global_assignment -name SIP_FILE DDR_IO8.sip
+set_location_assignment PIN_105 -to io_audio_sda
+set_location_assignment PIN_106 -to io_audio_scl
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_audio_scl
+set_instance_assignment -name IO_STANDARD "2.5 V" -to io_audio_sda
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_audio_scl
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_audio_sda
+set_location_assignment PIN_127 -to io_audio_shdn
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

@@ -26,6 +26,9 @@ class EndeavourSoc extends Component {
     val nreset = in Bool()
     val leds = out Bits(3 bits)
     val keys = in Bits(2 bits)
+    val audio_shdn = out Bool()
+    val audio_scl = out Bool()
+    val audio_sda = inout(Analog(Bool()))
     val uart = UART()
     //val dvi = DVI()
     val sdcard = SDCARD()
@@ -54,6 +57,11 @@ class EndeavourSoc extends Component {
   val gpio_ctrl = new GpioController()
   gpio_ctrl.io.leds <> io.leds
   gpio_ctrl.io.keys <> io.keys
+
+  val audio_ctrl = new AudioController()
+  audio_ctrl.io.shdn <> io.audio_shdn
+  audio_ctrl.io.i2c_scl <> io.audio_scl
+  audio_ctrl.io.i2c_sda <> io.audio_sda
 
   val ram_ctrl = new ddr_sdram_ctrl(rowBits = 14, colBits = 10)
   ram_ctrl.io.ddr <> io.ddr_sdram
@@ -108,15 +116,15 @@ class EndeavourSoc extends Component {
   val apbDecoder = Apb3Decoder(
     master = apbBridge.io.apb,
     slaves = List(
-      uart_ctrl.io.apb ->   (0x100, 16),
+      uart_ctrl.io.apb   -> (0x100, 16),
       sdcard_ctrl.io.apb -> (0x200, 32),
-      gpio_ctrl.io.apb ->   (0x300, 8)
+      gpio_ctrl.io.apb   -> (0x300, 8),
       // 0x400 USB_P1
       // 0x500 USB_P2
       // 0x600 reserved for USB_DEVICE
       // 0x700 timer
       // 0x800 video
-      // 0x900 audio
+      audio_ctrl.io.apb  -> (0x900, 8)
     )
   )
 }

@@ -80,6 +80,23 @@ class GpioController extends BlackBox {
   mapClockDomain(clock=io.clk, reset=io.reset)
 }
 
+class AudioController extends BlackBox {
+  val io = new Bundle {
+    val clk = in Bool()
+    val reset = in Bool()
+    val shdn = out Bool()
+    val i2c_scl = out Bool()
+    val i2c_sda = inout(Analog(Bool()))
+    val apb = slave(Apb3(Apb3Config(
+      addressWidth  = 3,
+      dataWidth     = 32,
+      useSlaveError = false
+    )))
+  }
+  noIoPrefix()
+  mapClockDomain(clock=io.clk, reset=io.reset)
+}
+
 class ddr_sdram_ctrl(rowBits: Int, colBits: Int) extends BlackBox {
   addGeneric("ROW_BITS", rowBits)
   addGeneric("COL_BITS", colBits)
