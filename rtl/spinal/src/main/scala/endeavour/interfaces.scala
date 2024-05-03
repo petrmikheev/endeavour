@@ -2,6 +2,18 @@ package endeavour.interfaces
 
 import spinal.core._
 
+case class I2C() extends Bundle {
+  val scl = out Bool()
+  val sda = inout(Analog(Bool()))
+}
+
+case class PLL() extends Bundle {
+  val i2c = I2C()
+  val clk0 = in Bool()
+  val clk1 = in Bool()
+  val clk2 = in Bool()
+}
+
 case class UART() extends Bundle {
   val rx = in Bool()
   val tx = out Bool()

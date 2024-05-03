@@ -4,11 +4,7 @@
 
 module testbench;
 
-  parameter CPU_FREQ = 96_000_000;
-  parameter UART_BAUD_RATE = 48_000_000;
-
-  defparam system.clocks.RESET_DELAY = 3;
-  defparam system.uart_ctrl.OVERRIDE_DIVISOR = CPU_FREQ / UART_BAUD_RATE - 1;
+  defparam system.board_ctrl.RESET_DELAY = 3;
 
   reg clk100mhz = 0;
   always #5 clk100mhz = ~clk100mhz;
@@ -38,7 +34,7 @@ module testbench;
   pullup(SD_CMD);
 
   EndeavourSoc system(
-    .io_clk100mhz(clk100mhz),
+    .io_clk_in(clk100mhz),
     .io_nreset(1'b1),
     .io_keys(2'b0),
     .io_leds(leds),
@@ -160,6 +156,7 @@ module testbench;
   end
 
   reg [7:0] uart_byte;
+  parameter UART_BAUD_RATE = 24_000_000;
   localparam UART_BIT_TIME = 1_000_000_000.0 / UART_BAUD_RATE;
   initial begin
     #500000;

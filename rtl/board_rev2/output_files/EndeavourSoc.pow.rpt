@@ -1,0 +1,485 @@
+Power Analyzer report for EndeavourSoc
+Wed May  1 14:55:50 2024
+Quartus Prime Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Parallel Compilation
+  3. Power Analyzer Summary
+  4. Power Analyzer Settings
+  5. Indeterminate Toggle Rates
+  6. Operating Conditions Used
+  7. Thermal Power Dissipation by Block
+  8. Thermal Power Dissipation by Block Type
+  9. Thermal Power Dissipation by Hierarchy
+ 10. Core Dynamic Thermal Power Dissipation by Clock Domain
+ 11. Current Drawn from Voltage Supplies Summary
+ 12. VCCIO Supply Current Drawn by I/O Bank
+ 13. VCCIO Supply Current Drawn by Voltage
+ 14. Confidence Metric Details
+ 15. Signal Activities
+ 16. Power Analyzer Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 2021  Intel Corporation. All rights reserved.
+Your use of Intel Corporation's design tools, logic functions 
+and other software and tools, and any partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel FPGA IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Intel and sold by Intel or its authorized distributors.  Please
+refer to the applicable agreement for further details, at
+https://fpgasoftware.intel.com/eula.
+
+
+
++------------------------------------------+
+; Parallel Compilation                     ;
++----------------------------+-------------+
+; Processors                 ; Number      ;
++----------------------------+-------------+
+; Number detected on machine ; 12          ;
+; Maximum allowed            ; 6           ;
+;                            ;             ;
+; Average used               ; 2.23        ;
+; Maximum used               ; 6           ;
+;                            ;             ;
+; Usage by Processor         ; % Time Used ;
+;     Processor 1            ; 100.0%      ;
+;     Processors 2-6         ;  24.5%      ;
++----------------------------+-------------+
+
+
++-------------------------------------------------------------------------------------------+
+; Power Analyzer Summary                                                                    ;
++----------------------------------------+--------------------------------------------------+
+; Power Analyzer Status                  ; Successful - Wed May  1 14:55:50 2024            ;
+; Quartus Prime Version                  ; 21.1.0 Build 842 10/21/2021 SJ Lite Edition      ;
+; Revision Name                          ; EndeavourSoc                                     ;
+; Top-level Entity Name                  ; EndeavourSoc                                     ;
+; Family                                 ; MAX 10                                           ;
+; Device                                 ; 10M50SAE144C8G                                   ;
+; Power Models                           ; Final                                            ;
+; Total Thermal Power Dissipation        ; 785.91 mW                                        ;
+; Core Dynamic Thermal Power Dissipation ; 455.66 mW                                        ;
+; Core Static Thermal Power Dissipation  ; 260.28 mW                                        ;
+; I/O Thermal Power Dissipation          ; 69.98 mW                                         ;
+; Power Estimation Confidence            ; Low: user provided insufficient toggle rate data ;
++----------------------------------------+--------------------------------------------------+
+
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Power Analyzer Settings                                                                                                  ;
++------------------------------------------------------------------+---------------------------------------+---------------+
+; Option                                                           ; Setting                               ; Default Value ;
++------------------------------------------------------------------+---------------------------------------+---------------+
+; Maximum processors allowed for parallel compilation              ; 6                                     ;               ;
+; Use smart compilation                                            ; Off                                   ; Off           ;
+; Enable parallel Assembler and Timing Analyzer during compilation ; On                                    ; On            ;
+; Enable compact report table                                      ; Off                                   ; Off           ;
+; Default Power Input I/O Toggle Rate                              ; 12.5%                                 ; 12.5%         ;
+; Preset Cooling Solution                                          ; 23 MM HEAT SINK WITH 200 LFPM AIRFLOW ;               ;
+; Board thermal model                                              ; None (CONSERVATIVE)                   ;               ;
+; Default Power Toggle Rate                                        ; 12.5%                                 ; 12.5%         ;
+; Use vectorless estimation                                        ; On                                    ; On            ;
+; Use Input Files                                                  ; Off                                   ; Off           ;
+; Filter Glitches in VCD File Reader                               ; On                                    ; On            ;
+; Power Analyzer Report Signal Activity                            ; Off                                   ; Off           ;
+; Power Analyzer Report Power Dissipation                          ; Off                                   ; Off           ;
+; Device Power Characteristics                                     ; TYPICAL                               ; TYPICAL       ;
+; Automatically Compute Junction Temperature                       ; On                                    ; On            ;
+; Specified Junction Temperature                                   ; 25                                    ; 25            ;
+; Ambient Temperature                                              ; 25                                    ; 25            ;
+; Use Custom Cooling Solution                                      ; Off                                   ; Off           ;
+; Board Temperature                                                ; 25                                    ; 25            ;
++------------------------------------------------------------------+---------------------------------------+---------------+
+
+
++-----------------------------------------------+
+; Indeterminate Toggle Rates                    ;
++-----------------+-----------------------------+
+; Node            ; Reason                      ;
++-----------------+-----------------------------+
+; io_plla_i2c_sda ; No valid clock domain found ;
+; io_pllb_i2c_sda ; No valid clock domain found ;
++-----------------+-----------------------------+
+
+
++-------------------------------------------------------------------------+
+; Operating Conditions Used                                               ;
++---------------------------------------------+---------------------------+
+; Setting                                     ; Value                     ;
++---------------------------------------------+---------------------------+
+; Device power characteristics                ; Typical                   ;
+;                                             ;                           ;
+; Voltages                                    ;                           ;
+;     VCCA                                    ; 3.00 V                    ;
+;     VCC_ONE                                 ; 3.00 V                    ;
+;     3.3-V LVTTL I/O Standard                ; 3.3 V                     ;
+;     2.5 V I/O Standard                      ; 2.5 V                     ;
+;     3.3 V Schmitt Trigger I/O Standard      ; 3.3 V                     ;
+;     2.5 V Schmitt Trigger I/O Standard      ; 2.5 V                     ;
+;                                             ;                           ;
+; Auto computed junction temperature          ; 35.1 degrees Celsius      ;
+;     Ambient temperature                     ; 25.0 degrees Celsius      ;
+;     Junction-to-Case thermal resistance     ; 5.50 degrees Celsius/Watt ;
+;     Case-to-Heat Sink thermal resistance    ; 0.10 degrees Celsius/Watt ;
+;     Heat Sink-to-Ambient thermal resistance ; 7.20 degrees Celsius/Watt ;
+;                                             ;                           ;
+; Board model used                            ; None                      ;
++---------------------------------------------+---------------------------+
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------+
+; Thermal Power Dissipation by Block                                                                                                           ;
++------------+------------+---------------------+-----------------------------+--------------------------------+-------------------------------+
+; Block Name ; Block Type ; Total Thermal Power ; Block Thermal Dynamic Power ; Block Thermal Static Power (1) ; Routing Thermal Dynamic Power ;
++------------+------------+---------------------+-----------------------------+--------------------------------+-------------------------------+
+(1) The "Thermal Power Dissipation by Block" Table has been hidden. To show this table, please select the "Write power dissipation by block to report file" option under "PowerPlay Power Analyzer Settings".
+
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Thermal Power Dissipation by Block Type                                                                                                                                                                                              ;
++---------------------------------------+-----------------------------------+-----------------------------+--------------------------------+-------------------------------+-----------------------------------------------------------+
+; Block Type                            ; Total Thermal Power by Block Type ; Block Thermal Dynamic Power ; Block Thermal Static Power (1) ; Routing Thermal Dynamic Power ; Block Average Toggle Rate (millions of transitions / sec) ;
++---------------------------------------+-----------------------------------+-----------------------------+--------------------------------+-------------------------------+-----------------------------------------------------------+
+; PLL                                   ; 13.47 mW                          ; 13.47 mW                    ; --                             ; 0.00 mW                       ;  192.021                                                  ;
+; M9K                                   ; 27.91 mW                          ; 26.25 mW                    ; --                             ; 1.66 mW                       ;   10.409                                                  ;
+; Embedded multiplier block             ; 2.36 mW                           ; 2.36 mW                     ; --                             ; 0.00 mW                       ;    2.772                                                  ;
+; Embedded multiplier output            ; 0.46 mW                           ; 0.00 mW                     ; --                             ; 0.46 mW                       ;   12.001                                                  ;
+; Combinational cell                    ; 27.73 mW                          ; 12.74 mW                    ; --                             ; 15.00 mW                      ;   10.487                                                  ;
+; Clock control block                   ; 56.11 mW                          ; 0.00 mW                     ; --                             ; 56.11 mW                      ;  213.829                                                  ;
+; Register cell                         ; 55.12 mW                          ; 36.52 mW                    ; --                             ; 18.59 mW                      ;   12.024                                                  ;
+; Double Data Rate I/O Output Circuitry ; 2.40 mW                           ; 2.40 mW                     ; --                             ; 0.00 mW                       ;    0.000                                                  ;
+; I/O                                   ; 24.40 mW                          ; 21.64 mW                    ; 1.76 mW                        ; 1.00 mW                       ;   29.646                                                  ;
+; Voltage Regulator                     ; 272.46 mW                         ; 271.49 mW                   ; 0.97 mW                        ; --                            ; --                                                        ;
++---------------------------------------+-----------------------------------+-----------------------------+--------------------------------+-------------------------------+-----------------------------------------------------------+
+(1) The "Block Thermal Static Power" for all block types except Pins and the Voltage Regulator, if one exists, is part of the "Core Static Thermal Power Dissipation" value found on the PowerPlay Power Analyzer-->Summary report panel. The "Core Static Thermal Power Dissipation" also contains the thermal static power dissipated by the routing.
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Thermal Power Dissipation by Hierarchy                                                                                                                                                                                                                                                                                                                                    ;
++-----------------------------------------------------------------------+--------------------------------------+---------------------------------+-----------------------------------+-----------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+; Compilation Hierarchy Node                                            ; Total Thermal Power by Hierarchy (1) ; Block Thermal Dynamic Power (1) ; Block Thermal Static Power (1)(2) ; Routing Thermal Dynamic Power (1) ; Full Hierarchy Name                                                                                                                              ;
++-----------------------------------------------------------------------+--------------------------------------+---------------------------------+-----------------------------------+-----------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+; |EndeavourSoc                                                         ; 482.43 mW (316.02 mW)                ; 386.88 mW (295.47 mW)           ; 2.73 mW (2.73 mW)                 ; 92.82 mW (17.82 mW)               ; |EndeavourSoc                                                                                                                                    ;
+;     |Apb3Router:apb3Router_1                                          ; 0.31 mW (0.31 mW)                    ; 0.18 mW (0.18 mW)               ; --                                ; 0.12 mW (0.12 mW)                 ; |EndeavourSoc|Apb3Router:apb3Router_1                                                                                                            ;
+;     |Axi4SharedToApb3Bridge:apbBridge                                 ; 0.67 mW (0.67 mW)                    ; 0.40 mW (0.40 mW)               ; --                                ; 0.26 mW (0.26 mW)                 ; |EndeavourSoc|Axi4SharedToApb3Bridge:apbBridge                                                                                                   ;
+;     |Axi4SharedArbiter_2:apbBridge_io_axi_arbiter                     ; 0.19 mW (0.05 mW)                    ; 0.16 mW (0.04 mW)               ; --                                ; 0.02 mW (0.01 mW)                 ; |EndeavourSoc|Axi4SharedArbiter_2:apbBridge_io_axi_arbiter                                                                                       ;
+;         |StreamFifoLowLatency_2:cmdRouteFork_thrown_translated_fifo   ; 0.13 mW (0.00 mW)                    ; 0.12 mW (0.00 mW)               ; --                                ; 0.01 mW (0.00 mW)                 ; |EndeavourSoc|Axi4SharedArbiter_2:apbBridge_io_axi_arbiter|StreamFifoLowLatency_2:cmdRouteFork_thrown_translated_fifo                            ;
+;             |StreamFifo_2:fifo                                        ; 0.13 mW (0.13 mW)                    ; 0.12 mW (0.12 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|Axi4SharedArbiter_2:apbBridge_io_axi_arbiter|StreamFifoLowLatency_2:cmdRouteFork_thrown_translated_fifo|StreamFifo_2:fifo          ;
+;     |AudioController:audio_ctrl                                       ; 4.08 mW (1.81 mW)                    ; 3.29 mW (1.15 mW)               ; --                                ; 0.79 mW (0.66 mW)                 ; |EndeavourSoc|AudioController:audio_ctrl                                                                                                         ;
+;         |altsyncram:fifo_rtl_0                                        ; 1.95 mW (0.00 mW)                    ; 1.92 mW (0.00 mW)               ; --                                ; 0.03 mW (0.00 mW)                 ; |EndeavourSoc|AudioController:audio_ctrl|altsyncram:fifo_rtl_0                                                                                   ;
+;             |altsyncram_sfg1:auto_generated                           ; 1.95 mW (1.95 mW)                    ; 1.92 mW (1.92 mW)               ; --                                ; 0.03 mW (0.03 mW)                 ; |EndeavourSoc|AudioController:audio_ctrl|altsyncram:fifo_rtl_0|altsyncram_sfg1:auto_generated                                                    ;
+;         |I2C:i2c                                                      ; 0.33 mW (0.33 mW)                    ; 0.22 mW (0.22 mW)               ; --                                ; 0.10 mW (0.10 mW)                 ; |EndeavourSoc|AudioController:audio_ctrl|I2C:i2c                                                                                                 ;
+;     |hard_block:auto_generated_inst                                   ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|hard_block:auto_generated_inst                                                                                                     ;
+;     |Axi4ReadOnlyDecoder:axi4ReadOnlyDecoder_1                        ; 0.42 mW (0.33 mW)                    ; 0.20 mW (0.13 mW)               ; --                                ; 0.21 mW (0.20 mW)                 ; |EndeavourSoc|Axi4ReadOnlyDecoder:axi4ReadOnlyDecoder_1                                                                                          ;
+;         |Axi4ReadOnlyErrorSlave:errorSlave                            ; 0.09 mW (0.09 mW)                    ; 0.07 mW (0.07 mW)               ; --                                ; 0.02 mW (0.02 mW)                 ; |EndeavourSoc|Axi4ReadOnlyDecoder:axi4ReadOnlyDecoder_1|Axi4ReadOnlyErrorSlave:errorSlave                                                        ;
+;     |BoardController:board_ctrl                                       ; 55.76 mW (9.16 mW)                   ; 14.33 mW (0.86 mW)              ; --                                ; 41.43 mW (8.30 mW)                ; |EndeavourSoc|BoardController:board_ctrl                                                                                                         ;
+;         |PLL:pll                                                      ; 46.60 mW (0.00 mW)                   ; 13.47 mW (0.00 mW)              ; --                                ; 33.12 mW (0.00 mW)                ; |EndeavourSoc|BoardController:board_ctrl|PLL:pll                                                                                                 ;
+;             |altpll:altpll_component                                  ; 46.60 mW (0.00 mW)                   ; 13.47 mW (0.00 mW)              ; --                                ; 33.12 mW (0.00 mW)                ; |EndeavourSoc|BoardController:board_ctrl|PLL:pll|altpll:altpll_component                                                                         ;
+;                 |PLL_altpll:auto_generated                            ; 46.60 mW (46.60 mW)                  ; 13.47 mW (13.47 mW)             ; --                                ; 33.12 mW (33.12 mW)               ; |EndeavourSoc|BoardController:board_ctrl|PLL:pll|altpll:altpll_component|PLL_altpll:auto_generated                                               ;
+;     |Axi4SharedDecoder:dbus_axi_decoder                               ; 0.78 mW (0.62 mW)                    ; 0.48 mW (0.34 mW)               ; --                                ; 0.30 mW (0.27 mW)                 ; |EndeavourSoc|Axi4SharedDecoder:dbus_axi_decoder                                                                                                 ;
+;         |Axi4SharedErrorSlave:errorSlave                              ; 0.16 mW (0.16 mW)                    ; 0.14 mW (0.14 mW)               ; --                                ; 0.03 mW (0.03 mW)                 ; |EndeavourSoc|Axi4SharedDecoder:dbus_axi_decoder|Axi4SharedErrorSlave:errorSlave                                                                 ;
+;     |Axi4SharedOnChipRam:internalRam                                  ; 5.94 mW (1.02 mW)                    ; 5.10 mW (0.41 mW)               ; --                                ; 0.84 mW (0.61 mW)                 ; |EndeavourSoc|Axi4SharedOnChipRam:internalRam                                                                                                    ;
+;         |Ram_1wrs:ram                                                 ; 4.92 mW (0.02 mW)                    ; 4.68 mW (0.00 mW)               ; --                                ; 0.23 mW (0.02 mW)                 ; |EndeavourSoc|Axi4SharedOnChipRam:internalRam|Ram_1wrs:ram                                                                                       ;
+;             |OnChipRAM:internal_ram                                   ; 4.89 mW (0.00 mW)                    ; 4.68 mW (0.00 mW)               ; --                                ; 0.21 mW (0.00 mW)                 ; |EndeavourSoc|Axi4SharedOnChipRam:internalRam|Ram_1wrs:ram|OnChipRAM:internal_ram                                                                ;
+;                 |altsyncram:altsyncram_component                      ; 4.89 mW (0.00 mW)                    ; 4.68 mW (0.00 mW)               ; --                                ; 0.21 mW (0.00 mW)                 ; |EndeavourSoc|Axi4SharedOnChipRam:internalRam|Ram_1wrs:ram|OnChipRAM:internal_ram|altsyncram:altsyncram_component                                ;
+;                     |altsyncram_0sk1:auto_generated                   ; 4.89 mW (4.89 mW)                    ; 4.68 mW (4.68 mW)               ; --                                ; 0.21 mW (0.21 mW)                 ; |EndeavourSoc|Axi4SharedOnChipRam:internalRam|Ram_1wrs:ram|OnChipRAM:internal_ram|altsyncram:altsyncram_component|altsyncram_0sk1:auto_generated ;
+;     |Axi4SharedArbiter_1:internalRam_io_axi_arbiter                   ; 0.25 mW (0.06 mW)                    ; 0.20 mW (0.04 mW)               ; --                                ; 0.06 mW (0.02 mW)                 ; |EndeavourSoc|Axi4SharedArbiter_1:internalRam_io_axi_arbiter                                                                                     ;
+;         |StreamArbiter_1:cmdArbiter                                   ; 0.09 mW (0.09 mW)                    ; 0.07 mW (0.07 mW)               ; --                                ; 0.02 mW (0.02 mW)                 ; |EndeavourSoc|Axi4SharedArbiter_1:internalRam_io_axi_arbiter|StreamArbiter_1:cmdArbiter                                                          ;
+;         |StreamFifoLowLatency_2:cmdRouteFork_thrown_translated_fifo   ; 0.10 mW (0.00 mW)                    ; 0.09 mW (0.00 mW)               ; --                                ; 0.02 mW (0.00 mW)                 ; |EndeavourSoc|Axi4SharedArbiter_1:internalRam_io_axi_arbiter|StreamFifoLowLatency_2:cmdRouteFork_thrown_translated_fifo                          ;
+;             |StreamFifo_2:fifo                                        ; 0.10 mW (0.10 mW)                    ; 0.09 mW (0.09 mW)               ; --                                ; 0.02 mW (0.02 mW)                 ; |EndeavourSoc|Axi4SharedArbiter_1:internalRam_io_axi_arbiter|StreamFifoLowLatency_2:cmdRouteFork_thrown_translated_fifo|StreamFifo_2:fifo        ;
+;     |Apb3Decoder:io_apb_decoder                                       ; 0.03 mW (0.03 mW)                    ; 0.01 mW (0.01 mW)               ; --                                ; 0.02 mW (0.02 mW)                 ; |EndeavourSoc|Apb3Decoder:io_apb_decoder                                                                                                         ;
+;     |ddr_sdram_ctrl:ram_ctrl                                          ; 7.02 mW (4.91 mW)                    ; 4.48 mW (2.50 mW)               ; --                                ; 2.54 mW (2.41 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl                                                                                                            ;
+;         |DDR_IO8:io_h                                                 ; 1.14 mW (0.00 mW)                    ; 1.05 mW (0.00 mW)               ; --                                ; 0.08 mW (0.00 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_h                                                                                               ;
+;             |altera_gpio_lite:ddr_io8_inst                            ; 1.14 mW (0.00 mW)                    ; 1.05 mW (0.00 mW)               ; --                                ; 0.08 mW (0.00 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_h|altera_gpio_lite:ddr_io8_inst                                                                 ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[0].altgpio_bit_i ; 0.20 mW (0.20 mW)                    ; 0.19 mW (0.19 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_h|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[0].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[1].altgpio_bit_i ; 0.18 mW (0.18 mW)                    ; 0.17 mW (0.17 mW)               ; --                                ; 0.02 mW (0.02 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_h|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[1].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[2].altgpio_bit_i ; 0.17 mW (0.17 mW)                    ; 0.15 mW (0.15 mW)               ; --                                ; 0.02 mW (0.02 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_h|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[2].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[3].altgpio_bit_i ; 0.12 mW (0.12 mW)                    ; 0.11 mW (0.11 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_h|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[3].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[4].altgpio_bit_i ; 0.11 mW (0.11 mW)                    ; 0.10 mW (0.10 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_h|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[4].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[5].altgpio_bit_i ; 0.15 mW (0.15 mW)                    ; 0.13 mW (0.13 mW)               ; --                                ; 0.02 mW (0.02 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_h|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[5].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[6].altgpio_bit_i ; 0.11 mW (0.11 mW)                    ; 0.10 mW (0.10 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_h|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[6].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[7].altgpio_bit_i ; 0.11 mW (0.11 mW)                    ; 0.10 mW (0.10 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_h|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[7].altgpio_bit_i            ;
+;         |DDR_IO8:io_l                                                 ; 0.98 mW (0.00 mW)                    ; 0.93 mW (0.00 mW)               ; --                                ; 0.05 mW (0.00 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_l                                                                                               ;
+;             |altera_gpio_lite:ddr_io8_inst                            ; 0.98 mW (0.00 mW)                    ; 0.93 mW (0.00 mW)               ; --                                ; 0.05 mW (0.00 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_l|altera_gpio_lite:ddr_io8_inst                                                                 ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[0].altgpio_bit_i ; 0.11 mW (0.11 mW)                    ; 0.10 mW (0.10 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_l|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[0].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[1].altgpio_bit_i ; 0.11 mW (0.11 mW)                    ; 0.11 mW (0.11 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_l|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[1].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[2].altgpio_bit_i ; 0.12 mW (0.12 mW)                    ; 0.10 mW (0.10 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_l|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[2].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[3].altgpio_bit_i ; 0.11 mW (0.11 mW)                    ; 0.11 mW (0.11 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_l|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[3].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[4].altgpio_bit_i ; 0.12 mW (0.12 mW)                    ; 0.11 mW (0.11 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_l|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[4].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[5].altgpio_bit_i ; 0.15 mW (0.15 mW)                    ; 0.15 mW (0.15 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_l|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[5].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[6].altgpio_bit_i ; 0.12 mW (0.12 mW)                    ; 0.11 mW (0.11 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_l|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[6].altgpio_bit_i            ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[7].altgpio_bit_i ; 0.14 mW (0.14 mW)                    ; 0.13 mW (0.13 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|ddr_sdram_ctrl:ram_ctrl|DDR_IO8:io_l|altera_gpio_lite:ddr_io8_inst|altgpio_one_bit:gpio_one_bit.i_loop[7].altgpio_bit_i            ;
+;     |Axi4SharedArbiter:ram_ctrl_axi_arbiter                           ; 0.35 mW (0.14 mW)                    ; 0.24 mW (0.07 mW)               ; --                                ; 0.12 mW (0.07 mW)                 ; |EndeavourSoc|Axi4SharedArbiter:ram_ctrl_axi_arbiter                                                                                             ;
+;         |StreamArbiter_2:cmdArbiter                                   ; 0.12 mW (0.12 mW)                    ; 0.09 mW (0.09 mW)               ; --                                ; 0.04 mW (0.04 mW)                 ; |EndeavourSoc|Axi4SharedArbiter:ram_ctrl_axi_arbiter|StreamArbiter_2:cmdArbiter                                                                  ;
+;         |StreamFifoLowLatency_2:cmdRouteFork_thrown_translated_fifo   ; 0.08 mW (0.00 mW)                    ; 0.08 mW (0.00 mW)               ; --                                ; 0.01 mW (0.00 mW)                 ; |EndeavourSoc|Axi4SharedArbiter:ram_ctrl_axi_arbiter|StreamFifoLowLatency_2:cmdRouteFork_thrown_translated_fifo                                  ;
+;             |StreamFifo_2:fifo                                        ; 0.08 mW (0.08 mW)                    ; 0.08 mW (0.08 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|Axi4SharedArbiter:ram_ctrl_axi_arbiter|StreamFifoLowLatency_2:cmdRouteFork_thrown_translated_fifo|StreamFifo_2:fifo                ;
+;     |SdcardController:sdcard_ctrl                                     ; 29.33 mW (0.45 mW)                   ; 22.02 mW (0.11 mW)              ; --                                ; 7.31 mW (0.35 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl                                                                                                       ;
+;         |sdio_top:impl                                                ; 28.88 mW (0.00 mW)                   ; 21.91 mW (0.00 mW)              ; --                                ; 6.97 mW (0.00 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl                                                                                         ;
+;             |sdfrontend:u_sdfrontend                                  ; 0.31 mW (0.31 mW)                    ; 0.17 mW (0.17 mW)               ; --                                ; 0.14 mW (0.14 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdfrontend:u_sdfrontend                                                                 ;
+;             |sdio:u_sdio                                              ; 28.57 mW (0.04 mW)                   ; 21.74 mW (0.01 mW)              ; --                                ; 6.83 mW (0.03 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio                                                                             ;
+;                 |sdckgen:u_clkgen                                     ; 0.68 mW (0.68 mW)                    ; 0.43 mW (0.43 mW)               ; --                                ; 0.26 mW (0.26 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdckgen:u_clkgen                                                            ;
+;                 |sdwb:u_control                                       ; 14.84 mW (5.80 mW)                   ; 12.02 mW (3.20 mW)              ; --                                ; 2.82 mW (2.60 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control                                                              ;
+;                     |altsyncram:fifo_a[0][7]__4                       ; 1.13 mW (0.00 mW)                    ; 1.10 mW (0.00 mW)               ; --                                ; 0.03 mW (0.00 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_a[0][7]__4                                   ;
+;                         |altsyncram_g4d1:auto_generated               ; 1.13 mW (1.13 mW)                    ; 1.10 mW (1.10 mW)               ; --                                ; 0.03 mW (0.03 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_a[0][7]__4|altsyncram_g4d1:auto_generated    ;
+;                     |altsyncram:fifo_a[0][15]__3                      ; 1.14 mW (0.00 mW)                    ; 1.10 mW (0.00 mW)               ; --                                ; 0.03 mW (0.00 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_a[0][15]__3                                  ;
+;                         |altsyncram_g4d1:auto_generated               ; 1.14 mW (1.14 mW)                    ; 1.10 mW (1.10 mW)               ; --                                ; 0.03 mW (0.03 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_a[0][15]__3|altsyncram_g4d1:auto_generated   ;
+;                     |altsyncram:fifo_a[0][23]__2                      ; 1.13 mW (0.00 mW)                    ; 1.10 mW (0.00 mW)               ; --                                ; 0.03 mW (0.00 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_a[0][23]__2                                  ;
+;                         |altsyncram_g4d1:auto_generated               ; 1.13 mW (1.13 mW)                    ; 1.10 mW (1.10 mW)               ; --                                ; 0.03 mW (0.03 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_a[0][23]__2|altsyncram_g4d1:auto_generated   ;
+;                     |altsyncram:fifo_a[0][31]__1                      ; 1.13 mW (0.00 mW)                    ; 1.10 mW (0.00 mW)               ; --                                ; 0.03 mW (0.00 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_a[0][31]__1                                  ;
+;                         |altsyncram_g4d1:auto_generated               ; 1.13 mW (1.13 mW)                    ; 1.10 mW (1.10 mW)               ; --                                ; 0.03 mW (0.03 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_a[0][31]__1|altsyncram_g4d1:auto_generated   ;
+;                     |altsyncram:fifo_b[0][7]__8                       ; 1.13 mW (0.00 mW)                    ; 1.10 mW (0.00 mW)               ; --                                ; 0.03 mW (0.00 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_b[0][7]__8                                   ;
+;                         |altsyncram_g4d1:auto_generated               ; 1.13 mW (1.13 mW)                    ; 1.10 mW (1.10 mW)               ; --                                ; 0.03 mW (0.03 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_b[0][7]__8|altsyncram_g4d1:auto_generated    ;
+;                     |altsyncram:fifo_b[0][15]__7                      ; 1.13 mW (0.00 mW)                    ; 1.10 mW (0.00 mW)               ; --                                ; 0.03 mW (0.00 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_b[0][15]__7                                  ;
+;                         |altsyncram_g4d1:auto_generated               ; 1.13 mW (1.13 mW)                    ; 1.10 mW (1.10 mW)               ; --                                ; 0.03 mW (0.03 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_b[0][15]__7|altsyncram_g4d1:auto_generated   ;
+;                     |altsyncram:fifo_b[0][23]__6                      ; 1.13 mW (0.00 mW)                    ; 1.10 mW (0.00 mW)               ; --                                ; 0.03 mW (0.00 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_b[0][23]__6                                  ;
+;                         |altsyncram_g4d1:auto_generated               ; 1.13 mW (1.13 mW)                    ; 1.10 mW (1.10 mW)               ; --                                ; 0.03 mW (0.03 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_b[0][23]__6|altsyncram_g4d1:auto_generated   ;
+;                     |altsyncram:fifo_b[0][31]__5                      ; 1.12 mW (0.00 mW)                    ; 1.10 mW (0.00 mW)               ; --                                ; 0.02 mW (0.00 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_b[0][31]__5                                  ;
+;                         |altsyncram_g4d1:auto_generated               ; 1.12 mW (1.12 mW)                    ; 1.10 mW (1.10 mW)               ; --                                ; 0.02 mW (0.02 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|altsyncram:fifo_b[0][31]__5|altsyncram_g4d1:auto_generated   ;
+;                 |sdrxframe:u_rxframe                                  ; 3.37 mW (3.37 mW)                    ; 2.56 mW (2.56 mW)               ; --                                ; 0.81 mW (0.81 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdrxframe:u_rxframe                                                         ;
+;                 |sdcmd:u_sdcmd                                        ; 3.49 mW (3.49 mW)                    ; 2.44 mW (2.44 mW)               ; --                                ; 1.05 mW (1.05 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdcmd:u_sdcmd                                                               ;
+;                 |sdtxframe:u_txframe                                  ; 6.15 mW (6.15 mW)                    ; 4.28 mW (4.28 mW)               ; --                                ; 1.86 mW (1.86 mW)                 ; |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdtxframe:u_txframe                                                         ;
+;     |UartController:uart_ctrl                                         ; 4.16 mW (2.24 mW)                    ; 3.35 mW (1.49 mW)               ; --                                ; 0.80 mW (0.76 mW)                 ; |EndeavourSoc|UartController:uart_ctrl                                                                                                           ;
+;         |altsyncram:fifo_rx_rtl_0                                     ; 0.97 mW (0.00 mW)                    ; 0.93 mW (0.00 mW)               ; --                                ; 0.04 mW (0.00 mW)                 ; |EndeavourSoc|UartController:uart_ctrl|altsyncram:fifo_rx_rtl_0                                                                                  ;
+;             |altsyncram_8dg1:auto_generated                           ; 0.97 mW (0.97 mW)                    ; 0.93 mW (0.93 mW)               ; --                                ; 0.04 mW (0.04 mW)                 ; |EndeavourSoc|UartController:uart_ctrl|altsyncram:fifo_rx_rtl_0|altsyncram_8dg1:auto_generated                                                   ;
+;         |altsyncram:fifo_tx_rtl_0                                     ; 0.94 mW (0.00 mW)                    ; 0.94 mW (0.00 mW)               ; --                                ; 0.01 mW (0.00 mW)                 ; |EndeavourSoc|UartController:uart_ctrl|altsyncram:fifo_tx_rtl_0                                                                                  ;
+;             |altsyncram_6dg1:auto_generated                           ; 0.94 mW (0.94 mW)                    ; 0.94 mW (0.94 mW)               ; --                                ; 0.01 mW (0.01 mW)                 ; |EndeavourSoc|UartController:uart_ctrl|altsyncram:fifo_tx_rtl_0|altsyncram_6dg1:auto_generated                                                   ;
+;     |VexRiscv:vexRiscv_1                                              ; 53.61 mW (33.82 mW)                  ; 33.97 mW (18.54 mW)             ; --                                ; 19.65 mW (15.28 mW)               ; |EndeavourSoc|VexRiscv:vexRiscv_1                                                                                                                ;
+;         |InstructionCache:IBusCachedPlugin_cache                      ; 5.75 mW (2.44 mW)                    ; 4.11 mW (1.09 mW)               ; --                                ; 1.64 mW (1.35 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|InstructionCache:IBusCachedPlugin_cache                                                                        ;
+;             |altsyncram:banks_0_rtl_0                                 ; 1.82 mW (0.00 mW)                    ; 1.63 mW (0.00 mW)               ; --                                ; 0.20 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|InstructionCache:IBusCachedPlugin_cache|altsyncram:banks_0_rtl_0                                               ;
+;                 |altsyncram_mcd1:auto_generated                       ; 1.82 mW (1.82 mW)                    ; 1.63 mW (1.63 mW)               ; --                                ; 0.20 mW (0.20 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|InstructionCache:IBusCachedPlugin_cache|altsyncram:banks_0_rtl_0|altsyncram_mcd1:auto_generated                ;
+;             |altsyncram:ways_0_tags_rtl_0                             ; 1.48 mW (0.00 mW)                    ; 1.39 mW (0.00 mW)               ; --                                ; 0.10 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|InstructionCache:IBusCachedPlugin_cache|altsyncram:ways_0_tags_rtl_0                                           ;
+;                 |altsyncram_1ad1:auto_generated                       ; 1.48 mW (1.48 mW)                    ; 1.39 mW (1.39 mW)               ; --                                ; 0.10 mW (0.10 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|InstructionCache:IBusCachedPlugin_cache|altsyncram:ways_0_tags_rtl_0|altsyncram_1ad1:auto_generated            ;
+;         |lpm_mult:Mult0                                               ; 0.60 mW (0.00 mW)                    ; 0.60 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|lpm_mult:Mult0                                                                                                 ;
+;             |mult_tgs:auto_generated                                  ; 0.60 mW (0.60 mW)                    ; 0.60 mW (0.60 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|lpm_mult:Mult0|mult_tgs:auto_generated                                                                         ;
+;         |lpm_mult:Mult1                                               ; 0.59 mW (0.00 mW)                    ; 0.59 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|lpm_mult:Mult1                                                                                                 ;
+;             |mult_tgs:auto_generated                                  ; 0.59 mW (0.59 mW)                    ; 0.59 mW (0.59 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|lpm_mult:Mult1|mult_tgs:auto_generated                                                                         ;
+;         |lpm_mult:Mult2                                               ; 0.59 mW (0.00 mW)                    ; 0.59 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|lpm_mult:Mult2                                                                                                 ;
+;             |mult_tgs:auto_generated                                  ; 0.59 mW (0.59 mW)                    ; 0.59 mW (0.59 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|lpm_mult:Mult2|mult_tgs:auto_generated                                                                         ;
+;         |lpm_mult:Mult3                                               ; 0.59 mW (0.00 mW)                    ; 0.59 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|lpm_mult:Mult3                                                                                                 ;
+;             |mult_tns:auto_generated                                  ; 0.59 mW (0.59 mW)                    ; 0.59 mW (0.59 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|lpm_mult:Mult3|mult_tns:auto_generated                                                                         ;
+;         |altsyncram:RegFilePlugin_regFile_rtl_0                       ; 1.94 mW (0.00 mW)                    ; 1.80 mW (0.00 mW)               ; --                                ; 0.14 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|altsyncram:RegFilePlugin_regFile_rtl_0                                                                         ;
+;             |altsyncram_47g1:auto_generated                           ; 1.94 mW (1.94 mW)                    ; 1.80 mW (1.80 mW)               ; --                                ; 0.14 mW (0.14 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|altsyncram:RegFilePlugin_regFile_rtl_0|altsyncram_47g1:auto_generated                                          ;
+;         |altsyncram:RegFilePlugin_regFile_rtl_1                       ; 1.98 mW (0.00 mW)                    ; 1.80 mW (0.00 mW)               ; --                                ; 0.18 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|altsyncram:RegFilePlugin_regFile_rtl_1                                                                         ;
+;             |altsyncram_47g1:auto_generated                           ; 1.98 mW (1.98 mW)                    ; 1.80 mW (1.80 mW)               ; --                                ; 0.18 mW (0.18 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|altsyncram:RegFilePlugin_regFile_rtl_1|altsyncram_47g1:auto_generated                                          ;
+;         |DataCache:dataCache_1                                        ; 7.76 mW (6.06 mW)                    ; 5.36 mW (3.92 mW)               ; --                                ; 2.41 mW (2.13 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1                                                                                          ;
+;             |altsyncram:ways_0_data_symbol0_rtl_0                     ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1|altsyncram:ways_0_data_symbol0_rtl_0                                                     ;
+;                 |altsyncram_s9d1:auto_generated                       ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1|altsyncram:ways_0_data_symbol0_rtl_0|altsyncram_s9d1:auto_generated                      ;
+;             |altsyncram:ways_0_data_symbol1_rtl_0                     ; 0.34 mW (0.00 mW)                    ; 0.25 mW (0.00 mW)               ; --                                ; 0.09 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1|altsyncram:ways_0_data_symbol1_rtl_0                                                     ;
+;                 |altsyncram_s9d1:auto_generated                       ; 0.34 mW (0.34 mW)                    ; 0.25 mW (0.25 mW)               ; --                                ; 0.09 mW (0.09 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1|altsyncram:ways_0_data_symbol1_rtl_0|altsyncram_s9d1:auto_generated                      ;
+;             |altsyncram:ways_0_data_symbol2_rtl_0                     ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1|altsyncram:ways_0_data_symbol2_rtl_0                                                     ;
+;                 |altsyncram_s9d1:auto_generated                       ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1|altsyncram:ways_0_data_symbol2_rtl_0|altsyncram_s9d1:auto_generated                      ;
+;             |altsyncram:ways_0_data_symbol3_rtl_0                     ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1|altsyncram:ways_0_data_symbol3_rtl_0                                                     ;
+;                 |altsyncram_s9d1:auto_generated                       ; 0.00 mW (0.00 mW)                    ; 0.00 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1|altsyncram:ways_0_data_symbol3_rtl_0|altsyncram_s9d1:auto_generated                      ;
+;             |altsyncram:ways_0_tags_rtl_0                             ; 1.37 mW (0.00 mW)                    ; 1.18 mW (0.00 mW)               ; --                                ; 0.18 mW (0.00 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1|altsyncram:ways_0_tags_rtl_0                                                             ;
+;                 |altsyncram_1ad1:auto_generated                       ; 1.37 mW (1.37 mW)                    ; 1.18 mW (1.18 mW)               ; --                                ; 0.18 mW (0.18 mW)                 ; |EndeavourSoc|VexRiscv:vexRiscv_1|DataCache:dataCache_1|altsyncram:ways_0_tags_rtl_0|altsyncram_1ad1:auto_generated                              ;
+;     |VideoController:video_ctrl                                       ; 3.52 mW (1.66 mW)                    ; 3.00 mW (1.26 mW)               ; --                                ; 0.52 mW (0.40 mW)                 ; |EndeavourSoc|VideoController:video_ctrl                                                                                                         ;
+;         |TMDS_encoder:encode_B                                        ; 0.17 mW (0.17 mW)                    ; 0.13 mW (0.13 mW)               ; --                                ; 0.05 mW (0.05 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|TMDS_encoder:encode_B                                                                                   ;
+;         |TMDS_encoder:encode_G                                        ; 0.19 mW (0.19 mW)                    ; 0.15 mW (0.15 mW)               ; --                                ; 0.04 mW (0.04 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|TMDS_encoder:encode_G                                                                                   ;
+;         |TMDS_encoder:encode_R                                        ; 0.16 mW (0.16 mW)                    ; 0.13 mW (0.13 mW)               ; --                                ; 0.03 mW (0.03 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|TMDS_encoder:encode_R                                                                                   ;
+;         |DDR_O4:out_m                                                 ; 0.67 mW (0.00 mW)                    ; 0.67 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_m                                                                                            ;
+;             |altera_gpio_lite:ddr_o4_inst                             ; 0.67 mW (0.00 mW)                    ; 0.67 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_m|altera_gpio_lite:ddr_o4_inst                                                               ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[0].altgpio_bit_i ; 0.17 mW (0.17 mW)                    ; 0.17 mW (0.17 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_m|altera_gpio_lite:ddr_o4_inst|altgpio_one_bit:gpio_one_bit.i_loop[0].altgpio_bit_i          ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[1].altgpio_bit_i ; 0.17 mW (0.17 mW)                    ; 0.17 mW (0.17 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_m|altera_gpio_lite:ddr_o4_inst|altgpio_one_bit:gpio_one_bit.i_loop[1].altgpio_bit_i          ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[2].altgpio_bit_i ; 0.17 mW (0.17 mW)                    ; 0.17 mW (0.17 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_m|altera_gpio_lite:ddr_o4_inst|altgpio_one_bit:gpio_one_bit.i_loop[2].altgpio_bit_i          ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[3].altgpio_bit_i ; 0.16 mW (0.16 mW)                    ; 0.16 mW (0.16 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_m|altera_gpio_lite:ddr_o4_inst|altgpio_one_bit:gpio_one_bit.i_loop[3].altgpio_bit_i          ;
+;         |DDR_O4:out_p                                                 ; 0.67 mW (0.00 mW)                    ; 0.67 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_p                                                                                            ;
+;             |altera_gpio_lite:ddr_o4_inst                             ; 0.67 mW (0.00 mW)                    ; 0.67 mW (0.00 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_p|altera_gpio_lite:ddr_o4_inst                                                               ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[0].altgpio_bit_i ; 0.17 mW (0.17 mW)                    ; 0.17 mW (0.17 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_p|altera_gpio_lite:ddr_o4_inst|altgpio_one_bit:gpio_one_bit.i_loop[0].altgpio_bit_i          ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[1].altgpio_bit_i ; 0.17 mW (0.17 mW)                    ; 0.17 mW (0.17 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_p|altera_gpio_lite:ddr_o4_inst|altgpio_one_bit:gpio_one_bit.i_loop[1].altgpio_bit_i          ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[2].altgpio_bit_i ; 0.17 mW (0.17 mW)                    ; 0.17 mW (0.17 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_p|altera_gpio_lite:ddr_o4_inst|altgpio_one_bit:gpio_one_bit.i_loop[2].altgpio_bit_i          ;
+;                 |altgpio_one_bit:gpio_one_bit.i_loop[3].altgpio_bit_i ; 0.16 mW (0.16 mW)                    ; 0.16 mW (0.16 mW)               ; --                                ; 0.00 mW (0.00 mW)                 ; |EndeavourSoc|VideoController:video_ctrl|DDR_O4:out_p|altera_gpio_lite:ddr_o4_inst|altgpio_one_bit:gpio_one_bit.i_loop[3].altgpio_bit_i          ;
++-----------------------------------------------------------------------+--------------------------------------+---------------------------------+-----------------------------------+-----------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+(1) Value in parentheses is the power consumed at that level of hierarchy. Value not in parentheses is the power consumed at that level of hierarchy plus the power consumed by all levels of hierarchy below it.
+
+(2) The "Block Thermal Static Power" for all levels of hierarchy except the top-level hierarchy is part of the "Core Static Thermal Power Dissipation" value found on the PowerPlay Power Analyzer-->Summary report panel. The "Core Static Thermal Power Dissipation" also contains the thermal static power dissipated by the routing.
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Core Dynamic Thermal Power Dissipation by Clock Domain                                                                                                   ;
++-------------------------------------------------------------------------------------------------------+-----------------------+--------------------------+
+; Clock Domain                                                                                          ; Clock Frequency (MHz) ; Total Core Dynamic Power ;
++-------------------------------------------------------------------------------------------------------+-----------------------+--------------------------+
+; BoardController:board_ctrl|PLL:pll|altpll:altpll_component|PLL_altpll:auto_generated|wire_pll1_clk[0] ; 96.01                 ; 154.15                   ;
+; BoardController:board_ctrl|PLL:pll|altpll:altpll_component|PLL_altpll:auto_generated|wire_pll1_clk[1] ; 96.01                 ; 4.03                     ;
+; BoardController:board_ctrl|PLL:pll|altpll:altpll_component|PLL_altpll:auto_generated|wire_pll1_clk[2] ; 48.00                 ; 2.12                     ;
+; BoardController:board_ctrl|PLL:pll|altpll:altpll_component|PLL_altpll:auto_generated|wire_pll1_clk[3] ; 240.04                ; 8.09                     ;
+; io_clk_in                                                                                             ; 100.00                ; 0.00                     ;
+; io_pllb_clk2                                                                                          ; 100.00                ; 2.67                     ;
+; io_plla_clk2                                                                                          ; 100.00                ; 2.64                     ;
+; io_pllb_clk1                                                                                          ; 100.00                ; 2.63                     ;
+; io_plla_clk1                                                                                          ; 100.00                ; 2.62                     ;
+; io_pllb_clk0                                                                                          ; 100.00                ; 2.63                     ;
+; io_plla_clk0                                                                                          ; 100.00                ; 2.62                     ;
+; No clock domain                                                                                       ; 0.00                  ; 2.36                     ;
++-------------------------------------------------------------------------------------------------------+-----------------------+--------------------------+
+
+
++------------------------------------------------------------------------------------------------------------------------------------+
+; Current Drawn from Voltage Supplies Summary                                                                                        ;
++----------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+; Voltage Supply ; Total Current Drawn (1) ; Dynamic Current Drawn (1) ; Static Current Drawn (1) ; Minimum Power Supply Current (2) ;
++----------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+; VCCIO          ; 22.12 mA                ; 7.66 mA                   ; 14.46 mA                 ; 22.12 mA                         ;
+; VCCA           ; 5.05 mA                 ; 2.10 mA                   ; 2.94 mA                  ; 5.05 mA                          ;
+; VCC_ONE        ; 234.64 mA               ; 150.83 mA                 ; 83.82 mA                 ; 234.64 mA                        ;
++----------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+(1) Currents reported in columns "Total Current Drawn", "Dynamic Current Drawn", and "Static Current Drawn" are sufficient for user operation of the device.  
+(2) Currents reported in column "Minimum Power Supply Current" are sufficient for power-up, configuration, and user operation of the device.
+
+
++-----------------------------------------------------------------------------------------------+
+; VCCIO Supply Current Drawn by I/O Bank                                                        ;
++----------+---------------+---------------------+-----------------------+----------------------+
+; I/O Bank ; VCCIO Voltage ; Total Current Drawn ; Dynamic Current Drawn ; Static Current Drawn ;
++----------+---------------+---------------------+-----------------------+----------------------+
+; 1A       ; 3.3V          ; 2.45 mA             ; 0.00 mA               ; 2.45 mA              ;
+; 1B       ; 3.3V          ; 2.86 mA             ; 0.30 mA               ; 2.57 mA              ;
+; 2        ; 3.3V          ; 2.88 mA             ; 0.29 mA               ; 2.60 mA              ;
+; 3        ; 2.5V          ; 0.95 mA             ; 0.54 mA               ; 0.42 mA              ;
+; 4        ; 2.5V          ; 4.13 mA             ; 3.72 mA               ; 0.41 mA              ;
+; 5        ; 2.5V          ; 1.43 mA             ; 1.02 mA               ; 0.41 mA              ;
+; 6        ; 3.3V          ; 3.73 mA             ; 1.11 mA               ; 2.62 mA              ;
+; 7        ; 3.3V          ; 2.61 mA             ; 0.03 mA               ; 2.57 mA              ;
+; 8        ; 2.5V          ; 1.08 mA             ; 0.65 mA               ; 0.43 mA              ;
++----------+---------------+---------------------+-----------------------+----------------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------+
+; VCCIO Supply Current Drawn by Voltage                                                                                             ;
++---------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+; VCCIO Voltage ; Total Current Drawn (1) ; Dynamic Current Drawn (1) ; Static Current Drawn (1) ; Minimum Power Supply Current (2) ;
++---------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+; 2.5V          ; 7.60 mA                 ; 5.94 mA                   ; 1.66 mA                  ; 7.60 mA                          ;
+; 3.3V          ; 14.53 mA                ; 1.73 mA                   ; 12.80 mA                 ; 14.53 mA                         ;
++---------------+-------------------------+---------------------------+--------------------------+----------------------------------+
+(1) Currents reported in columns "Total Current Drawn", "Dynamic Current Drawn", and "Static Current Drawn" are sufficient for user operation of the device.  
+(2) Currents reported in column "Minimum Power Supply Current" are sufficient for power-up, configuration, and user operation of the device.
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------+
+; Confidence Metric Details                                                                                                                           ;
++----------------------------------------------------------------------------------------+---------------+------------+---------------+---------------+
+; Data Source                                                                            ; Total         ; Pin        ; Registered    ; Combinational ;
++----------------------------------------------------------------------------------------+---------------+------------+---------------+---------------+
+; Simulation (from file)                                                                 ;               ;            ;               ;               ;
+;     -- Number of signals with Toggle Rate from Simulation                              ; 0 (0.0%)      ; 0 (0.0%)   ; 0 (0.0%)      ; 0 (0.0%)      ;
+;     -- Number of signals with Static Probability from Simulation                       ; 0 (0.0%)      ; 0 (0.0%)   ; 0 (0.0%)      ; 0 (0.0%)      ;
+;                                                                                        ;               ;            ;               ;               ;
+; Node, entity or clock assignment                                                       ;               ;            ;               ;               ;
+;     -- Number of signals with Toggle Rate from Node, entity or clock assignment        ; 22 (0.2%)     ; 7 (6.4%)   ; 0 (0.0%)      ; 15 (0.2%)     ;
+;     -- Number of signals with Static Probability from Node, entity or clock assignment ; 22 (0.2%)     ; 7 (6.4%)   ; 0 (0.0%)      ; 15 (0.2%)     ;
+;                                                                                        ;               ;            ;               ;               ;
+; Vectorless estimation                                                                  ;               ;            ;               ;               ;
+;     -- Number of signals with Toggle Rate from Vectorless estimation                   ; 13247 (99.6%) ; 69 (63.3%) ; 4180 (100.0%) ; 8998 (99.8%)  ;
+;     -- Number of signals with Zero toggle rate, from Vectorless estimation             ; 99 (0.7%)     ; 29 (26.6%) ; 2 (0.0%)      ; 68 (0.8%)     ;
+;     -- Number of signals with Static Probability from Vectorless estimation            ; 13247 (99.6%) ; 69 (63.3%) ; 4180 (100.0%) ; 8998 (99.8%)  ;
+;                                                                                        ;               ;            ;               ;               ;
+; Default assignment                                                                     ;               ;            ;               ;               ;
+;     -- Number of signals with Toggle Rate from Default assignment                      ; 28 (0.2%)     ; 28 (25.7%) ; 0 (0.0%)      ; 0 (0.0%)      ;
+;     -- Number of signals with Static Probability from Default assignment               ; 33 (0.2%)     ; 33 (30.3%) ; 0 (0.0%)      ; 0 (0.0%)      ;
+;                                                                                        ;               ;            ;               ;               ;
+; Assumed 0                                                                              ;               ;            ;               ;               ;
+;     -- Number of signals with Toggle Rate assumed 0                                    ; 5 (0.0%)      ; 5 (4.6%)   ; 0 (0.0%)      ; 0 (0.0%)      ;
++----------------------------------------------------------------------------------------+---------------+------------+---------------+---------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------+
+; Signal Activities                                                                                                                           ;
++--------+------+---------------------------------------------+-------------------------+--------------------+--------------------------------+
+; Signal ; Type ; Toggle Rate (millions of transitions / sec) ; Toggle Rate Data Source ; Static Probability ; Static Probability Data Source ;
++--------+------+---------------------------------------------+-------------------------+--------------------+--------------------------------+
+(1) The "Signal Activity" Table has been hidden. To show this table, please select the "Write signal activities to report file" option under "PowerPlay Power Analyzer Settings".
+
+
++-------------------------+
+; Power Analyzer Messages ;
++-------------------------+
+Info: *******************************************************************
+Info: Running Quartus Prime Power Analyzer
+    Info: Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
+    Info: Processing started: Wed May  1 14:55:43 2024
+Info: Command: quartus_pow --read_settings_files=off --write_settings_files=off endeavour -c EndeavourSoc
+Info (21077): Low junction temperature is 0 degrees C
+Info (21077): High junction temperature is 85 degrees C
+Info (332104): Reading SDC File: 'EndeavourSoc.sdc'
+Info (332110): Deriving PLL clocks
+    Info (332110): create_generated_clock -source {board_ctrl|pll|altpll_component|auto_generated|pll1|inclk[0]} -divide_by 25 -multiply_by 24 -duty_cycle 50.00 -name {board_ctrl|pll|altpll_component|auto_generated|pll1|clk[0]} {board_ctrl|pll|altpll_component|auto_generated|pll1|clk[0]}
+    Info (332110): create_generated_clock -source {board_ctrl|pll|altpll_component|auto_generated|pll1|inclk[0]} -divide_by 25 -multiply_by 24 -phase 90.00 -duty_cycle 50.00 -name {board_ctrl|pll|altpll_component|auto_generated|pll1|clk[1]} {board_ctrl|pll|altpll_component|auto_generated|pll1|clk[1]}
+    Info (332110): create_generated_clock -source {board_ctrl|pll|altpll_component|auto_generated|pll1|inclk[0]} -divide_by 25 -multiply_by 12 -duty_cycle 50.00 -name {board_ctrl|pll|altpll_component|auto_generated|pll1|clk[2]} {board_ctrl|pll|altpll_component|auto_generated|pll1|clk[2]}
+    Info (332110): create_generated_clock -source {board_ctrl|pll|altpll_component|auto_generated|pll1|inclk[0]} -divide_by 5 -multiply_by 12 -duty_cycle 50.00 -name {board_ctrl|pll|altpll_component|auto_generated|pll1|clk[3]} {board_ctrl|pll|altpll_component|auto_generated|pll1|clk[3]}
+Info (332151): Clock uncertainty is not calculated until you update the timing netlist.
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[15]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+    Info (332050): set_output_delay -clock {board_ctrl|pll|altpll_component|auto_generated|pll1|clk[0]} 0 [get_ports {io_ddr_*}] File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[14]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[13]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[12]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[11]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[10]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[9]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[8]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[7]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[6]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[5]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[4]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[3]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[2]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[1]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dq[0]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dm[0]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dm[1]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dqs[0]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_dqs[1]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_ck_p". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_ck_n". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_cke". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_cs_n". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_ras_n". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_cas_n". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_we_n". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_ba[0]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_ba[1]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[0]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[1]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[2]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[3]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[4]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[5]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[6]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[7]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[8]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[9]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[10]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[11]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[12]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Warning (332054): Assignment set_output_delay is accepted but has some problems at EndeavourSoc.sdc(80): Set_input_delay/set_output_delay has replaced one or more delays on port "io_ddr_sdram_a[13]". Please use -add_delay option if you meant to add additional constraints. File: /home/petya/endeavour/rtl/board_rev2/EndeavourSoc.sdc Line: 80
+Info (332123): Deriving Clock Uncertainty. Please refer to report_sdc in the Timing Analyzer to see clock uncertainties.
+Info (223000): Starting Vectorless Power Activity Estimation
+Warning (222013): Relative toggle rates could not be calculated because no clock domain could be identified for some nodes
+Info (223001): Completed Vectorless Power Activity Estimation
+Info (218000): Using Advanced I/O Power to simulate I/O buffers with the specified board trace model
+Info (334003): Started post-fitting delay annotation
+Info (334004): Delay annotation completed successfully
+Info (215049): Average toggle rate for this design is 11.225 millions of transitions / sec
+Info (215031): Total thermal power estimate for the design is 785.91 mW
+Info: Quartus Prime Power Analyzer was successful. 0 errors, 44 warnings
+    Info: Peak virtual memory: 918 megabytes
+    Info: Processing ended: Wed May  1 14:55:50 2024
+    Info: Elapsed time: 00:00:07
+    Info: Total CPU time (on all processors): 00:00:14
+
+

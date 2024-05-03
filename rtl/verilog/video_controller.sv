@@ -10,9 +10,6 @@ module VideoController(
   output dvi_tmdsCp, output dvi_tmdsCm
 );
 
-  assign dvi_tmdsCp = tmds_pixel_clk;
-  assign dvi_tmdsCm = ~dvi_tmdsCp;
-
   assign video_mode_out = 2'd1;
 
   // mode 1 (640x480)
@@ -94,6 +91,7 @@ module VideoController(
 
   reg [2:0] shift_counter = 3'd0;
   reg [9:0] tmds0_shift, tmds1_shift, tmds2_shift;
+  reg tmdsC, tmdsC_next;
 
   always @(posedge tmds_x5_clk) begin
     if (shift_counter == 3'd0) begin
@@ -107,15 +105,30 @@ module VideoController(
       tmds1_shift <= {2'd0, tmds1_shift[9:2]};
       tmds2_shift <= {2'd0, tmds2_shift[9:2]};
     end
+    tmdsC <= |shift_counter[2:1];
+    tmdsC_next <= shift_counter[2] | &shift_counter[1:0];
   end
 
-  // TODO DDR_OUT3
-  assign dvi_tmds0p = tmds0_shift[0];
-  assign dvi_tmds0m = tmds0_shift[1];
-  assign dvi_tmds1p = tmds1_shift[0];
-  assign dvi_tmds1m = tmds1_shift[1];
-  assign dvi_tmds2p = tmds2_shift[0];
-  assign dvi_tmds2m = tmds2_shift[1];
+  wire [3:0] pad_out_p;
+  wire [3:0] pad_out_m;
+  DDR_O4 out_p(
+    .outclock(tmds_x5_clk),
+    .din({tmdsC_next, tmds2_shift[1], tmds1_shift[1], tmds0_shift[1], tmdsC, tmds2_shift[0], tmds1_shift[0], tmds0_shift[0]}),
+    .pad_out(pad_out_p)
+  );
+  DDR_O4 out_m(
+    .outclock(tmds_x5_clk),
+    .din(~{tmdsC_next, tmds2_shift[1], tmds1_shift[1], tmds0_shift[1], tmdsC, tmds2_shift[0], tmds1_shift[0], tmds0_shift[0]}),
+    .pad_out(pad_out_m)
+  );
+  assign dvi_tmds0p = pad_out_p[0];
+  assign dvi_tmds0m = pad_out_m[0];
+  assign dvi_tmds1p = pad_out_p[1];
+  assign dvi_tmds1m = pad_out_m[1];
+  assign dvi_tmds2p = pad_out_p[2];
+  assign dvi_tmds2m = pad_out_m[2];
+  assign dvi_tmdsCp = pad_out_p[3];
+  assign dvi_tmdsCm = pad_out_m[3];
 
 endmodule
 

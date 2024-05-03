@@ -7,16 +7,49 @@ import spinal.lib.bus.amba4.axi._
 
 import endeavour.interfaces._
 
-class Clocking extends BlackBox {
+class ApbClockBridge(awidth: Int) extends BlackBox {
+  addGeneric("AWIDTH", awidth)
+  val apb_conf = Apb3Config(
+    addressWidth  = awidth,
+    dataWidth     = 32,
+    useSlaveError = false
+  )
   val io = new Bundle {
-    val clk_in = in Bool()
+    val clk_input = in Bool()
+    val clk_output = in Bool()
+    val input = slave(Apb3(apb_conf))
+    val output = master(Apb3(apb_conf))
+  }
+  noIoPrefix()
+  mapClockDomain(clock=io.clk_input)
+}
+
+class BoardController extends BlackBox {
+  val io = new Bundle {
     val nreset_in = in Bool()
-    val clk = out Bool()
-    val clk_delayed = out Bool()
+    val clk_in = in Bool()
+    val plla = PLL()
+    val pllb = PLL()
+
     val reset = out Bool()
+    val clk_cpu = out Bool()
+    val clk_ram = out Bool()
+    //val clk_ram_bus = out Bool()
+    //val clk_sdcard = out Bool()
+    val clk_peripheral = out Bool()  // uart, audio, usb
+
     val video_mode = in Bits(2 bits)
-    val tmds_pixel_clk = out Bool()
-    val tmds_x5_clk = out Bool()
+    val clk_tmds_pixel = out Bool()
+    val clk_tmds_x5 = out Bool()
+
+    val leds = out Bits(3 bits)
+    val keys = in Bits(2 bits)
+
+    val apb = slave(Apb3(Apb3Config(
+      addressWidth  = 4,
+      dataWidth     = 32,
+      useSlaveError = false
+    )))
   }
   noIoPrefix()
 }
@@ -64,29 +97,12 @@ class SdcardController extends BlackBox {
   mapClockDomain(clock=io.clk, reset=io.reset)
 }
 
-class GpioController extends BlackBox {
-  val io = new Bundle {
-    val clk = in Bool()
-    val reset = in Bool()
-    val leds = out Bits(3 bits)
-    val keys = in Bits(2 bits)
-    val apb = slave(Apb3(Apb3Config(
-      addressWidth  = 3,
-      dataWidth     = 32,
-      useSlaveError = false
-    )))
-  }
-  noIoPrefix()
-  mapClockDomain(clock=io.clk, reset=io.reset)
-}
-
 class AudioController extends BlackBox {
   val io = new Bundle {
     val clk = in Bool()
     val reset = in Bool()
     val shdn = out Bool()
-    val i2c_scl = out Bool()
-    val i2c_sda = inout(Analog(Bool()))
+    val i2c = I2C()
     val apb = slave(Apb3(Apb3Config(
       addressWidth  = 3,
       dataWidth     = 32,

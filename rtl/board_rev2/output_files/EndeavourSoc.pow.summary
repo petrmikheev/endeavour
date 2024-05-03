@@ -1,0 +1,12 @@
+Power Analyzer Status : Successful - Wed May  1 14:55:50 2024
+Quartus Prime Version : 21.1.0 Build 842 10/21/2021 SJ Lite Edition
+Revision Name : EndeavourSoc
+Top-level Entity Name : EndeavourSoc
+Family : MAX 10
+Device : 10M50SAE144C8G
+Power Models : Final
+Total Thermal Power Dissipation : 785.91 mW
+Core Dynamic Thermal Power Dissipation : 455.66 mW
+Core Static Thermal Power Dissipation : 260.28 mW
+I/O Thermal Power Dissipation : 69.98 mW
+Power Estimation Confidence : Low: user provided insufficient toggle rate data

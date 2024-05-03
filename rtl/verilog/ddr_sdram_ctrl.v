@@ -342,7 +342,7 @@ reg ddr_out_valid_buf = 0;
 
 DDR_IO8 io_l(
   .outclock(clk),
-  .inclock(ddr_dqs[0]),
+  .inclock(clk /*ddr_dqs[0]*/),
   .oe(output_enable ? 8'hff : 8'h0),
   .pad_io(ddr_dq[7:0]),
   .din({ddr_out[7:0], ddr_out[23:16]}),
@@ -351,7 +351,7 @@ DDR_IO8 io_l(
 
 DDR_IO8 io_h(
   .outclock(clk),
-  .inclock(ddr_dqs[1]),
+  .inclock(clk /*ddr_dqs[1]*/),
   .oe(output_enable ? 8'hff : 8'h0),
   .pad_io(ddr_dq[15:8]),
   .din({ddr_out[15:8], ddr_out[31:24]}),

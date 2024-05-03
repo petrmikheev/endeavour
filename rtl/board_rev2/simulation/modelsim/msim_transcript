@@ -1,0 +1,901 @@
+# //  Questa Intel Starter FPGA Edition-64
+# //  Version 2021.2 linux_x86_64 Apr 14 2021
+# //
+# //  Copyright 1991-2021 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# do EndeavourSoc_run_msim_rtl_verilog.do
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Questa Intel Starter FPGA Edition-64 vmap 2021.2 Lib Mapping Utility 2021.04 Apr 14 2021
+# vmap work rtl_work 
+# Copying /home/petya/intelFPGA_lite/21.1/questa_fse/linux_x86_64/../modelsim.ini to modelsim.ini
+# Modifying modelsim.ini
+# 
+# vlog -vlog01compat -work work +incdir+/home/petya/sdspi/rtl {/home/petya/sdspi/rtl/sdwb.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:32 on Apr 02,2024
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+/home/petya/sdspi/rtl" /home/petya/sdspi/rtl/sdwb.v 
+# -- Compiling module sdwb
+# 
+# Top level modules:
+# 	sdwb
+# End time: 02:46:32 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+/home/petya/sdspi/rtl {/home/petya/sdspi/rtl/sdio_top.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:32 on Apr 02,2024
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+/home/petya/sdspi/rtl" /home/petya/sdspi/rtl/sdio_top.v 
+# -- Compiling module sdio_top
+# 
+# Top level modules:
+# 	sdio_top
+# End time: 02:46:32 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+/home/petya/sdspi/rtl {/home/petya/sdspi/rtl/sdio.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:32 on Apr 02,2024
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+/home/petya/sdspi/rtl" /home/petya/sdspi/rtl/sdio.v 
+# -- Compiling module sdio
+# 
+# Top level modules:
+# 	sdio
+# End time: 02:46:32 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+/home/petya/sdspi/rtl {/home/petya/sdspi/rtl/sdfrontend.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:32 on Apr 02,2024
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+/home/petya/sdspi/rtl" /home/petya/sdspi/rtl/sdfrontend.v 
+# -- Compiling module sdfrontend
+# 
+# Top level modules:
+# 	sdfrontend
+# End time: 02:46:32 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+/home/petya/sdspi/rtl {/home/petya/sdspi/rtl/sdcmd.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:32 on Apr 02,2024
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+/home/petya/sdspi/rtl" /home/petya/sdspi/rtl/sdcmd.v 
+# -- Compiling module sdcmd
+# 
+# Top level modules:
+# 	sdcmd
+# End time: 02:46:32 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+/home/petya/sdspi/rtl {/home/petya/sdspi/rtl/sdckgen.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:32 on Apr 02,2024
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+/home/petya/sdspi/rtl" /home/petya/sdspi/rtl/sdckgen.v 
+# -- Compiling module sdckgen
+# 
+# Top level modules:
+# 	sdckgen
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+/home/petya/endeavour/rtl2/spinal {/home/petya/endeavour/rtl2/spinal/EndeavourSoc.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+/home/petya/endeavour/rtl2/spinal" /home/petya/endeavour/rtl2/spinal/EndeavourSoc.v 
+# -- Compiling module EndeavourSoc
+# -- Compiling module Apb3Router
+# -- Compiling module Apb3Decoder
+# -- Compiling module Axi4SharedArbiter_1
+# -- Compiling module Axi4SharedArbiter
+# -- Compiling module Axi4SharedDecoder
+# -- Compiling module Axi4ReadOnlyDecoder
+# -- Compiling module Axi4SharedToApb3Bridge
+# -- Compiling module Axi4SharedOnChipRam
+# -- Compiling module VexRiscv
+# -- Compiling module StreamArbiter
+# -- Compiling module StreamFifoLowLatency_1
+# -- Compiling module StreamArbiter_1
+# -- Compiling module Axi4SharedErrorSlave
+# -- Compiling module Axi4ReadOnlyErrorSlave
+# -- Compiling module DataCache
+# -- Compiling module InstructionCache
+# -- Compiling module StreamFifo_1
+# 
+# Top level modules:
+# 	EndeavourSoc
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+/home/petya/endeavour/rtl2/board_rev1 {/home/petya/endeavour/rtl2/board_rev1/PLL.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+/home/petya/endeavour/rtl2/board_rev1" /home/petya/endeavour/rtl2/board_rev1/PLL.v 
+# -- Compiling module PLL
+# 
+# Top level modules:
+# 	PLL
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+/home/petya/endeavour/rtl2/board_rev1 {/home/petya/endeavour/rtl2/board_rev1/OnChipRAM.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+/home/petya/endeavour/rtl2/board_rev1" /home/petya/endeavour/rtl2/board_rev1/OnChipRAM.v 
+# -- Compiling module OnChipRAM
+# 
+# Top level modules:
+# 	OnChipRAM
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -vlog01compat -work work +incdir+/home/petya/endeavour/rtl2/board_rev1/db {/home/petya/endeavour/rtl2/board_rev1/db/PLL_altpll.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -vlog01compat -work work "+incdir+/home/petya/endeavour/rtl2/board_rev1/db" /home/petya/endeavour/rtl2/board_rev1/db/PLL_altpll.v 
+# -- Compiling module PLL_altpll
+# 
+# Top level modules:
+# 	PLL_altpll
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/sdspi/rtl {/home/petya/sdspi/rtl/sdrxframe.sv}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/sdspi/rtl" /home/petya/sdspi/rtl/sdrxframe.sv 
+# -- Compiling module sdrxframe
+# 
+# Top level modules:
+# 	sdrxframe
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/sdspi/rtl {/home/petya/sdspi/rtl/sdtxframe.sv}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/sdspi/rtl" /home/petya/sdspi/rtl/sdtxframe.sv 
+# -- Compiling module sdtxframe
+# 
+# Top level modules:
+# 	sdtxframe
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/endeavour/rtl2/verilog {/home/petya/endeavour/rtl2/verilog/video_controller.sv}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/endeavour/rtl2/verilog" /home/petya/endeavour/rtl2/verilog/video_controller.sv 
+# -- Compiling module VideoController
+# -- Compiling module TMDS_encoder
+# 
+# Top level modules:
+# 	VideoController
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/endeavour/rtl2/verilog {/home/petya/endeavour/rtl2/verilog/uart_controller.sv}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/endeavour/rtl2/verilog" /home/petya/endeavour/rtl2/verilog/uart_controller.sv 
+# -- Compiling module UartController
+# 
+# Top level modules:
+# 	UartController
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/endeavour/rtl2/verilog {/home/petya/endeavour/rtl2/verilog/sdcard_controller.sv}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/endeavour/rtl2/verilog" /home/petya/endeavour/rtl2/verilog/sdcard_controller.sv 
+# -- Compiling module SdcardController
+# -- Compiling module IOBUF
+# 
+# Top level modules:
+# 	SdcardController
+# 	IOBUF
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/endeavour/rtl2/verilog {/home/petya/endeavour/rtl2/verilog/internal_ram.sv}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/endeavour/rtl2/verilog" /home/petya/endeavour/rtl2/verilog/internal_ram.sv 
+# -- Compiling module Ram_1wrs
+# 
+# Top level modules:
+# 	Ram_1wrs
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/endeavour/rtl2/verilog {/home/petya/endeavour/rtl2/verilog/clocking.sv}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/endeavour/rtl2/verilog" /home/petya/endeavour/rtl2/verilog/clocking.sv 
+# -- Compiling module Clocking
+# 
+# Top level modules:
+# 	Clocking
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# 
+# vlog -sv -work work +incdir+/home/petya/endeavour/rtl2/board_rev1/../testbench {/home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/endeavour/rtl2/board_rev1/../testbench" /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv 
+# -- Compiling module testbench
+# 
+# Top level modules:
+# 	testbench
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog {/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog/mdl_sdcmd.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog" /home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog/mdl_sdcmd.v 
+# -- Compiling module mdl_sdcmd
+# 
+# Top level modules:
+# 	mdl_sdcmd
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog {/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog/mdl_sdio.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog" /home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog/mdl_sdio.v 
+# -- Compiling module mdl_sdio
+# 
+# Top level modules:
+# 	mdl_sdio
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog {/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog/mdl_sdrx.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog" /home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog/mdl_sdrx.v 
+# -- Compiling module mdl_sdrx
+# 
+# Top level modules:
+# 	mdl_sdrx
+# End time: 02:46:33 on Apr 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vlog -sv -work work +incdir+/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog {/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog/mdl_sdtx.v}
+# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
+# Start time: 02:46:33 on Apr 02,2024
+# vlog -reportprogress 300 -sv -work work "+incdir+/home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog" /home/petya/endeavour/rtl2/board_rev1/../../../sdspi/bench/verilog/mdl_sdtx.v 
+# -- Compiling module mdl_sdtx
+# 
+# Top level modules:
+# 	mdl_sdtx
+# End time: 02:46:34 on Apr 02,2024, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# 
+# vsim -t 1ps -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L fiftyfivenm_ver -L rtl_work -L work -voptargs="+acc"  testbench
+# vsim -t 1ps -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L fiftyfivenm_ver -L rtl_work -L work -voptargs=""+acc"" testbench 
+# Start time: 02:46:34 on Apr 02,2024
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Warning: /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(38): (vopt-2685) [TFMPC] - Too few port connections for 'system'.  Expected 16, found 7.
+# ** Warning: /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(38): (vopt-2718) [TFMPC] - Missing connection for port 'io_dvi_tmdsCm'.
+# ** Warning: /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(38): (vopt-2718) [TFMPC] - Missing connection for port 'io_dvi_tmdsCp'.
+# ** Warning: /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(38): (vopt-2718) [TFMPC] - Missing connection for port 'io_dvi_tmds2m'.
+# ** Warning: /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(38): (vopt-2718) [TFMPC] - Missing connection for port 'io_dvi_tmds2p'.
+# ** Warning: /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(38): (vopt-2718) [TFMPC] - Missing connection for port 'io_dvi_tmds1m'.
+# ** Warning: /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(38): (vopt-2718) [TFMPC] - Missing connection for port 'io_dvi_tmds1p'.
+# ** Warning: /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(38): (vopt-2718) [TFMPC] - Missing connection for port 'io_dvi_tmds0m'.
+# ** Warning: /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(38): (vopt-2718) [TFMPC] - Missing connection for port 'io_dvi_tmds0p'.
+# ** Warning: /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(38): (vopt-2718) [TFMPC] - Missing connection for port 'io_leds'.
+# ** Warning: /home/petya/endeavour/rtl2/verilog/sdcard_controller.sv(32): (vopt-2685) [TFMPC] - Too few port connections for 'impl'.  Expected 20, found 15.
+# ** Warning: /home/petya/endeavour/rtl2/verilog/sdcard_controller.sv(32): (vopt-2718) [TFMPC] - Missing connection for port 'o_debug'.
+# ** Warning: /home/petya/endeavour/rtl2/verilog/sdcard_controller.sv(32): (vopt-2718) [TFMPC] - Missing connection for port 'o_int'.
+# ** Warning: /home/petya/endeavour/rtl2/verilog/sdcard_controller.sv(32): (vopt-2718) [TFMPC] - Missing connection for port 'o_1p8v'.
+# ** Warning: /home/petya/endeavour/rtl2/verilog/sdcard_controller.sv(32): (vopt-2718) [TFMPC] - Missing connection for port 'i_ds'.
+# ** Warning: /home/petya/endeavour/rtl2/verilog/sdcard_controller.sv(32): (vopt-2718) [TFMPC] - Missing connection for port 'i_hsclk'.
+# ** Note: (vopt-143) Recognized 1 FSM in module "VexRiscv(fast)".
+# ** Note: (vopt-143) Recognized 1 FSM in module "sdtxframe(fast)".
+# ** Note: (vopt-143) Recognized 1 FSM in module "Axi4SharedToApb3Bridge(fast)".
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=16.
+# Loading sv_std.std
+# Loading work.testbench(fast)
+# Loading work.EndeavourSoc(fast)
+# Loading work.Clocking(fast)
+# Loading work.PLL(fast)
+# Loading altera_mf_ver.altpll(fast)
+# Loading altera_mf_ver.ALTERA_DEVICE_FAMILIES(fast)
+# Loading altera_mf_ver.MF_cycloneiii_pll(fast)
+# Loading altera_mf_ver.cda_m_cntr(fast)
+# Loading altera_mf_ver.cda_n_cntr(fast)
+# Loading altera_mf_ver.cda_scale_cntr(fast)
+# Loading altera_mf_ver.pll_iobuf(fast)
+# Loading work.VideoController(fast)
+# Loading work.TMDS_encoder(fast)
+# Loading work.UartController(fast)
+# Loading work.SdcardController(fast)
+# Loading work.sdio_top(fast)
+# Loading work.sdio(fast)
+# Loading work.sdwb(fast)
+# Loading work.sdckgen(fast)
+# Loading work.sdcmd(fast)
+# Loading work.sdtxframe(fast)
+# Loading work.sdrxframe(fast)
+# Loading work.sdfrontend(fast)
+# Loading work.IOBUF(fast)
+# Loading work.VexRiscv(fast)
+# Loading work.InstructionCache(fast)
+# Loading work.DataCache(fast)
+# Loading work.Axi4SharedOnChipRam(fast)
+# Loading work.Ram_1wrs(fast)
+# Loading work.OnChipRAM(fast)
+# Loading altera_mf_ver.altsyncram(fast)
+# Loading altera_mf_ver.altsyncram_body(fast)
+# Loading altera_mf_ver.ALTERA_DEVICE_FAMILIES(fast__1)
+# Loading altera_mf_ver.ALTERA_MF_MEMORY_INITIALIZATION(fast)
+# Loading work.Axi4SharedToApb3Bridge(fast)
+# Loading work.Axi4ReadOnlyDecoder(fast)
+# Loading work.Axi4ReadOnlyErrorSlave(fast)
+# Loading work.Axi4SharedDecoder(fast)
+# Loading work.Axi4SharedErrorSlave(fast)
+# Loading work.Axi4SharedArbiter(fast)
+# Loading work.StreamArbiter_1(fast)
+# Loading work.StreamFifoLowLatency_1(fast)
+# Loading work.StreamFifo_1(fast)
+# Loading work.Axi4SharedArbiter_1(fast)
+# Loading work.StreamArbiter(fast)
+# Loading work.Apb3Decoder(fast)
+# Loading work.Apb3Router(fast)
+# Loading work.mdl_sdio(fast)
+# Loading work.mdl_sdcmd(fast)
+# Loading work.mdl_sdrx(fast)
+# Loading work.mdl_sdtx(fast)
+# 
+# add wave *
+# view structure
+# .main_pane.structure.interior.cs.body.struct
+# view signals
+# .main_pane.objects.interior.cs.body.tree
+# run -all
+# ** Warning: (vsim-3534) [FOFIR] - Failed to open file "../../endeavour/software/bootloader/bootloader.hex" for reading.
+# No such file or directory. (errno = ENOENT)    : /home/petya/intelFPGA_lite/21.1/questa_fse/linux_x86_64/../intel/verilog/src/altera_mf.v(871)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench/system/internalRam/ram/internal_ram/altsyncram_component/m_default/altsyncram_inst
+# ERROR: cannot read ../../endeavour/software/bootloader/bootloader.hex.
+# ** Warning: (vsim-7) Failed to open readmem file "../../endeavour/software/bootloader/bootloader.ver" in read mode.
+# No such file or directory. (errno = ENOENT)    : /home/petya/intelFPGA_lite/21.1/questa_fse/linux_x86_64/../intel/verilog/src/altera_mf.v(48977)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench/system/internalRam/ram/internal_ram/altsyncram_component/m_default/altsyncram_inst
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+#  Note : MAX 10 PLL locked to incoming clock
+# Time: 45000  Instance: testbench.system.clocks.pll.altpll_component.cycloneiii_pll.pll3
+# Break key hit
+# Break in Module MF_cycloneiii_pll at /home/petya/intelFPGA_lite/21.1/questa_fse/linux_x86_64/../intel/verilog/src/altera_mf.v line 16982
+add wave -position end  sim:/testbench/system/io_leds
+add wave -position end  sim:/testbench/system/clocks/nreset_in
+add wave -position end  sim:/testbench/system/clocks/reset
+add wave -position end  sim:/testbench/system/clocks/reset_counter
+restart -f
+# Closing VCD file "dump.vcd"
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+# ** Note: (vsim-8009) Loading existing optimized design _opt
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=16.
+# Loading work.testbench(fast)
+# Loading work.EndeavourSoc(fast)
+# Loading work.Clocking(fast)
+# Loading work.PLL(fast)
+# Loading altera_mf_ver.altpll(fast)
+# Loading altera_mf_ver.ALTERA_DEVICE_FAMILIES(fast)
+# Loading altera_mf_ver.MF_cycloneiii_pll(fast)
+# Loading altera_mf_ver.cda_m_cntr(fast)
+# Loading altera_mf_ver.cda_n_cntr(fast)
+# Loading altera_mf_ver.cda_scale_cntr(fast)
+# Loading altera_mf_ver.pll_iobuf(fast)
+# Loading work.VideoController(fast)
+# Loading work.TMDS_encoder(fast)
+# Loading work.UartController(fast)
+# Loading work.SdcardController(fast)
+# Loading work.sdio_top(fast)
+# Loading work.sdio(fast)
+# Loading work.sdwb(fast)
+# Loading work.sdckgen(fast)
+# Loading work.sdcmd(fast)
+# Loading work.sdtxframe(fast)
+# Loading work.sdrxframe(fast)
+# Loading work.sdfrontend(fast)
+# Loading work.IOBUF(fast)
+# Loading work.VexRiscv(fast)
+# Loading work.InstructionCache(fast)
+# Loading work.DataCache(fast)
+# Loading work.Axi4SharedOnChipRam(fast)
+# Loading work.Ram_1wrs(fast)
+# Loading work.OnChipRAM(fast)
+# Loading altera_mf_ver.altsyncram(fast)
+# Loading altera_mf_ver.altsyncram_body(fast)
+# Loading altera_mf_ver.ALTERA_DEVICE_FAMILIES(fast__1)
+# Loading altera_mf_ver.ALTERA_MF_MEMORY_INITIALIZATION(fast)
+# Loading work.Axi4SharedToApb3Bridge(fast)
+# Loading work.Axi4ReadOnlyDecoder(fast)
+# Loading work.Axi4ReadOnlyErrorSlave(fast)
+# Loading work.Axi4SharedDecoder(fast)
+# Loading work.Axi4SharedErrorSlave(fast)
+# Loading work.Axi4SharedArbiter(fast)
+# Loading work.StreamArbiter_1(fast)
+# Loading work.StreamFifoLowLatency_1(fast)
+# Loading work.StreamFifo_1(fast)
+# Loading work.Axi4SharedArbiter_1(fast)
+# Loading work.StreamArbiter(fast)
+# Loading work.Apb3Decoder(fast)
+# Loading work.Apb3Router(fast)
+# Loading work.mdl_sdio(fast)
+# Loading work.mdl_sdcmd(fast)
+# Loading work.mdl_sdrx(fast)
+# Loading work.mdl_sdtx(fast)
+run -all
+# ** Warning: (vsim-3534) [FOFIR] - Failed to open file "../../endeavour/software/bootloader/bootloader.hex" for reading.
+# No such file or directory. (errno = ENOENT)    : /home/petya/intelFPGA_lite/21.1/questa_fse/linux_x86_64/../intel/verilog/src/altera_mf.v(871)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench/system/internalRam/ram/internal_ram/altsyncram_component/m_default/altsyncram_inst
+# ERROR: cannot read ../../endeavour/software/bootloader/bootloader.hex.
+# ** Warning: (vsim-7) Failed to open readmem file "../../endeavour/software/bootloader/bootloader.ver" in read mode.
+# No such file or directory. (errno = ENOENT)    : /home/petya/intelFPGA_lite/21.1/questa_fse/linux_x86_64/../intel/verilog/src/altera_mf.v(48977)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench/system/internalRam/ram/internal_ram/altsyncram_component/m_default/altsyncram_inst
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+#  Note : MAX 10 PLL locked to incoming clock
+# Time: 45000  Instance: testbench.system.clocks.pll.altpll_component.cycloneiii_pll.pll3
+# Break key hit
+# Break in Module MF_cycloneiii_pll at /home/petya/intelFPGA_lite/21.1/questa_fse/linux_x86_64/../intel/verilog/src/altera_mf.v line 17699
+add wave -position end  sim:/testbench/system/clocks/clk
+add wave -position end  sim:/testbench/system/internalRam/ram_en
+add wave -position end  sim:/testbench/system/internalRam/ram_addr
+add wave -position end  sim:/testbench/system/internalRam/ram_rdData
+add wave -position end  sim:/testbench/system/internalRam/ram/en
+add wave -position end  sim:/testbench/system/internalRam/ram/wr
+add wave -position end  sim:/testbench/system/internalRam/ram/addr
+add wave -position end  sim:/testbench/system/internalRam/ram/mask
+add wave -position end  sim:/testbench/system/internalRam/ram/wrData
+add wave -position end  sim:/testbench/system/internalRam/ram/rdData
+add wave -position end  sim:/testbench/system/video_ctrl/dvi_tmds0p
+add wave -position end  sim:/testbench/system/video_ctrl/dvi_tmds0m
+# Break key hit
+restart -f
+# Closing VCD file "dump.vcd"
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+# ** Note: (vsim-8009) Loading existing optimized design _opt
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=16.
+# Loading work.testbench(fast)
+# Loading work.EndeavourSoc(fast)
+# Loading work.Clocking(fast)
+# Loading work.PLL(fast)
+# Loading altera_mf_ver.altpll(fast)
+# Loading altera_mf_ver.ALTERA_DEVICE_FAMILIES(fast)
+# Loading altera_mf_ver.MF_cycloneiii_pll(fast)
+# Loading altera_mf_ver.cda_m_cntr(fast)
+# Loading altera_mf_ver.cda_n_cntr(fast)
+# Loading altera_mf_ver.cda_scale_cntr(fast)
+# Loading altera_mf_ver.pll_iobuf(fast)
+# Loading work.VideoController(fast)
+# Loading work.TMDS_encoder(fast)
+# Loading work.UartController(fast)
+# Loading work.SdcardController(fast)
+# Loading work.sdio_top(fast)
+# Loading work.sdio(fast)
+# Loading work.sdwb(fast)
+# Loading work.sdckgen(fast)
+# Loading work.sdcmd(fast)
+# Loading work.sdtxframe(fast)
+# Loading work.sdrxframe(fast)
+# Loading work.sdfrontend(fast)
+# Loading work.IOBUF(fast)
+# Loading work.VexRiscv(fast)
+# Loading work.InstructionCache(fast)
+# Loading work.DataCache(fast)
+# Loading work.Axi4SharedOnChipRam(fast)
+# Loading work.Ram_1wrs(fast)
+# Loading work.OnChipRAM(fast)
+# Loading altera_mf_ver.altsyncram(fast)
+# Loading altera_mf_ver.altsyncram_body(fast)
+# Loading altera_mf_ver.ALTERA_DEVICE_FAMILIES(fast__1)
+# Loading altera_mf_ver.ALTERA_MF_MEMORY_INITIALIZATION(fast)
+# Loading work.Axi4SharedToApb3Bridge(fast)
+# Loading work.Axi4ReadOnlyDecoder(fast)
+# Loading work.Axi4ReadOnlyErrorSlave(fast)
+# Loading work.Axi4SharedDecoder(fast)
+# Loading work.Axi4SharedErrorSlave(fast)
+# Loading work.Axi4SharedArbiter(fast)
+# Loading work.StreamArbiter_1(fast)
+# Loading work.StreamFifoLowLatency_1(fast)
+# Loading work.StreamFifo_1(fast)
+# Loading work.Axi4SharedArbiter_1(fast)
+# Loading work.StreamArbiter(fast)
+# Loading work.Apb3Decoder(fast)
+# Loading work.Apb3Router(fast)
+# Loading work.mdl_sdio(fast)
+# Loading work.mdl_sdcmd(fast)
+# Loading work.mdl_sdrx(fast)
+# Loading work.mdl_sdtx(fast)
+run -all
+# ** Warning: (vsim-3534) [FOFIR] - Failed to open file "../../endeavour/software/bootloader/bootloader.hex" for reading.
+# No such file or directory. (errno = ENOENT)    : /home/petya/intelFPGA_lite/21.1/questa_fse/linux_x86_64/../intel/verilog/src/altera_mf.v(871)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench/system/internalRam/ram/internal_ram/altsyncram_component/m_default/altsyncram_inst
+# ERROR: cannot read ../../endeavour/software/bootloader/bootloader.hex.
+# ** Warning: (vsim-7) Failed to open readmem file "../../endeavour/software/bootloader/bootloader.ver" in read mode.
+# No such file or directory. (errno = ENOENT)    : /home/petya/intelFPGA_lite/21.1/questa_fse/linux_x86_64/../intel/verilog/src/altera_mf.v(48977)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench/system/internalRam/ram/internal_ram/altsyncram_component/m_default/altsyncram_inst
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 2 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+# ** Error: (vsim-PLI-3537) $dumpvars() : Argument 3 is invalid.    : /home/petya/endeavour/rtl2/board_rev1/../testbench/testbench.sv(100)
+#    Time: 0 ps  Iteration: 0  Instance: /testbench
+#  Note : MAX 10 PLL locked to incoming clock
+# Time: 45000  Instance: testbench.system.clocks.pll.altpll_component.cycloneiii_pll.pll3
+# Break key hit
+# Break in Module MF_cycloneiii_pll at /home/petya/intelFPGA_lite/21.1/questa_fse/linux_x86_64/../intel/verilog/src/altera_mf.v line 16982
+# Can't move the Now cursor.
+# End time: 03:06:18 on Apr 02,2024, Elapsed time: 0:19:44
+# Errors: 64, Warnings: 18

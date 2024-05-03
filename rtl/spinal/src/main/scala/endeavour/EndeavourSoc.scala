@@ -22,52 +22,77 @@ class EndeavourSoc extends Component {
   val externalRamSize = 0x8000000L // 128 MB
 
   val io = new Bundle {
-    val clk100mhz = in Bool()
     val nreset = in Bool()
+    val clk_in = in Bool()
+    val plla = PLL()
+    val pllb = PLL()
+
     val leds = out Bits(3 bits)
     val keys = in Bits(2 bits)
     val audio_shdn = out Bool()
-    val audio_scl = out Bool()
-    val audio_sda = inout(Analog(Bool()))
+    val audio_i2c = I2C()
     val uart = UART()
-    //val dvi = DVI()
+    val dvi = DVI()
     val sdcard = SDCARD()
     val ddr_sdram = DDR_SDRAM(14)
   }
 
-  val clocks = new Clocking()
-  clocks.io.clk_in <> io.clk100mhz
-  clocks.io.nreset_in <> io.nreset
+  val board_ctrl = new BoardController()
+  board_ctrl.io.nreset_in <> io.nreset
+  board_ctrl.io.clk_in <> io.clk_in
+  board_ctrl.io.plla <> io.plla
+  board_ctrl.io.pllb <> io.pllb
+  board_ctrl.io.leds <> io.leds
+  board_ctrl.io.keys <> io.keys
 
-  ClockDomainStack.set(ClockDomain(clock=clocks.io.clk, reset=clocks.io.reset))
+  ClockDomainStack.set(ClockDomain(clock=board_ctrl.io.clk_cpu, reset=board_ctrl.io.reset))
 
-  /*val video_ctrl = new VideoController()
-  video_ctrl.io.video_mode_out <> clocks.io.video_mode
-  video_ctrl.io.tmds_pixel_clk <> clocks.io.tmds_pixel_clk
-  video_ctrl.io.tmds_x5_clk <> clocks.io.tmds_x5_clk
-  video_ctrl.io.dvi <> io.dvi*/
-  clocks.io.video_mode := B(0, 2 bits)
+  val video_ctrl = new VideoController()
+  video_ctrl.io.video_mode_out <> board_ctrl.io.video_mode
+  video_ctrl.io.tmds_pixel_clk <> board_ctrl.io.clk_tmds_pixel
+  video_ctrl.io.tmds_x5_clk <> board_ctrl.io.clk_tmds_x5
+  video_ctrl.io.dvi <> io.dvi
+  //board_ctrl.io.video_mode := B(0, 2 bits)
 
-  val uart_ctrl = new UartController()
-  uart_ctrl.io.uart <> io.uart
+  val peripheral = new ClockingArea(ClockDomain(
+      clock = board_ctrl.io.clk_peripheral,
+      reset = board_ctrl.io.reset)) {
+
+    val uart_ctrl = new UartController()
+    uart_ctrl.io.uart <> io.uart
+
+    val audio_ctrl = new AudioController()
+    audio_ctrl.io.shdn <> io.audio_shdn
+    audio_ctrl.io.i2c <> io.audio_i2c
+
+    val apb = Apb3(Apb3Config(
+      addressWidth  = 11,
+      dataWidth     = 32,
+      useSlaveError = false
+    ))
+    val apbDecoder = Apb3Decoder(
+      master = apb,
+      slaves = List(
+        uart_ctrl.io.apb   -> (0x100, 16),
+        audio_ctrl.io.apb  -> (0x200, 8)
+        // 0x300 reserved for USB_DEVICE
+        // 0x400 USB_P1
+        // 0x500 USB_P2
+      )
+    )
+  }
+  val peripheral_apb_bridge = new ApbClockBridge(11)
+  peripheral_apb_bridge.io.clk_output <> board_ctrl.io.clk_peripheral
+  peripheral_apb_bridge.io.output <> peripheral.apb
 
   val sdcard_ctrl = new SdcardController()
   sdcard_ctrl.io.sdcard <> io.sdcard
 
-  val gpio_ctrl = new GpioController()
-  gpio_ctrl.io.leds <> io.leds
-  gpio_ctrl.io.keys <> io.keys
-
-  val audio_ctrl = new AudioController()
-  audio_ctrl.io.shdn <> io.audio_shdn
-  audio_ctrl.io.i2c_scl <> io.audio_scl
-  audio_ctrl.io.i2c_sda <> io.audio_sda
-
   val ram_ctrl = new ddr_sdram_ctrl(rowBits = 14, colBits = 10)
   ram_ctrl.io.ddr <> io.ddr_sdram
-  ram_ctrl.io.clk <> clocks.io.clk
-  ram_ctrl.io.dqs_clk <> clocks.io.clk_delayed
-  ram_ctrl.io.reset <> clocks.io.reset
+  ram_ctrl.io.clk <> board_ctrl.io.clk_cpu
+  ram_ctrl.io.dqs_clk <> board_ctrl.io.clk_ram
+  ram_ctrl.io.reset <> board_ctrl.io.reset
 
   val cpu = new VexRiscvGen(useCache=true, resetVector=internalRamBaseAddr)
 
@@ -116,15 +141,11 @@ class EndeavourSoc extends Component {
   val apbDecoder = Apb3Decoder(
     master = apbBridge.io.apb,
     slaves = List(
-      uart_ctrl.io.apb   -> (0x100, 16),
-      sdcard_ctrl.io.apb -> (0x200, 32),
-      gpio_ctrl.io.apb   -> (0x300, 8),
-      // 0x400 USB_P1
-      // 0x500 USB_P2
-      // 0x600 reserved for USB_DEVICE
+      peripheral_apb_bridge.io.input -> (0x000, 2048),
+      board_ctrl.io.apb  -> (0x800, 16),
+      sdcard_ctrl.io.apb -> (0x900, 32)
       // 0x700 timer
       // 0x800 video
-      audio_ctrl.io.apb  -> (0x900, 8)
     )
   )
 }

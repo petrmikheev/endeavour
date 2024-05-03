@@ -72,4 +72,18 @@ module DDR_IO8(
 
 endmodule
 
+module DDR_O4 (
+  input  wire       outclock,
+  input  wire [7:0] din,
+  output wire [3:0] pad_out
+);
+
+  ddr_gpio_sim #(.WIDTH(4)) impl(
+    .inclock(1'b0),
+    .outclock(outclock), .din(din),
+    .oe(4'b1111), .pad_io(pad_out)
+  );
+
+endmodule
+
 `endif

@@ -66,7 +66,7 @@ void print_cpu_info() {
     if (isa & 1) bios_putc('a' + i);
     isa = isa >> 1;
   }
-  bios_printf(", 1 core, %uMhz\n", CPU_FREQ / 1000000);
+  bios_printf(", 1 core, %uMhz\n", IO_PORT(BOARD_CPU_FREQ) / 1000000);
 }
 
 unsigned test_ram_size() {
@@ -76,7 +76,12 @@ unsigned test_ram_size() {
 
 int main() {
   IO_PORT(BOARD_LEDS) = 0x1;  // first LED on, means that bootloader has started
+#ifndef SIMULATION
   IO_PORT(UART_CFG) = UART_BAUD_RATE(115200) | UART_PARITY_EVEN | UART_CSTOPB;
+#else
+  // Increase UART speed in simulation
+  IO_PORT(UART_CFG) = UART_BAUD_RATE(24000000) | UART_PARITY_EVEN | UART_CSTOPB;
+#endif
   while (IO_PORT(UART_RX) >= 0);  // clear UART input buffer
   IO_PORT(UART_RX) = 0;  // clear UART framing error flag
 

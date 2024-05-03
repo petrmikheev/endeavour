@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="DDR_O4_sim/altera_gpio_lite/altera_gpio_lite.sv"
+   type="SYSTEM_VERILOG"
+   library="DDR_O4" />
+ <file path="DDR_O4_sim/DDR_O4.v" type="VERILOG" />
+ <topLevel name="DDR_O4" />
+ <deviceFamily name="max10" />
+</simPackage>

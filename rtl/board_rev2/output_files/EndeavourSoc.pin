@@ -1,0 +1,217 @@
+ -- Copyright (C) 2021  Intel Corporation. All rights reserved.
+ -- Your use of Intel Corporation's design tools, logic functions 
+ -- and other software and tools, and any partner logic 
+ -- functions, and any output files from any of the foregoing 
+ -- (including device programming or simulation files), and any 
+ -- associated documentation or information are expressly subject 
+ -- to the terms and conditions of the Intel Program License 
+ -- Subscription Agreement, the Intel Quartus Prime License Agreement,
+ -- the Intel FPGA IP License Agreement, or other applicable license
+ -- agreement, including, without limitation, that your use is for
+ -- the sole purpose of programming logic devices manufactured by
+ -- Intel and sold by Intel or its authorized distributors.  Please
+ -- refer to the applicable agreement for further details, at
+ -- https://fpgasoftware.intel.com/eula.
+ -- 
+ -- This is a Quartus Prime output file. It is for reporting purposes only, and is
+ -- not intended for use as a Quartus Prime input file. This file cannot be used
+ -- to make Quartus Prime pin assignments - for instructions on how to make pin
+ -- assignments, please see Quartus Prime help.
+ ---------------------------------------------------------------------------------
+
+
+
+ ---------------------------------------------------------------------------------
+ -- NC            : No Connect. This pin has no internal connection to the device.
+ -- DNU           : Do Not Use. This pin MUST NOT be connected.
+ -- VCCINT        : Dedicated power pin, which MUST be connected to VCC  (1.2V).
+ -- VCCIO         : Dedicated power pin, which MUST be connected to VCC
+ --                 of its bank.
+ --                  Bank 1A:       3.3V
+ --                  Bank 1B:       3.3V
+ --                  Bank 2:       3.3V
+ --                  Bank 3:       2.5V
+ --                  Bank 4:       2.5V
+ --                  Bank 5:       2.5V
+ --                  Bank 6:       3.3V
+ --                  Bank 7:       3.3V
+ --                  Bank 8:       2.5V
+ -- GND           : Dedicated ground pin. Dedicated GND pins MUST be connected to GND.
+ --                  It can also be used to report unused dedicated pins. The connection
+ --                  on the board for unused dedicated pins depends on whether this will
+ --                  be used in a future design. One example is device migration. When
+ --                  using device migration, refer to the device pin-tables. If it is a
+ --                  GND pin in the pin table or if it will not be used in a future design
+ --                  for another purpose the it MUST be connected to GND. If it is an unused
+ --                  dedicated pin, then it can be connected to a valid signal on the board
+ --                  (low, high, or toggling) if that signal is required for a different
+ --                  revision of the design.
+ -- GND+          : Unused input pin. It can also be used to report unused dual-purpose pins.
+ --                  This pin should be connected to GND. It may also be connected  to a
+ --                  valid signal  on the board  (low, high, or toggling)  if that signal
+ --                  is required for a different revision of the design.
+ -- GND*          : Unused  I/O  pin. Connect each pin marked GND* directly to GND
+ --                  or leave it unconnected.
+ -- RESERVED      : Unused I/O pin, which MUST be left unconnected.
+ -- RESERVED_INPUT    : Pin is tri-stated and should be connected to the board.
+ -- RESERVED_INPUT_WITH_WEAK_PULLUP    : Pin is tri-stated with internal weak pull-up resistor.
+ -- RESERVED_INPUT_WITH_BUS_HOLD       : Pin is tri-stated with bus-hold circuitry.
+ -- RESERVED_OUTPUT_DRIVEN_HIGH        : Pin is output driven high.
+ ---------------------------------------------------------------------------------
+
+
+
+ ---------------------------------------------------------------------------------
+ -- Pin directions (input, output or bidir) are based on device operating in user mode.
+ ---------------------------------------------------------------------------------
+
+Quartus Prime Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
+CHIP  "EndeavourSoc"  ASSIGNED TO AN: 10M50SAE144C8G
+
+Pin Name/Usage               : Location  : Dir.   : I/O Standard      : Voltage : I/O Bank  : User Assignment
+-------------------------------------------------------------------------------------------------------------
+VCC_ONE                      : 1         : power  :                   : 3.0V/3.3V :           :                
+VCCA6                        : 2         : power  :                   : 3.0V/3.3V :           :                
+ANAIN1                       : 3         :        :                   :         :           :                
+REFGND                       : 4         :        :                   :         :           :                
+ADC_VREF                     : 5         :        :                   :         :           :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 6         :        :                   :         : 1A        :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 7         :        :                   :         : 1A        :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 8         :        :                   :         : 1A        :                
+VCCIO1A                      : 9         : power  :                   : 3.3V    : 1A        :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 10        :        :                   :         : 1A        :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 11        :        :                   :         : 1A        :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 12        :        :                   :         : 1A        :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 13        :        :                   :         : 1A        :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 14        :        :                   :         : 1A        :                
+io_ddr_sdram_cs_n            : 15        : output : 3.3-V LVTTL       :         : 1B        : Y              
+~ALTERA_TMS~ / RESERVED_INPUT_WITH_WEAK_PULLUP : 16        : input  : 3.3 V Schmitt Trigger :         : 1B        : N              
+~ALTERA_TCK~ / RESERVED_INPUT : 17        : input  : 3.3 V Schmitt Trigger :         : 1B        : N              
+~ALTERA_TDI~ / RESERVED_INPUT_WITH_WEAK_PULLUP : 18        : input  : 3.3 V Schmitt Trigger :         : 1B        : N              
+~ALTERA_TDO~                 : 19        : output : 3.3-V LVTTL       :         : 1B        : N              
+RESERVED_INPUT_WITH_WEAK_PULLUP : 20        :        :                   :         : 1B        :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 21        :        :                   :         : 1B        :                
+io_uart_tx                   : 22        : output : 3.3-V LVTTL       :         : 1B        : Y              
+io_uart_rx                   : 23        : input  : 3.3 V Schmitt Trigger :         : 1B        : Y              
+VCCIO1B                      : 24        : power  :                   : 3.3V    : 1B        :                
+io_nreset                    : 25        : input  : 3.3-V LVTTL       :         : 2         : Y              
+io_sdcard_data[1]            : 26        : bidir  : 3.3-V LVTTL       :         : 2         : Y              
+io_sdcard_data[0]            : 27        : bidir  : 3.3-V LVTTL       :         : 2         : Y              
+io_sdcard_clk                : 28        : output : 3.3-V LVTTL       :         : 2         : Y              
+RESERVED_INPUT_WITH_WEAK_PULLUP : 29        :        :                   :         : 2         :                
+io_sdcard_cmd                : 30        : bidir  : 3.3-V LVTTL       :         : 2         : Y              
+VCCIO2                       : 31        : power  :                   : 3.3V    : 2         :                
+io_sdcard_data[3]            : 32        : bidir  : 3.3-V LVTTL       :         : 2         : Y              
+io_sdcard_data[2]            : 33        : bidir  : 3.3-V LVTTL       :         : 2         : Y              
+VCCA2                        : 34        : power  :                   : 3.0V/3.3V :           :                
+VCCA1                        : 35        : power  :                   : 3.0V/3.3V :           :                
+VCC_ONE                      : 36        : power  :                   : 3.0V/3.3V :           :                
+VCC_ONE                      : 37        : power  :                   : 3.0V/3.3V :           :                
+io_ddr_sdram_dq[15]          : 38        : bidir  : 2.5 V             :         : 3         : Y              
+io_ddr_sdram_dq[14]          : 39        : bidir  : 2.5 V             :         : 3         : Y              
+io_ddr_sdram_dq[13]          : 40        : bidir  : 2.5 V             :         : 3         : Y              
+io_ddr_sdram_dq[12]          : 41        : bidir  : 2.5 V             :         : 3         : Y              
+io_ddr_sdram_dq[11]          : 42        : bidir  : 2.5 V             :         : 3         : Y              
+io_ddr_sdram_dq[10]          : 43        : bidir  : 2.5 V             :         : 3         : Y              
+io_plla_i2c_scl              : 44        : output : 2.5 V             :         : 3         : Y              
+VCCIO3                       : 45        : power  :                   : 2.5V    : 3         :                
+io_ddr_sdram_dq[9]           : 46        : bidir  : 2.5 V             :         : 3         : Y              
+VCC_ONE                      : 47        : power  :                   : 3.0V/3.3V :           :                
+GND                          : 48        : gnd    :                   :         :           :                
+io_ddr_sdram_dq[8]           : 49        : bidir  : 2.5 V             :         : 3         : Y              
+io_ddr_sdram_dqs[1]          : 50        : bidir  : 2.5 V             :         : 3         : Y              
+io_plla_clk0                 : 51        : input  : 2.5 V             :         : 3         : Y              
+io_plla_clk1                 : 52        : input  : 2.5 V             :         : 3         : Y              
+io_clk_in                    : 53        : input  : 2.5 V             :         : 3         : Y              
+VCCIO3                       : 54        : power  :                   : 2.5V    : 3         :                
+io_plla_clk2                 : 55        : input  : 2.5 V             :         : 3         : Y              
+GND                          : 56        : gnd    :                   :         :           :                
+io_plla_i2c_sda              : 57        : bidir  : 2.5 V             :         : 4         : Y              
+io_ddr_sdram_dm[1]           : 58        : output : 2.5 V             :         : 4         : Y              
+GND                          : 59        : gnd    :                   :         :           :                
+io_ddr_sdram_ck_n            : 60        : output : 2.5 V             :         : 4         : Y              
+io_ddr_sdram_ck_p            : 61        : output : 2.5 V             :         : 4         : Y              
+io_ddr_sdram_cke             : 62        : output : 2.5 V             :         : 4         : Y              
+io_ddr_sdram_a[12]           : 63        : output : 2.5 V             :         : 4         : Y              
+io_ddr_sdram_a[11]           : 64        : output : 2.5 V             :         : 4         : Y              
+io_ddr_sdram_a[9]            : 65        : output : 2.5 V             :         : 4         : Y              
+io_ddr_sdram_a[8]            : 66        : output : 2.5 V             :         : 4         : Y              
+VCCIO4                       : 67        : power  :                   : 2.5V    : 4         :                
+GND                          : 68        : gnd    :                   :         :           :                
+io_ddr_sdram_a[7]            : 69        : output : 2.5 V             :         : 4         : Y              
+io_ddr_sdram_a[6]            : 70        : output : 2.5 V             :         : 4         : Y              
+VCCA5                        : 71        : power  :                   : 3.0V/3.3V :           :                
+VCC_ONE                      : 72        : power  :                   : 3.0V/3.3V :           :                
+VCC_ONE                      : 73        : power  :                   : 3.0V/3.3V :           :                
+io_ddr_sdram_a[5]            : 74        : output : 2.5 V             :         : 5         : Y              
+io_ddr_sdram_a[4]            : 75        : output : 2.5 V             :         : 5         : Y              
+io_ddr_sdram_cas_n           : 76        : output : 2.5 V             :         : 5         : Y              
+io_ddr_sdram_ras_n           : 77        : output : 2.5 V             :         : 5         : Y              
+VCCIO5                       : 78        : power  :                   : 2.5V    : 5         :                
+GND                          : 79        : gnd    :                   :         :           :                
+io_ddr_sdram_ba[0]           : 80        : output : 2.5 V             :         : 5         : Y              
+io_pllb_i2c_scl              : 81        : output : 2.5 V             :         : 5         : Y              
+io_ddr_sdram_ba[1]           : 82        : output : 2.5 V             :         : 5         : Y              
+io_ddr_sdram_a[10]           : 83        : output : 2.5 V             :         : 5         : Y              
+io_ddr_sdram_a[0]            : 84        : output : 2.5 V             :         : 5         : Y              
+io_ddr_sdram_a[1]            : 85        : output : 2.5 V             :         : 5         : Y              
+io_ddr_sdram_a[3]            : 86        : output : 2.5 V             :         : 5         : Y              
+io_ddr_sdram_a[2]            : 87        : output : 2.5 V             :         : 5         : Y              
+io_pllb_clk0                 : 88        : input  : 3.3-V LVTTL       :         : 6         : Y              
+io_pllb_clk1                 : 89        : input  : 3.3-V LVTTL       :         : 6         : Y              
+io_pllb_clk2                 : 90        : input  : 3.3-V LVTTL       :         : 6         : Y              
+io_pllb_i2c_sda              : 91        : bidir  : 3.3-V LVTTL       :         : 6         : Y              
+RESERVED_INPUT_WITH_WEAK_PULLUP : 92        :        :                   :         : 6         :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 93        :        :                   :         : 6         :                
+VCCIO6                       : 94        : power  :                   : 3.3V    : 6         :                
+GND                          : 95        : gnd    :                   :         :           :                
+io_audio_i2c_scl             : 96        : output : 3.3-V LVTTL       :         : 6         : Y              
+io_audio_i2c_sda             : 97        : bidir  : 3.3-V LVTTL       :         : 6         : Y              
+RESERVED_INPUT_WITH_WEAK_PULLUP : 98        :        :                   :         : 6         :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 99        :        :                   :         : 6         :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 100       :        :                   :         : 6         :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 101       :        :                   :         : 6         :                
+RESERVED_INPUT_WITH_WEAK_PULLUP : 102       :        :                   :         : 6         :                
+VCCIO6                       : 103       : power  :                   : 3.3V    : 6         :                
+GND                          : 104       : gnd    :                   :         :           :                
+io_dvi_tmdsCm                : 105       : output : 3.3-V LVTTL       :         : 6         : Y              
+io_dvi_tmdsCp                : 106       : output : 3.3-V LVTTL       :         : 6         : Y              
+VCCA3                        : 107       : power  :                   : 3.0V/3.3V :           :                
+VCC_ONE                      : 108       : power  :                   : 3.0V/3.3V :           :                
+VCC_ONE                      : 109       : power  :                   : 3.0V/3.3V :           :                
+io_dvi_tmds0m                : 110       : output : 3.3-V LVTTL       :         : 7         : Y              
+io_dvi_tmds0p                : 111       : output : 3.3-V LVTTL       :         : 7         : Y              
+GND                          : 112       : gnd    :                   :         :           :                
+VCCIO7                       : 113       : power  :                   : 3.3V    : 7         :                
+VCC_ONE                      : 114       : power  :                   : 3.0V/3.3V :           :                
+GND                          : 115       : gnd    :                   :         :           :                
+io_audio_shdn                : 116       : output : 3.3-V LVTTL       :         : 7         : Y              
+io_dvi_tmds1m                : 117       : output : 3.3-V LVTTL       :         : 7         : Y              
+io_dvi_tmds1p                : 118       : output : 3.3-V LVTTL       :         : 7         : Y              
+io_dvi_tmds2m                : 119       : output : 3.3-V LVTTL       :         : 7         : Y              
+io_dvi_tmds2p                : 120       : output : 3.3-V LVTTL       :         : 7         : Y              
+GND                          : 121       : gnd    :                   :         :           :                
+VCCIO8                       : 122       : power  :                   : 2.5V    : 8         :                
+io_ddr_sdram_we_n            : 123       : output : 2.5 V             :         : 8         : Y              
+io_ddr_sdram_dm[0]           : 124       : output : 2.5 V             :         : 8         : Y              
+io_ddr_sdram_a[13]           : 125       : output : 2.5 V             :         : 8         : Y              
+io_keys[1]                   : 126       : input  : 2.5 V Schmitt Trigger :         : 8         : Y              
+io_ddr_sdram_dqs[0]          : 127       : bidir  : 2.5 V             :         : 8         : Y              
+io_ddr_sdram_dq[7]           : 128       : bidir  : 2.5 V             :         : 8         : Y              
+io_ddr_sdram_dq[6]           : 129       : bidir  : 2.5 V             :         : 8         : Y              
+io_keys[0]                   : 130       : input  : 2.5 V Schmitt Trigger :         : 8         : Y              
+io_ddr_sdram_dq[5]           : 131       : bidir  : 2.5 V             :         : 8         : Y              
+io_ddr_sdram_dq[4]           : 132       : bidir  : 2.5 V             :         : 8         : Y              
+io_ddr_sdram_dq[3]           : 133       : bidir  : 2.5 V             :         : 8         : Y              
+io_leds[2]                   : 134       : output : 2.5 V             :         : 8         : Y              
+io_ddr_sdram_dq[2]           : 135       : bidir  : 2.5 V             :         : 8         : Y              
+io_leds[1]                   : 136       : output : 2.5 V             :         : 8         : Y              
+GND                          : 137       : gnd    :                   :         :           :                
+io_leds[0]                   : 138       : output : 2.5 V             :         : 8         : Y              
+VCCIO8                       : 139       : power  :                   : 2.5V    : 8         :                
+io_ddr_sdram_dq[1]           : 140       : bidir  : 2.5 V             :         : 8         : Y              
+io_ddr_sdram_dq[0]           : 141       : bidir  : 2.5 V             :         : 8         : Y              
+GND                          : 142       : gnd    :                   :         :           :                
+VCCA4                        : 143       : power  :                   : 3.0V/3.3V :           :                
+VCC_ONE                      : 144       : power  :                   : 3.0V/3.3V :           :                
+GND                          : EPAD      :        :                   :         :           :                

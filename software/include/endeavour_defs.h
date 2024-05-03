@@ -1,8 +1,6 @@
 #ifndef ENDEAVOUR_DEFS_H
 #define ENDEAVOUR_DEFS_H
 
-#define CPU_FREQ 96000000
-
 #define BIOS_ROM_ADDR 0x40000000
 #define BIOS_ROM_SIZE 0x2000
 
@@ -22,21 +20,26 @@
 #define UART_TX 0x104
 #define UART_CFG 0x108
 
-#define SDCARD_CMD 0x200
-#define SDCARD_DATA 0x204
-#define SDCARD_FIFO0 0x208
-#define SDCARD_FIFO1 0x20C
-#define SDCARD_PHY 0x210
-#define SDCARD_FIFO0_LE 0x218  // FIFO0 with big-endian -> little-endian conversion
-#define SDCARD_FIFO1_LE 0x21C  // FIFO1 with big-endian -> little-endian conversion
+#define AUDIO_CFG 0x200
+// write - add to stream, read - remaining buf size
+#define AUDIO_STREAM 0x204
 
-#define BOARD_LEDS 0x300
-#define BOARD_KEYS 0x304
+#define BOARD_LEDS     0x800
+#define BOARD_KEYS     0x804
+#define BOARD_CPU_FREQ 0x808
+
+#define SDCARD_CMD 0x900
+#define SDCARD_DATA 0x904
+#define SDCARD_FIFO0 0x908
+#define SDCARD_FIFO1 0x90C
+#define SDCARD_PHY 0x910
+#define SDCARD_FIFO0_LE 0x918  // FIFO0 with big-endian -> little-endian conversion
+#define SDCARD_FIFO1_LE 0x91C  // FIFO1 with big-endian -> little-endian conversion
 
 #define IO_PORT(X) (*(volatile int*)(X))
 
 // UART_CFG flags
-#define UART_BAUD_RATE(X) (CPU_FREQ / X - 1)
+#define UART_BAUD_RATE(X) (48000000 / (X) - 1)
 #define UART_PARITY_NONE  0
 #define UART_PARITY_EVEN  (1<<16)
 #define UART_PARITY_ODD   (3<<16)
@@ -45,6 +48,16 @@
 // UART_RX flags
 #define UART_PARITY_ERROR  0x100
 #define UART_FRAMING_ERROR 0x200
+
+// AUDIO_CFG flags
+#define AUDIO_SAMPLE_RATE(X) (48000000 / (X) - 1)
+#define AUDIO_VOLUME(X) (((unsigned)(X)&15) << 16)
+#define AUDIO_MAX_VOLUME 15
+#define AUDIO_FLUSH 0x80000000
+
+// AUDIO_CMD flags
+#define AUDIO_CLEAR_STREAM0 1
+#define AUDIO_CLEAR_STREAM1 2
 
 // builtin functions
 
