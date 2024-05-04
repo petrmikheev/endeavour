@@ -1,2 +1,0 @@
-DDR_IO8_sim/DDR_IO8.v
-DDR_IO8_sim/altera_gpio_lite/altera_gpio_lite.sv
