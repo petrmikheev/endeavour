@@ -24,17 +24,17 @@
 // write - add to stream, read - remaining buf size
 #define AUDIO_STREAM 0x204
 
+#define SDCARD_CMD 0x300
+#define SDCARD_DATA 0x304
+#define SDCARD_FIFO0 0x308
+#define SDCARD_FIFO1 0x30C
+#define SDCARD_PHY 0x310
+#define SDCARD_FIFO0_LE 0x318  // FIFO0 with big-endian -> little-endian conversion
+#define SDCARD_FIFO1_LE 0x31C  // FIFO1 with big-endian -> little-endian conversion
+
 #define BOARD_LEDS     0x800
 #define BOARD_KEYS     0x804
 #define BOARD_CPU_FREQ 0x808
-
-#define SDCARD_CMD 0x900
-#define SDCARD_DATA 0x904
-#define SDCARD_FIFO0 0x908
-#define SDCARD_FIFO1 0x90C
-#define SDCARD_PHY 0x910
-#define SDCARD_FIFO0_LE 0x918  // FIFO0 with big-endian -> little-endian conversion
-#define SDCARD_FIFO1_LE 0x91C  // FIFO1 with big-endian -> little-endian conversion
 
 #define IO_PORT(X) (*(volatile int*)(X))
 

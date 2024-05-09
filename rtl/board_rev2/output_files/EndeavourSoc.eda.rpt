@@ -1,5 +1,5 @@
 EDA Netlist Writer report for EndeavourSoc
-Wed May  1 14:55:59 2024
+Fri May 10 01:11:09 2024
 Quartus Prime Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
 
 
@@ -37,7 +37,7 @@ https://fpgasoftware.intel.com/eula.
 +-------------------------------------------------------------------+
 ; EDA Netlist Writer Summary                                        ;
 +---------------------------+---------------------------------------+
-; EDA Netlist Writer Status ; Successful - Wed May  1 14:55:59 2024 ;
+; EDA Netlist Writer Status ; Successful - Fri May 10 01:11:09 2024 ;
 ; Revision Name             ; EndeavourSoc                          ;
 ; Top-level Entity Name     ; EndeavourSoc                          ;
 ; Family                    ; MAX 10                                ;
@@ -81,13 +81,13 @@ https://fpgasoftware.intel.com/eula.
 Info: *******************************************************************
 Info: Running Quartus Prime EDA Netlist Writer
     Info: Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
-    Info: Processing started: Wed May  1 14:55:58 2024
+    Info: Processing started: Fri May 10 01:11:08 2024
 Info: Command: quartus_eda --read_settings_files=off --write_settings_files=off endeavour -c EndeavourSoc
 Info (204019): Generated file EndeavourSoc.vo in folder "/home/petya/endeavour/rtl/board_rev2/simulation/modelsim/" for EDA simulation tool
 Info: Quartus Prime EDA Netlist Writer was successful. 0 errors, 0 warnings
-    Info: Peak virtual memory: 671 megabytes
-    Info: Processing ended: Wed May  1 14:55:59 2024
+    Info: Peak virtual memory: 673 megabytes
+    Info: Processing ended: Fri May 10 01:11:09 2024
     Info: Elapsed time: 00:00:01
-    Info: Total CPU time (on all processors): 00:00:01
+    Info: Total CPU time (on all processors): 00:00:02
 
 

@@ -1,14 +1,14 @@
-Fitter Status : Successful - Wed May  1 14:55:37 2024
+Fitter Status : Successful - Fri May 10 01:10:44 2024
 Quartus Prime Version : 21.1.0 Build 842 10/21/2021 SJ Lite Edition
 Revision Name : EndeavourSoc
 Top-level Entity Name : EndeavourSoc
 Family : MAX 10
 Device : 10M50SAE144C8G
 Timing Models : Final
-Total logic elements : 7,659 / 49,760 ( 15 % )
-    Total combinational functions : 6,855 / 49,760 ( 14 % )
-    Dedicated logic registers : 4,024 / 49,760 ( 8 % )
-Total registers : 4072
+Total logic elements : 7,780 / 49,760 ( 16 % )
+    Total combinational functions : 7,029 / 49,760 ( 14 % )
+    Dedicated logic registers : 4,047 / 49,760 ( 8 % )
+Total registers : 4136
 Total pins : 79 / 101 ( 78 % )
 Total virtual pins : 0
 Total memory bits : 242,176 / 1,677,312 ( 14 % )

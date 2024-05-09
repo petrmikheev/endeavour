@@ -4,6 +4,7 @@ module SdcardController (
   output        sdcard_clk,
   inout         sdcard_cmd,
   inout   [3:0] sdcard_data,
+  input         sdcard_ndetect,
 
   input   [4:0] apb_PADDR,
   input         apb_PSEL,
@@ -32,8 +33,8 @@ module SdcardController (
     .LGFIFO(9),
     .OPT_EMMC(0),
     .OPT_SERDES(0),
-    .OPT_DDR(0),
-    .OPT_CARD_DETECT(0),
+    .OPT_DDR(1),
+    .OPT_CARD_DETECT(1),
     .OPT_1P8V(0)
   ) impl(
     .i_clk(clk), // 96-104mhz
@@ -43,7 +44,11 @@ module SdcardController (
     .o_ck(sdcard_clk),
     .io_cmd(sdcard_cmd),
     .io_dat(sdcard_data),
+`ifdef ENDEAVOUR_BOARD_VER1
     .i_card_detect(1'b1),
+`else
+    .i_card_detect(~sdcard_ndetect),
+`endif
     //.o_int() output wire interrupt
 
     .i_wb_addr({apb_PADDR[4] & ~apb_PADDR[3], apb_PADDR[3:2]}),
@@ -59,7 +64,7 @@ module SdcardController (
 
 endmodule
 
-module IOBUF(input T, input I, output O, inout IO);
+/*module IOBUF(input T, input I, output O, inout IO);
   assign IO = T ? 1'bz : I;
   assign O = IO;
-endmodule
+endmodule*/

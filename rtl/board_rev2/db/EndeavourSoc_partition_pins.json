@@ -64,11 +64,15 @@
 					"strict" : false
 				},
 				{
-					"name" : "io_ddr_sdram_cke",
+					"name" : "io_ddr_sdram_ck_p",
 					"strict" : false
 				},
 				{
-					"name" : "io_ddr_sdram_cs_n",
+					"name" : "io_ddr_sdram_ck_n",
+					"strict" : false
+				},
+				{
+					"name" : "io_ddr_sdram_cke",
 					"strict" : false
 				},
 				{
@@ -252,27 +256,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "io_pllb_clk2",
-					"strict" : false
-				},
-				{
-					"name" : "io_plla_clk2",
-					"strict" : false
-				},
-				{
-					"name" : "io_pllb_clk1",
-					"strict" : false
-				},
-				{
-					"name" : "io_plla_clk1",
-					"strict" : false
-				},
-				{
-					"name" : "io_pllb_clk0",
-					"strict" : false
-				},
-				{
-					"name" : "io_plla_clk0",
+					"name" : "io_clk_in",
 					"strict" : false
 				},
 				{
@@ -285,6 +269,10 @@
 				},
 				{
 					"name" : "io_keys[0]",
+					"strict" : false
+				},
+				{
+					"name" : "io_sdcard_ndetect",
 					"strict" : false
 				},
 				{

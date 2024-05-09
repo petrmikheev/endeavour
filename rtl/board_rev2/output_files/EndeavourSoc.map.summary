@@ -1,12 +1,12 @@
-Analysis & Synthesis Status : Successful - Wed May  1 14:54:51 2024
+Analysis & Synthesis Status : Successful - Fri May 10 01:09:46 2024
 Quartus Prime Version : 21.1.0 Build 842 10/21/2021 SJ Lite Edition
 Revision Name : EndeavourSoc
 Top-level Entity Name : EndeavourSoc
 Family : MAX 10
-Total logic elements : 8,214
-    Total combinational functions : 6,852
-    Dedicated logic registers : 4,180
-Total registers : 4228
+Total logic elements : 8,404
+    Total combinational functions : 7,026
+    Dedicated logic registers : 4,224
+Total registers : 4292
 Total pins : 79
 Total virtual pins : 0
 Total memory bits : 242,176

@@ -10,10 +10,10 @@ module VideoController(
   output dvi_tmdsCp, output dvi_tmdsCm
 );
 
-  assign video_mode_out = 2'd1;
+  assign video_mode_out = 2'd2;
 
   // mode 1 (640x480)
-  reg [10:0] hDrawEnd   = 11'd640;
+  /*reg [10:0] hDrawEnd   = 11'd640;
   reg [10:0] hSyncStart = 11'd656;
   reg [10:0] hSyncEnd   = 11'd752;
   reg [10:0] hLast      = 11'd799;
@@ -21,8 +21,8 @@ module VideoController(
   reg  [9:0] vDrawEnd   = 10'd480;
   reg  [9:0] vSyncStart = 10'd490;
   reg  [9:0] vSyncEnd   = 10'd492;
-  reg  [9:0] vLast      = 10'd524;
-/*
+  reg  [9:0] vLast      = 10'd524;*/
+
   // mode 2 (1024x768)
   reg [10:0] hDrawEnd   = 11'd1024;
   reg [10:0] hSyncStart = 11'd1048;
@@ -35,7 +35,7 @@ module VideoController(
   reg  [9:0] vLast      = 10'd805;
 
   // mode 3 (1280x720)
-  reg [10:0] hDrawEnd   = 11'd1280;
+  /*reg [10:0] hDrawEnd   = 11'd1280;
   reg [10:0] hSyncStart = 11'd1390;
   reg [10:0] hSyncEnd   = 11'd1430;
   reg [10:0] hLast      = 11'd1649;

@@ -84,7 +84,7 @@ RESERVED_INPUT_WITH_WEAK_PULLUP : 11        :        :                   :      
 RESERVED_INPUT_WITH_WEAK_PULLUP : 12        :        :                   :         : 1A        :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 13        :        :                   :         : 1A        :                
 RESERVED_INPUT_WITH_WEAK_PULLUP : 14        :        :                   :         : 1A        :                
-io_ddr_sdram_cs_n            : 15        : output : 3.3-V LVTTL       :         : 1B        : Y              
+RESERVED_INPUT_WITH_WEAK_PULLUP : 15        :        :                   :         : 1B        :                
 ~ALTERA_TMS~ / RESERVED_INPUT_WITH_WEAK_PULLUP : 16        : input  : 3.3 V Schmitt Trigger :         : 1B        : N              
 ~ALTERA_TCK~ / RESERVED_INPUT : 17        : input  : 3.3 V Schmitt Trigger :         : 1B        : N              
 ~ALTERA_TDI~ / RESERVED_INPUT_WITH_WEAK_PULLUP : 18        : input  : 3.3 V Schmitt Trigger :         : 1B        : N              
@@ -98,7 +98,7 @@ io_nreset                    : 25        : input  : 3.3-V LVTTL       :         
 io_sdcard_data[1]            : 26        : bidir  : 3.3-V LVTTL       :         : 2         : Y              
 io_sdcard_data[0]            : 27        : bidir  : 3.3-V LVTTL       :         : 2         : Y              
 io_sdcard_clk                : 28        : output : 3.3-V LVTTL       :         : 2         : Y              
-RESERVED_INPUT_WITH_WEAK_PULLUP : 29        :        :                   :         : 2         :                
+io_sdcard_ndetect            : 29        : input  : 3.3-V LVTTL       :         : 2         : Y              
 io_sdcard_cmd                : 30        : bidir  : 3.3-V LVTTL       :         : 2         : Y              
 VCCIO2                       : 31        : power  :                   : 3.3V    : 2         :                
 io_sdcard_data[3]            : 32        : bidir  : 3.3-V LVTTL       :         : 2         : Y              

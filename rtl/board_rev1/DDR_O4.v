@@ -6,17 +6,16 @@
 
 `timescale 1 ps / 1 ps
 module DDR_O4 (
-		input  wire       outclock,  //  outclock.export
-		input  wire [7:0] din,       //       din.export
-		output wire [3:0] pad_out,   //   pad_out.export
-		output wire [3:0] pad_out_b  // pad_out_b.export
+		input  wire       outclock, // outclock.export
+		input  wire [7:0] din,      //      din.export
+		output wire [3:0] pad_out   //  pad_out.export
 	);
 
 	altera_gpio_lite #(
 		.PIN_TYPE                                 ("output"),
 		.SIZE                                     (4),
 		.REGISTER_MODE                            ("ddr"),
-		.BUFFER_TYPE                              ("true_differential"),
+		.BUFFER_TYPE                              ("single-ended"),
 		.ASYNC_MODE                               ("none"),
 		.SYNC_MODE                                ("none"),
 		.BUS_HOLD                                 ("false"),
@@ -39,28 +38,28 @@ module DDR_O4 (
 		.INVERT_OE_INCLOCK                        ("false"),
 		.ENABLE_PHASE_DETECTOR_FOR_CK             ("false")
 	) ddr_o4_inst (
-		.outclock        (outclock),  //  outclock.export
-		.din             (din),       //       din.export
-		.pad_out         (pad_out),   //   pad_out.export
-		.pad_out_b       (pad_out_b), // pad_out_b.export
-		.outclocken      (1'b1),      // (terminated)
-		.inclock         (1'b0),      // (terminated)
-		.inclocken       (1'b0),      // (terminated)
-		.fr_clock        (),          // (terminated)
-		.hr_clock        (),          // (terminated)
-		.invert_hr_clock (1'b0),      // (terminated)
-		.phy_mem_clock   (1'b0),      // (terminated)
-		.mimic_clock     (),          // (terminated)
-		.dout            (),          // (terminated)
-		.pad_io          (),          // (terminated)
-		.pad_io_b        (),          // (terminated)
-		.pad_in          (4'b0000),   // (terminated)
-		.pad_in_b        (4'b0000),   // (terminated)
-		.aset            (1'b0),      // (terminated)
-		.aclr            (1'b0),      // (terminated)
-		.sclr            (1'b0),      // (terminated)
-		.nsleep          (4'b0000),   // (terminated)
-		.oe              (4'b0000)    // (terminated)
+		.outclock        (outclock), // outclock.export
+		.din             (din),      //      din.export
+		.pad_out         (pad_out),  //  pad_out.export
+		.outclocken      (1'b1),     // (terminated)
+		.inclock         (1'b0),     // (terminated)
+		.inclocken       (1'b0),     // (terminated)
+		.fr_clock        (),         // (terminated)
+		.hr_clock        (),         // (terminated)
+		.invert_hr_clock (1'b0),     // (terminated)
+		.phy_mem_clock   (1'b0),     // (terminated)
+		.mimic_clock     (),         // (terminated)
+		.dout            (),         // (terminated)
+		.pad_io          (),         // (terminated)
+		.pad_io_b        (),         // (terminated)
+		.pad_in          (4'b0000),  // (terminated)
+		.pad_in_b        (4'b0000),  // (terminated)
+		.pad_out_b       (),         // (terminated)
+		.aset            (1'b0),     // (terminated)
+		.aclr            (1'b0),     // (terminated)
+		.sclr            (1'b0),     // (terminated)
+		.nsleep          (4'b0000),  // (terminated)
+		.oe              (4'b0000)   // (terminated)
 	);
 
 endmodule
@@ -94,7 +93,7 @@ endmodule
 // Retrieval info: 	<generic name="DEVICE_FAMILY" value="MAX 10" />
 // Retrieval info: 	<generic name="PIN_TYPE" value="output" />
 // Retrieval info: 	<generic name="SIZE" value="4" />
-// Retrieval info: 	<generic name="gui_true_diff_buf" value="true" />
+// Retrieval info: 	<generic name="gui_true_diff_buf" value="false" />
 // Retrieval info: 	<generic name="gui_pseudo_diff_buf" value="false" />
 // Retrieval info: 	<generic name="gui_bus_hold" value="false" />
 // Retrieval info: 	<generic name="gui_open_drain" value="false" />

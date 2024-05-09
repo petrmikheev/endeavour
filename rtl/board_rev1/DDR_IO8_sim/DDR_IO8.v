@@ -26,7 +26,7 @@ module DDR_IO8 (
 		.ENABLE_CLOCK_ENA_PORT                    ("false"),
 		.SET_REGISTER_OUTPUTS_HIGH                ("false"),
 		.INVERT_OUTPUT                            ("false"),
-		.INVERT_INPUT_CLOCK                       ("true"),
+		.INVERT_INPUT_CLOCK                       ("false"),
 		.USE_ONE_REG_TO_DRIVE_OE                  ("false"),
 		.USE_DDIO_REG_TO_DRIVE_OE                 ("false"),
 		.USE_ADVANCED_DDR_FEATURES                ("false"),

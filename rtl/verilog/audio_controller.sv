@@ -123,9 +123,9 @@ module I2C (
 
   reg [1:0] state = HALT;
 
-  parameter CLK_FREQ = 96_000_000;
-  localparam DIVISOR_400K = CLK_FREQ / (400_000 * 4) - 1;  // 59
-  localparam DIVISOR_HS = CLK_FREQ / (3_000_000 * 4) - 1;  // 5
+  parameter CLK_FREQ = 48_000_000;
+  localparam DIVISOR_400K = CLK_FREQ / (400_000 * 4) - 1;  // 29
+  localparam DIVISOR_HS = CLK_FREQ / (3_000_000 * 4) - 1;  // 2
 
   reg [5:0] clk_counter = 0;
   reg [1:0] q = 0;

@@ -35,8 +35,7 @@ class BoardController extends BlackBox {
     val clk_cpu = out Bool()
     val clk_ram = out Bool()
     //val clk_ram_bus = out Bool()
-    //val clk_sdcard = out Bool()
-    val clk_peripheral = out Bool()  // uart, audio, usb
+    val clk_peripheral = out Bool()  // uart, audio, usb, sdcard
 
     val video_mode = in Bits(2 bits)
     val clk_tmds_pixel = out Bool()
@@ -116,7 +115,6 @@ class AudioController extends BlackBox {
 class ddr_sdram_ctrl(rowBits: Int, colBits: Int) extends BlackBox {
   addGeneric("ROW_BITS", rowBits)
   addGeneric("COL_BITS", colBits)
-  addGeneric("DQ_LEVEL", 2)
   val io = new Bundle {
     val clk = in Bool()
     val dqs_clk = in Bool()

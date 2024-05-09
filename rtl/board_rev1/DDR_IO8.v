@@ -28,7 +28,7 @@ module DDR_IO8 (
 		.ENABLE_CLOCK_ENA_PORT                    ("false"),
 		.SET_REGISTER_OUTPUTS_HIGH                ("false"),
 		.INVERT_OUTPUT                            ("false"),
-		.INVERT_INPUT_CLOCK                       ("true"),
+		.INVERT_INPUT_CLOCK                       ("false"),
 		.USE_ONE_REG_TO_DRIVE_OE                  ("false"),
 		.USE_DDIO_REG_TO_DRIVE_OE                 ("false"),
 		.USE_ADVANCED_DDR_FEATURES                ("false"),
@@ -109,7 +109,7 @@ endmodule
 // Retrieval info: 	<generic name="gui_set_registers_to_power_up_high" value="false" />
 // Retrieval info: 	<generic name="gui_clock_enable" value="false" />
 // Retrieval info: 	<generic name="gui_invert_output" value="false" />
-// Retrieval info: 	<generic name="gui_invert_input_clock" value="true" />
+// Retrieval info: 	<generic name="gui_invert_input_clock" value="false" />
 // Retrieval info: 	<generic name="gui_use_register_to_drive_obuf_oe" value="false" />
 // Retrieval info: 	<generic name="gui_use_ddio_reg_to_drive_oe" value="false" />
 // Retrieval info: 	<generic name="gui_use_advanced_ddr_features" value="false" />

@@ -1,2 +1,2 @@
 Info (10281): Verilog HDL Declaration information at audio_controller.sv(106): object "halt" differs only in case from object "HALT" in the same scope File: /home/petya/endeavour/rtl/verilog/audio_controller.sv Line: 106
-Info (10281): Verilog HDL Declaration information at ddr_sdram_ctrl.v(29): object "reset" differs only in case from object "RESET" in the same scope File: /home/petya/endeavour/rtl/verilog/ddr_sdram_ctrl.v Line: 29
+Info (10281): Verilog HDL Declaration information at ddr_sdram_ctrl.v(22): object "reset" differs only in case from object "RESET" in the same scope File: /home/petya/endeavour/rtl/verilog/ddr_sdram_ctrl.v Line: 22

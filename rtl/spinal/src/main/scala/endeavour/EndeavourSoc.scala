@@ -65,6 +65,9 @@ class EndeavourSoc extends Component {
     audio_ctrl.io.shdn <> io.audio_shdn
     audio_ctrl.io.i2c <> io.audio_i2c
 
+    val sdcard_ctrl = new SdcardController()
+    sdcard_ctrl.io.sdcard <> io.sdcard
+
     val apb = Apb3(Apb3Config(
       addressWidth  = 11,
       dataWidth     = 32,
@@ -74,19 +77,17 @@ class EndeavourSoc extends Component {
       master = apb,
       slaves = List(
         uart_ctrl.io.apb   -> (0x100, 16),
-        audio_ctrl.io.apb  -> (0x200, 8)
-        // 0x300 reserved for USB_DEVICE
+        audio_ctrl.io.apb  -> (0x200, 8),
+        sdcard_ctrl.io.apb  -> (0x300, 32)
         // 0x400 USB_P1
         // 0x500 USB_P2
+        // 0x600 reserved for USB_DEVICE
       )
     )
   }
   val peripheral_apb_bridge = new ApbClockBridge(11)
   peripheral_apb_bridge.io.clk_output <> board_ctrl.io.clk_peripheral
   peripheral_apb_bridge.io.output <> peripheral.apb
-
-  val sdcard_ctrl = new SdcardController()
-  sdcard_ctrl.io.sdcard <> io.sdcard
 
   val ram_ctrl = new ddr_sdram_ctrl(rowBits = 14, colBits = 10)
   ram_ctrl.io.ddr <> io.ddr_sdram
@@ -142,10 +143,9 @@ class EndeavourSoc extends Component {
     master = apbBridge.io.apb,
     slaves = List(
       peripheral_apb_bridge.io.input -> (0x000, 2048),
-      board_ctrl.io.apb  -> (0x800, 16),
-      sdcard_ctrl.io.apb -> (0x900, 32)
-      // 0x700 timer
-      // 0x800 video
+      board_ctrl.io.apb  -> (0x800, 16)
+      // 0xa00 timer
+      // 0xb00 video
     )
   )
 }

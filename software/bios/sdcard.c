@@ -15,13 +15,26 @@ static const unsigned
     SDIO_FIFO     = 0x00001000,
     SDIO_ERR      = 0x00008000,
     SDIO_REMOVED  = 0x00040000,
+    SDIO_PRESENTN = 0x00080000,
     SDIO_BUSY     = 0x00104800,
     // PHY enumerations
     SDIO_W4       = 0x00000400,
     SDIO_PUSHPULL = 0x00003000,
     SDIOCK_25MHZ  = 0x00000003,
     SDIOCK_50MHZ  = 0x00000002,
+    SDIOCK_100MHZ = 0x00000001,
     SECTOR_512B   = 0x09000000;
+
+#define BASE_CLK_IS_48MHZ
+
+static const unsigned
+#ifdef BASE_CLK_IS_48MHZ
+  SDIOCK_DEFAULT = SDIOCK_50MHZ,  // It is actually 24 MHz
+  SDIOCK_HS = SDIOCK_100MHZ;  // It is actually 48 MHz
+#else
+  SDIOCK_DEFAULT = SDIOCK_25MHZ,
+  SDIOCK_HS = SDIOCK_50MHZ;
+#endif
 
 static unsigned command(unsigned cmd, unsigned arg) {
   IO_PORT(SDCARD_DATA) = arg;
@@ -32,15 +45,21 @@ static unsigned command(unsigned cmd, unsigned arg) {
 
 unsigned init_sdcard() {
   bios_printf("SD card: ");
-  IO_PORT(SDCARD_PHY) = SDIOCK_25MHZ | SECTOR_512B | SDIO_PUSHPULL;
-  while (SDIOCK_25MHZ != (IO_PORT(SDCARD_PHY) & 0xff));
+
+  if (IO_PORT(SDCARD_CMD) & SDIO_PRESENTN) {
+    bios_printf("slot empty\n");
+    return 0;
+  }
+
+  IO_PORT(SDCARD_PHY) = SDIOCK_DEFAULT | SECTOR_512B | SDIO_PUSHPULL;
+  while (SDIOCK_DEFAULT != (IO_PORT(SDCARD_PHY) & 0xff));
 
   // CMD0 - reset
   command(SDIO_REMOVED, 0);
 
   // CMD8 - check power range
   if ((command(SDIO_R1 | 8, 0x1a5) & 0xff) != 0xa5 || (IO_PORT(SDCARD_CMD) & SDIO_ERR)) {
-    bios_printf("no card\n");
+    bios_printf("no response\n");
     return 0;
   }
 
@@ -104,11 +123,11 @@ unsigned init_sdcard() {
 
   if (hs) {  // CMD6 - switch to HS mode
     command(SDIO_R1 | SDIO_MEM | 6, 0x80fffff1);
-    phy = (phy & ~0xff) | SDIOCK_50MHZ;
+    phy = (phy & ~0xff) | SDIOCK_HS;
   }
 #else
   // Simulation model doesn't implement CMD6
-  phy = (phy & ~0xff) | SDIOCK_50MHZ;
+  phy = (phy & ~0xff) | SDIOCK_HS;
 #endif
 
   phy = (phy & 0xf0ffffff) | SECTOR_512B;
@@ -132,12 +151,11 @@ unsigned sdread_impl(unsigned* dst, unsigned sector, unsigned sector_count) {
 static unsigned* receive_sector(unsigned* ptr, long port) {
   unsigned* end = ptr + 128;
   while (ptr < end) {
-    /*ptr[0] = IO_PORT(port);
+    ptr[0] = IO_PORT(port);
     ptr[1] = IO_PORT(port);
     ptr[2] = IO_PORT(port);
     ptr[3] = IO_PORT(port);
-    ptr += 4;*/
-    *ptr++ = IO_PORT(port);
+    ptr += 4;
   }
   return ptr;
 }

@@ -111,16 +111,13 @@ set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_sdcard_data[3]
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_sdcard_data[2]
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_sdcard_data[1]
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_sdcard_data[0]
-set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_sdcard_data
 set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
 set_location_assignment PIN_130 -to io_keys[0]
 set_location_assignment PIN_126 -to io_keys[1]
 set_instance_assignment -name IO_STANDARD "2.5 V SCHMITT TRIGGER" -to io_keys[1]
 set_instance_assignment -name IO_STANDARD "2.5 V SCHMITT TRIGGER" -to io_keys[0]
-set_instance_assignment -name IO_STANDARD "2.5 V SCHMITT TRIGGER" -to io_keys
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_keys[1]
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_keys[0]
-set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_keys
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_uart_rx
 set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "6 MHz" -to io_uart_rx
 set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to io_uart_rx
@@ -132,7 +129,6 @@ set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_we_n
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ras_n
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dqs[0]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dqs[1]
-set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dqs
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[0]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[1]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[2]
@@ -149,18 +145,14 @@ set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[12]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[13]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[14]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq[15]
-set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dq
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dm[0]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dm[1]
-set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_dm
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to io_ddr_sdram_cs_n
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_cke
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ck_p
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ck_n
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_cas_n
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ba[0]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ba[1]
-set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_ba
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[0]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[2]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[1]
@@ -171,7 +163,6 @@ set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[6]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[7]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[8]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a[9]
-set_instance_assignment -name IO_STANDARD "2.5 V" -to io_ddr_sdram_a
 set_location_assignment PIN_76 -to io_ddr_sdram_cas_n
 set_location_assignment PIN_77 -to io_ddr_sdram_ras_n
 set_location_assignment PIN_123 -to io_ddr_sdram_we_n
@@ -195,7 +186,6 @@ set_location_assignment PIN_127 -to io_ddr_sdram_dqs[0]
 set_location_assignment PIN_50 -to io_ddr_sdram_dqs[1]
 set_location_assignment PIN_124 -to io_ddr_sdram_dm[0]
 set_location_assignment PIN_58 -to io_ddr_sdram_dm[1]
-set_location_assignment PIN_15 -to io_ddr_sdram_cs_n
 set_location_assignment PIN_62 -to io_ddr_sdram_cke
 set_location_assignment PIN_61 -to io_ddr_sdram_ck_p
 set_location_assignment PIN_60 -to io_ddr_sdram_ck_n
@@ -216,28 +206,6 @@ set_location_assignment PIN_64 -to io_ddr_sdram_a[11]
 set_location_assignment PIN_63 -to io_ddr_sdram_a[12]
 set_location_assignment PIN_125 -to io_ddr_sdram_a[13]
 set_location_assignment PIN_116 -to io_audio_shdn
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/board_controller.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/audio_controller.sv
-set_global_assignment -name VERILOG_FILE ../verilog/ddr_sdram_ctrl.v
-set_global_assignment -name SYSTEMVERILOG_FILE ../../../sdspi/rtl/sdrxframe.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../../sdspi/rtl/sdtxframe.sv
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdwb.v
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdio_top.v
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdio.v
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdfrontend.v
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdcmd.v
-set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdckgen.v
-set_global_assignment -name VERILOG_FILE ../spinal/EndeavourSoc.v
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/video_controller.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/uart_controller.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/sdcard_controller.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/internal_ram.sv
-set_global_assignment -name QIP_FILE PLL.qip
-set_global_assignment -name QIP_FILE OnChipRAM.qip
-set_global_assignment -name QIP_FILE DDR_IO8.qip
-set_global_assignment -name SIP_FILE DDR_IO8.sip
-set_global_assignment -name QIP_FILE DDR_O4.qip
-set_global_assignment -name SIP_FILE DDR_O4.sip
 set_location_assignment PIN_96 -to io_audio_i2c_scl
 set_location_assignment PIN_97 -to io_audio_i2c_sda
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_audio_i2c_scl
@@ -260,7 +228,6 @@ set_location_assignment PIN_91 -to io_pllb_i2c_sda
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_leds[2]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_leds[1]
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_leds[0]
-set_instance_assignment -name IO_STANDARD "2.5 V" -to io_leds
 set_instance_assignment -name IO_STANDARD "2.5 V" -to io_plla_clk0
 set_location_assignment PIN_51 -to io_plla_clk0
 set_location_assignment PIN_52 -to io_plla_clk1
@@ -273,4 +240,39 @@ set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_pllb_i2c_scl
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_pllb_i2c_sda
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_nreset
 set_global_assignment -name VERILOG_MACRO "ENDEAVOUR_BOARD_VER2=<None>"
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/apb_clock_bridge.sv
+set_global_assignment -name QIP_FILE DDR_O2.qip
+set_global_assignment -name QIP_FILE DDR_O1.qip
+set_global_assignment -name QIP_FILE DDR_IO2.qip
+set_global_assignment -name QIP_FILE DDR_IO1.qip
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/board_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/audio_controller.sv
+set_global_assignment -name VERILOG_FILE ../verilog/ddr_sdram_ctrl.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../../../sdspi/rtl/sdrxframe.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../../sdspi/rtl/sdtxframe.sv
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdwb.v
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdio_top.v
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdio.v
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdfrontend.v
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdcmd.v
+set_global_assignment -name VERILOG_FILE ../../../sdspi/rtl/sdckgen.v
+set_global_assignment -name VERILOG_FILE ../spinal/EndeavourSoc.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/video_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/uart_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/sdcard_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/internal_ram.sv
+set_global_assignment -name QIP_FILE PLL.qip
+set_global_assignment -name QIP_FILE OnChipRAM.qip
+set_global_assignment -name QIP_FILE DDR_IO8.qip
+set_global_assignment -name SIP_FILE DDR_IO8.sip
+set_global_assignment -name QIP_FILE DDR_O4.qip
+set_global_assignment -name SIP_FILE DDR_O4.sip
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_sdcard_ndetect
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to io_ddr_sdram_cas_n
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to io_ddr_sdram_ras_n
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to io_ddr_sdram_we_n
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to io_ddr_sdram_a*
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to io_ddr_sdram_ba*
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to io_ddr_sdram_dm*
+set_location_assignment PIN_29 -to io_sdcard_ndetect
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

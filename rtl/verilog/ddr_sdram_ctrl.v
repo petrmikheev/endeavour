@@ -1,8 +1,5 @@
 // Based on https://github.com/WangXuan95/FPGA-DDR-SDRAM/blob/main/RTL/ddr_sdram_ctrl.v
 // License: GPL-3.0
-// Modifications:
-// - Instead of extra high frequency clock `drv_clk` using DDR IO buffer "DDR_IO8" (instance of altera_gpio_lite)
-//   and shifted clock `dqs_clk` = `clk` with tCK/4 delay.
 
 //--------------------------------------------------------------------------------------------------------
 // Module  : ddr_sdram_ctrl
@@ -16,10 +13,6 @@ module ddr_sdram_ctrl #(
     parameter       BA_BITS   = 2,
     parameter       ROW_BITS  = 13,
     parameter       COL_BITS  = 11,
-    parameter       DQ_LEVEL  = 2,  // DDR DQ_BITS = 4<<DQ_LEVEL, AXI4 DATA WIDTH = 8<<DQ_LEVEL, for example:
-                                    // DQ_LEVEL = 0: DQ_BITS = 4  (x4)  , AXI DATA WIDTH = 8
-                                    // DQ_LEVEL = 1: DQ_BITS = 8  (x8)  , AXI DATA WIDTH = 16    (default)
-                                    // DQ_LEVEL = 2: DQ_BITS = 16 (x16) , AXI DATA WIDTH = 32
     parameter [9:0] tREFC     = 10'd600,
     parameter [7:0] tW2I      = 8'd2,
     parameter [7:0] tR2I      = 8'd2
@@ -28,44 +21,40 @@ module ddr_sdram_ctrl #(
     input dqs_clk,  // should be same rate as `clk` with 1/4 period delay
     input reset,
     // user interface (AXI4)
-    input  wire                                           arw_valid,
-    output wire                                           arw_ready,
-    input  wire  [BA_BITS+ROW_BITS+COL_BITS+DQ_LEVEL-2:0] arw_addr,   // byte address, not word address.
-    input  wire                                    [ 7:0] arw_len,
-    input  wire                                           arw_write,
-    input  wire                                           wvalid,
-    output wire                                           wready,
-    input  wire                                           wlast,
-    input  wire                       [(8<<DQ_LEVEL)-1:0] wdata,
-    output wire                                           bvalid,
-    input  wire                                           bready,
-    output wire                                           rvalid,
-    input  wire                                           rready,
-    output wire                                           rlast,
-    output wire                       [(8<<DQ_LEVEL)-1:0] rdata,
+    input  wire                                arw_valid,
+    output wire                                arw_ready,
+    input  wire  [BA_BITS+ROW_BITS+COL_BITS:0] arw_addr,   // byte address, not word address.
+    input  wire                          [7:0] arw_len,
+    input  wire                                arw_write,
+    input  wire                                wvalid,
+    output wire                                wready,
+    input  wire                                wlast,
+    input  wire                         [31:0] wdata,
+    output wire                                bvalid,
+    input  wire                                bready,
+    output wire                                rvalid,
+    input  wire                                rready,
+    output wire                                rlast,
+    output wire                         [31:0] rdata,
     //
     input wire   [0:0] arw_id,
     input wire   [2:0] arw_size,  // ignored
     input wire   [1:0] arw_burst, // ignored
     input wire   [3:0] wstrb,     // ignored
     output reg   [0:0] bid,
-    output reg   [0:0] rid,
+    output wire  [0:0] rid,
     // DDR-SDRAM interface
-    output wire                                           ddr_ck_p, ddr_ck_n,
-    output wire                                           ddr_cke,
-    output reg                                            ddr_cs_n,
-    output reg                                            ddr_ras_n,
-    output reg                                            ddr_cas_n,
-    output reg                                            ddr_we_n,
-    output reg                  [            BA_BITS-1:0] ddr_ba,
-    output reg                  [           ROW_BITS-1:0] ddr_a,
-    output wire                 [((1<<DQ_LEVEL)+1)/2-1:0] ddr_dm,
-    inout                       [((1<<DQ_LEVEL)+1)/2-1:0] ddr_dqs,
-    inout                       [      (4<<DQ_LEVEL)-1:0] ddr_dq
+    output wire                                ddr_ck_p, ddr_ck_n,
+    output reg                                 ddr_cke,
+    output reg                                 ddr_ras_n,
+    output reg                                 ddr_cas_n,
+    output reg                                 ddr_we_n,
+    output reg                   [BA_BITS-1:0] ddr_ba,
+    output reg                  [ROW_BITS-1:0] ddr_a,
+    output wire                          [1:0] ddr_dm,
+    inout                                [1:0] ddr_dqs,
+    inout                               [15:0] ddr_dq
 );
-
-
-localparam DQS_BITS = ((1<<DQ_LEVEL)+1)/2;
 
 reg        init_done = 1'b0;
 reg  [2:0] ref_idle = 3'd1, ref_real = 3'd0;
@@ -97,24 +86,15 @@ end else begin
     assign ddr_a_col = {burst_last, col_addr[8:0], 1'b0};
 end endgenerate
 
-wire read_accessible, read_respdone;
-reg  output_enable=1'b0, output_enable_d1=1'b0, output_enable_d2=1'b0;
+reg  output_enable=1'b0, output_enable_d1=1'b0, output_enable_dqs=1'b0;
 
 // -------------------------------------------------------------------------------------
 //   constants defination and assignment
 // -------------------------------------------------------------------------------------
-localparam [ROW_BITS-1:0] DDR_A_DEFAULT      = 'b0100_0000_0000;
-localparam [ROW_BITS-1:0] DDR_A_EMR          = 'b0000_0000_0000;  // or 0x2  -> weak drive strength
+reg        [ROW_BITS-1:0] DDR_A_DEFAULT      = 'b0100_0000_0000 /* synthesis keep */;
+localparam [ROW_BITS-1:0] DDR_A_EMR          = 'b0000_0000_0010;  // 0x0 (default) or 0x2 (weak drive strength)
 localparam [ROW_BITS-1:0] DDR_A_MR0          = 'b0001_0010_1001;  // 0x29 -> CL2, burst length 2, interleave
 localparam [ROW_BITS-1:0] DDR_A_MR_CLEAR_DLL = 'b0000_0010_1001;
-
-
-initial ddr_cs_n = 1'b1;
-initial ddr_ras_n = 1'b1;
-initial ddr_cas_n = 1'b1;
-initial ddr_we_n = 1'b1;
-initial ddr_ba = 0;
-initial ddr_a = DDR_A_DEFAULT;
 
 // -------------------------------------------------------------------------------------
 //   refresh wptr self increasement
@@ -135,25 +115,19 @@ always @ (posedge clk)
     end
 
 // -------------------------------------------------------------------------------------
-//   DDR clock
-// -------------------------------------------------------------------------------------
-assign ddr_ck_p = dqs_clk; //~clk;
-assign ddr_ck_n = ~dqs_clk; //clk;
-assign ddr_cke = ~ddr_cs_n;
-
-// -------------------------------------------------------------------------------------
 //  assignment for user interface (AXI4)
 // -------------------------------------------------------------------------------------
 assign wready  = stat==WRITE;
 assign bvalid  = stat==WRESP;
-assign arw_ready = stat==IDLE && init_done && ref_real==ref_idle && (arw_write || read_accessible);
+assign arw_ready = stat==IDLE && init_done && ref_real==ref_idle;
+assign rid = bid;
 
 // -------------------------------------------------------------------------------------
 //   main FSM for generating DDR-SDRAM behavior
 // -------------------------------------------------------------------------------------
 always @ (posedge clk)
     if(reset) begin
-        ddr_cs_n <= 1'b1;
+        ddr_cke <= 1'b0;
         ddr_ras_n <= 1'b1;
         ddr_cas_n <= 1'b1;
         ddr_we_n <= 1'b1;
@@ -171,14 +145,14 @@ always @ (posedge clk)
                 cnt <= cnt + 8'd1;
                 if(cnt[5:0]<8'd13) begin
                 end else if(cnt[5:0]<8'd50) begin
-                    ddr_cs_n <= 1'b0;
-                end else if(cnt[5:0]<8'd51) begin
+                    ddr_cke <= 1'b1;
+                end else if(cnt[5:0]==8'd50) begin
                     ddr_ras_n <= 1'b0;
                     ddr_we_n <= 1'b0;
                 end else if(cnt[5:0]<8'd53) begin
                     ddr_ras_n <= 1'b1;
                     ddr_we_n <= 1'b1;
-                end else if(cnt[5:0]<8'd54) begin
+                end else if(cnt[5:0]==8'd53) begin
                     ddr_ras_n <= 1'b0;
                     ddr_cas_n <= 1'b0;
                     ddr_we_n <= 1'b0;
@@ -202,18 +176,12 @@ always @ (posedge clk)
                     stat <= REFRESH;
                 end else if(~init_done) begin
                     stat <= CLEARDLL;
-                end else if(arw_valid & arw_write) begin
+                end else if(arw_valid) begin
                     ddr_ras_n <= 1'b0;
-                    {ddr_ba, ddr_a, col_addr} <= arw_addr[BA_BITS+ROW_BITS+COL_BITS+DQ_LEVEL-2:DQ_LEVEL];
+                    {ddr_ba, ddr_a, col_addr} <= arw_addr[BA_BITS+ROW_BITS+COL_BITS:2];
                     burst_len <= arw_len;
-                    stat <= WPRE;
+                    stat <= arw_write ? WPRE : RPRE;
                     bid <= arw_id;
-                end else if(arw_valid & ~arw_write & read_accessible) begin
-                    ddr_ras_n <= 1'b0;
-                    {ddr_ba, ddr_a, col_addr} <= arw_addr[BA_BITS+ROW_BITS+COL_BITS+DQ_LEVEL-2:DQ_LEVEL];
-                    burst_len <= arw_len;
-                    stat <= RPRE;
-                    rid <= arw_id;
                 end
             end
             CLEARDLL: begin
@@ -229,22 +197,22 @@ always @ (posedge clk)
             end
             REFRESH: begin
                 cnt <= cnt + 8'd1;
-                if(cnt<8'd1) begin
+                if(cnt == 8'd0) begin
                     ddr_ras_n <= 1'b0;
                     ddr_we_n <= 1'b0;
-                end else if(cnt<8'd3) begin
+                end else if(cnt < 8'd3) begin
                     ddr_ras_n <= 1'b1;
                     ddr_we_n <= 1'b1;
-                end else if(cnt == 8'd4) begin
+                end else if(cnt == 8'd3) begin
                     ddr_ras_n <= 1'b0;
                     ddr_cas_n <= 1'b0;
-                end else if(cnt<8'd10) begin
+                end else if(cnt < 8'd10) begin
                     ddr_ras_n <= 1'b1;
                     ddr_cas_n <= 1'b1;
-                end else if(cnt == 8'd11) begin
+                end else if(cnt == 8'd10) begin
                     ddr_ras_n <= 1'b0;
                     ddr_cas_n <= 1'b0;
-                end else if(cnt<8'd17) begin
+                end else if(cnt < 8'd17) begin
                     ddr_ras_n <= 1'b1;
                     ddr_cas_n <= 1'b1;
                 end else begin
@@ -304,7 +272,7 @@ always @ (posedge clk)
             RRESP: begin 
                 ddr_cas_n <= 1'b1;
                 cnt <= cnt + 8'd1;
-                if(read_respdone)
+                if(rlast)
                     stat <= RWAIT;
             end
             RWAIT: begin
@@ -319,19 +287,22 @@ always @ (posedge clk)
 // -------------------------------------------------------------------------------------
 //   output enable generate
 // -------------------------------------------------------------------------------------
-always @ (posedge clk)
+always @(posedge clk) begin
     if(reset) begin
         output_enable <= 1'b0;
         output_enable_d1 <= 1'b0;
-        output_enable_d2 <= 1'b0;
     end else begin
-        output_enable <= stat==WRITE || output_enable_d1 || output_enable_d2;
+        output_enable <= output_enable_d1;
         output_enable_d1 <= stat==WRITE;
-        output_enable_d2 <= output_enable_d1;
     end
+end
+
+always @(posedge dqs_clk) begin
+  output_enable_dqs <= output_enable_d1 | output_enable;
+end
 
 // -------------------------------------------------------------------------------------
-//   DDR DQ
+//   io bufs
 // -------------------------------------------------------------------------------------
 
 wire [31:0] ddr_in;
@@ -342,57 +313,69 @@ reg ddr_out_valid_buf = 0;
 
 DDR_IO8 io_l(
   .outclock(clk),
-  .inclock(clk /*ddr_dqs[0]*/),
+  .inclock(clk),
   .oe(output_enable ? 8'hff : 8'h0),
   .pad_io(ddr_dq[7:0]),
-  .din({ddr_out[7:0], ddr_out[23:16]}),
-  .dout({ddr_in[7:0], ddr_in[23:16]})
+  .din({ddr_out[23:16], ddr_out[7:0]}),
+  .dout({ddr_in[23:16], ddr_in[7:0]})
 );
 
 DDR_IO8 io_h(
   .outclock(clk),
-  .inclock(clk /*ddr_dqs[1]*/),
+  .inclock(clk),
   .oe(output_enable ? 8'hff : 8'h0),
   .pad_io(ddr_dq[15:8]),
-  .din({ddr_out[15:8], ddr_out[31:24]}),
-  .dout({ddr_in[15:8], ddr_in[31:24]})
+  .din({ddr_out[31:24], ddr_out[15:8]}),
+  .dout({ddr_in[31:24], ddr_in[15:8]})
 );
 
-assign ddr_dm  = output_enable ? {DQS_BITS{1'b0}}   : {DQS_BITS{1'bz}};
-assign ddr_dqs = {DQS_BITS{output_enable ? (dqs_clk & ddr_out_valid) : 1'bz}};
+DDR_O2 o_ck(
+  .outclock(dqs_clk),
+  .din(4'b1001),
+  .pad_out({ddr_ck_n, ddr_ck_p})
+);
+
+DDR_IO2 io_dqs(
+  .outclock(dqs_clk),
+  .inclock(dqs_clk),
+  .oe({2{output_enable_dqs}}),
+  .pad_io(ddr_dqs),
+  .din({2'b00, {2{ddr_out_valid}}})
+);
+
+assign ddr_dm  = output_enable ? 2'b00 : 2'bzz;
 
 // -------------------------------------------------------------------------------------
 //   output data latches
 // -------------------------------------------------------------------------------------
-always @ (posedge clk)
+always @(posedge clk) begin
     if(reset) begin
-        ddr_out_valid <= 1'b0;
         ddr_out_valid_buf <= 1'b0;
         ddr_out <= 32'b0;
         ddr_out_buf <= 32'b0;
     end else begin
         ddr_out_valid_buf <= (stat==WRITE && wvalid);
         ddr_out_buf <= wdata;
-        ddr_out_valid <= ddr_out_valid_buf;
         ddr_out <= ddr_out_buf;
     end
+end
+always @(negedge clk) ddr_out_valid <= ddr_out_valid_buf;
 
 // -------------------------------------------------------------------------------------
 //   dq sampling for input (read)
 // -------------------------------------------------------------------------------------
 
-reg                      i_v_a = 1'b0;
-reg                      i_l_a = 1'b0;
-reg                      i_v_b = 1'b0;
-reg                      i_l_b = 1'b0;
-reg                      i_v_c = 1'b0;
-reg                      i_l_c = 1'b0;
-reg                      i_dqs_c = 1'b0;
-reg                      i_v_d = 1'b0;
-reg                      i_l_d = 1'b0;
-reg                      i_v_e = 1'b0;
-reg                      i_l_e = 1'b0;
-reg  [(8<<DQ_LEVEL)-1:0] i_d_e = 0;
+reg         i_v_a = 1'b0;
+reg         i_l_a = 1'b0;
+reg         i_v_b = 1'b0;
+reg         i_l_b = 1'b0;
+reg         i_v_c = 1'b0;
+reg         i_l_c = 1'b0;
+reg         i_v_d = 1'b0;
+reg         i_l_d = 1'b0;
+reg         i_v_e = 1'b0;
+reg         i_l_e = 1'b0;
+reg  [31:0] i_d_e = 0;
 
 always @ (posedge clk)
     if(reset) begin
@@ -422,7 +405,5 @@ always @ (posedge clk)
 assign rvalid = i_v_e;
 assign rlast = i_l_e;
 assign rdata = i_d_e;
-assign read_accessible = 1'b1;
-assign read_respdone = i_l_e;
 
 endmodule

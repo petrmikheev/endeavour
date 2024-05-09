@@ -23,7 +23,6 @@ module BoardController(
   output reg clk_cpu,
   output reg clk_ram,
   // output reg clk_ram_bus,
-  // output reg clk_sdcard,
   output reg clk_peripheral,
   output reg clk_tmds_pixel,
   output reg clk_tmds_x5,
@@ -39,21 +38,13 @@ module BoardController(
   output [31:0] apb_PRDATA
 );
 
-  reg [7:0] ca0=0, ca1=0, ca2=0, cb0=0, cb1=0, cb2=0;
-  always @(posedge plla_clk0) ca0 <= ca0 + 1'b1;
-  always @(posedge plla_clk1) ca1 <= ca1 + 1'b1;
-  always @(posedge plla_clk2) ca2 <= ca2 + 1'b1;
-  always @(posedge pllb_clk0) cb0 <= cb0 + 1'b1;
-  always @(posedge pllb_clk1) cb1 <= cb1 + 1'b1;
-  always @(posedge pllb_clk2) cb2 <= cb2 + 1'b1;
-
   assign plla_i2c_scl = 1'bz;
   assign plla_i2c_sda = 1'bz;
   assign pllb_i2c_scl = 1'bz;
   assign pllb_i2c_sda = 1'bz;
 
-  parameter CLK_FREQ = 90_000_000;
-  localparam CLK_PERIOD = 1_000_000_000.0 / CLK_FREQ;
+  parameter CPU_FREQ = 88_727_000; //48_000_000;
+  localparam CPU_PERIOD = 1_000_000_000.0 / CPU_FREQ;
 
   parameter PERIPHERAL_FREQ = 48_000_000;
   localparam PERIPHERAL_PERIOD = 1_000_000_000.0 / PERIPHERAL_FREQ;
@@ -68,7 +59,7 @@ module BoardController(
 
   initial reset = 1'b1;
 
-  parameter RESET_DELAY = CLK_FREQ / 1000; // 1ms
+  parameter RESET_DELAY = CPU_FREQ / 1000; // 1ms
 
   reg [$clog2(RESET_DELAY)-1:0] reset_counter = $clog2(RESET_DELAY)'(RESET_DELAY);
 
@@ -93,11 +84,11 @@ module BoardController(
     clk_tmds_pixel = 0;
     clk_tmds_x5 = 0;
 
-    #(CLK_PERIOD/4);
-    while (1) #(CLK_PERIOD/2) clk_ram = ~clk_ram;
+    #(CPU_PERIOD/4);
+    while (1) #(CPU_PERIOD/2) clk_ram = ~clk_ram;
   end
 
-  always #(CLK_PERIOD/2) clk_cpu = ~clk_cpu;
+  always #(CPU_PERIOD/2) clk_cpu = ~clk_cpu;
   always #(PERIPHERAL_PERIOD/2) clk_peripheral = ~clk_peripheral;
 
   reg tmds_bit_clk = 0;
@@ -113,16 +104,28 @@ module BoardController(
     if (tmds_bit_counter == 4'd0 || tmds_bit_counter == 4'd5) clk_tmds_pixel = ~clk_tmds_pixel;
   end
 
-`else
-
+`endif
+`ifdef ENDEAVOUR_BOARD_VER1
   PLL pll(
     .inclk0(clk_in),
     .c0(clk_cpu),
     .c1(clk_ram),
-    .c2(clk_tmds_pixel),
+    .c2(clk_peripheral),
     .c3(clk_tmds_x5)
   );
-
+  assign clk_tmds_pixel = clk_peripheral;
+`endif
+`ifdef ENDEAVOUR_BOARD_VER2
+  PLL pll(
+    .inclk0(clk_in),
+    .c0(clk_tmds_pixel),
+    .c1(clk_tmds_x5),
+    .c2(clk_cpu),
+    .c3(clk_ram)
+  );
+  assign clk_peripheral = clk_in;
+  //assign clk_cpu = clk_in;
+  //assign clk_ram = clk_in;
 `endif
 
   reg [2:0] leds_normalized;
@@ -133,7 +136,7 @@ module BoardController(
   assign keys_normalized = ~keys;
 `else
 `ifdef ENDEAVOUR_BOARD_VER2
-  assign leds = ~leds_normalized ^ {ca0[7], ca1[7], ca2[7]} ^ {cb0[7], cb1[7], cb2[7]};
+  assign leds = ~leds_normalized;
   assign keys_normalized = ~keys;
 `else
   assign leds = leds_normalized;
@@ -141,7 +144,7 @@ module BoardController(
 `endif
 `endif
 
-  assign apb_PRDATA = apb_PADDR[3] ? 32'(CLK_FREQ) :
+  assign apb_PRDATA = apb_PADDR[3] ? 32'(CPU_FREQ) :
                       apb_PADDR[2] ? {30'b0, keys_normalized} : {29'b0, leds_normalized};
   assign apb_PREADY = 1'b1;
 

@@ -43,6 +43,9 @@ module UartController (
   reg parity_odd;
   reg cstopb;
 
+  reg uart_rx_buf = 0;
+  always @(posedge clk) uart_rx_buf <= uart_rx;
+
   reg [3:0] read_bit_num = 0;
   reg [15:0] read_state = 0;
   reg [8:0] read_data = 0;
@@ -106,9 +109,9 @@ module UartController (
           read_state <= read_state - 1'b1;
         else begin
           read_bit_num <= read_bit_num - 1'b1;
-          read_data <= {uart_rx, read_data[8:1]};
+          read_data <= {uart_rx_buf, read_data[8:1]};
           if (read_bit_num == 4'b1) begin
-            if (uart_rx) begin
+            if (uart_rx_buf) begin
               fifo_rx[rx_ina] <= use_parity ? {^{read_data, parity_odd}, read_data[7:0]} : {1'b0, read_data[8:1]};
               rx_ina <= rx_ina + 1'b1;
             end else
@@ -116,13 +119,13 @@ module UartController (
           end else read_state <= divisor;
         end
       end else begin
-        if (read_state == 16'b0 && ~uart_rx) begin
+        if (read_state == 16'b0 && ~uart_rx_buf) begin
           read_state[14:0] <= {divisor[15:3], 2'b01};
         end
         if (read_state == 16'b1) begin
           read_state <= divisor;
           read_bit_num <= 4'd9 + use_parity;
-          if (~rx_err_clear & uart_rx) rx_err <= 1;
+          if (~rx_err_clear & uart_rx_buf) rx_err <= 1;
         end
         if (|read_state[14:1]) begin
           read_state <= read_state - 1'b1;

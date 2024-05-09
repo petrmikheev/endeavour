@@ -34,13 +34,13 @@ case class SDCARD() extends Bundle {
   val clk = out Bool()
   val cmd = inout(Analog(Bool()))
   val data = inout(Analog(Bits(4 bits)))
+  val ndetect = in Bool()
 }
 
 case class DDR_SDRAM(rowBits: Int) extends Bundle {
   val ck_p = out Bool()
   val ck_n = out Bool()
   val cke = out Bool()
-  val cs_n = out Bool()
   val ras_n = out Bool()
   val cas_n = out Bool()
   val we_n = out Bool()

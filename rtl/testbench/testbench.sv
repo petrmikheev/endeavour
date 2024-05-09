@@ -6,8 +6,8 @@ module testbench;
 
   defparam system.board_ctrl.RESET_DELAY = 3;
 
-  reg clk100mhz = 0;
-  always #5 clk100mhz = ~clk100mhz;
+  reg clk48mhz = 0;
+  always #10.417 clk48mhz = ~clk48mhz;
 
   wire [2:0] leds;
 
@@ -18,7 +18,6 @@ module testbench;
   wire [1:0]  DDR_DQS;
   wire [13:0] DDR_A;
   wire [1:0]  DDR_BA;
-  wire        DDR_nCS;
   wire        DDR_CK;
   wire        DDR_nCK;
   wire        DDR_CKE;
@@ -30,11 +29,12 @@ module testbench;
   wire SD_CLK;
   wire SD_CMD;
   wire [3:0] SD_DATA;
+  reg SD_NDETECT = 1'b1;
 
   pullup(SD_CMD);
 
   EndeavourSoc system(
-    .io_clk_in(clk100mhz),
+    .io_clk_in(clk48mhz),
     .io_nreset(1'b1),
     .io_keys(2'b0),
     .io_leds(leds),
@@ -44,7 +44,6 @@ module testbench;
     .io_ddr_sdram_dqs(DDR_DQS),
     .io_ddr_sdram_a(DDR_A),
     .io_ddr_sdram_ba(DDR_BA),
-    .io_ddr_sdram_cs_n(DDR_nCS),
     .io_ddr_sdram_ck_p(DDR_CK),
     .io_ddr_sdram_ck_n(DDR_nCK),
     .io_ddr_sdram_cke(DDR_CKE),
@@ -54,7 +53,8 @@ module testbench;
     .io_ddr_sdram_dm(DDR_DM),
     .io_sdcard_clk(SD_CLK),
     .io_sdcard_cmd(SD_CMD),
-    .io_sdcard_data(SD_DATA)
+    .io_sdcard_data(SD_DATA),
+    .io_sdcard_ndetect(SD_NDETECT)
   );
 
   mdl_sdio #(.OPT_HIGH_CAPACITY(1'b1), .LGMEMSZ(27)) sdcard(
@@ -83,7 +83,7 @@ module testbench;
     .tWR(15.0)     // tWR    ns    Write recovery time*/
   ) ram (
     .Clk(DDR_CK), .Clk_n(DDR_nCK), .Cke(DDR_CKE),
-    .Cs_n(DDR_nCS),
+    .Cs_n(1'b0),
     .Ras_n(DDR_nRAS), .Cas_n(DDR_nCAS), .We_n(DDR_nWE),
     .Ba(DDR_BA), .Addr(DDR_A),
     .Dm(DDR_DM), .Dq(DDR_DQ), .Dqs(DDR_DQS)
@@ -140,6 +140,7 @@ module testbench;
   reg [511:0] sdcard_file_path;
   initial begin
     if ($value$plusargs("sdcard=%s", sdcard_file_path)) begin
+      SD_NDETECT = 1'b0;
       sdcard_file = $fopen(sdcard_file_path, "rb");
       if (!$fread(sdcard.mem, sdcard_file)) $display("Sdcard content initialization failed");
     end

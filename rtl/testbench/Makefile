@@ -1,4 +1,5 @@
 sources = ../verilog/*.sv ../verilog/*.v ../spinal/EndeavourSoc.v /home/petya/sdspi/rtl/sd*.v
+#/home/petya/sdspi/rtl/xsdddr.v
 testbench_sources = /home/petya/sdspi/bench/verilog/mdl_*.v micron_ddr_sdram_model.v io_buf.sv
 
 .PHONY: runbench

@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.10.1    git head : 2527c7c6b0fb0f95e5e1a5722a0be732b364ce43
 // Component : EndeavourSoc
-// Git hash  : 905d63e60d6fce9b00a9311c0d6542d6ac71a714
+// Git hash  : fbe3330a66b63edfe47d192f4b369dc1f7547c47
 
 `timescale 1ns/1ps
 
@@ -35,10 +35,10 @@ module EndeavourSoc (
   output wire          io_sdcard_clk,
   inout  wire          io_sdcard_cmd,
   inout  wire [3:0]    io_sdcard_data,
+  input  wire          io_sdcard_ndetect,
   output wire          io_ddr_sdram_ck_p,
   output wire          io_ddr_sdram_ck_n,
   output wire          io_ddr_sdram_cke,
-  output wire          io_ddr_sdram_cs_n,
   output wire          io_ddr_sdram_ras_n,
   output wire          io_ddr_sdram_cas_n,
   output wire          io_ddr_sdram_we_n,
@@ -52,8 +52,8 @@ module EndeavourSoc (
   wire       [3:0]    board_ctrl_apb_PADDR;
   wire       [3:0]    peripheral_uart_ctrl_apb_PADDR;
   wire       [2:0]    peripheral_audio_ctrl_apb_PADDR;
+  wire       [4:0]    peripheral_sdcard_ctrl_apb_PADDR;
   wire       [10:0]   peripheral_apb_bridge_input_PADDR;
-  wire       [4:0]    sdcard_ctrl_apb_PADDR;
   wire                vexRiscv_1_softwareInterrupt;
   reg                 vexRiscv_1_dBus_cmd_ready;
   wire                vexRiscv_1_dBus_rsp_payload_last;
@@ -79,7 +79,6 @@ module EndeavourSoc (
   wire       [1:0]    apbBridge_io_axi_arbiter_io_sharedInputs_0_arw_payload_burst;
   wire                apb3Router_3_io_outputs_0_PSLVERROR;
   wire                apb3Router_3_io_outputs_1_PSLVERROR;
-  wire                apb3Router_3_io_outputs_2_PSLVERROR;
   wire                board_ctrl_plla_i2c_scl;
   wire                board_ctrl_pllb_i2c_scl;
   wire                board_ctrl_reset;
@@ -107,10 +106,13 @@ module EndeavourSoc (
   wire                peripheral_audio_ctrl_i2c_scl;
   wire                peripheral_audio_ctrl_apb_PREADY;
   wire       [31:0]   peripheral_audio_ctrl_apb_PRDATA;
+  wire                peripheral_sdcard_ctrl_sdcard_clk;
+  wire                peripheral_sdcard_ctrl_apb_PREADY;
+  wire       [31:0]   peripheral_sdcard_ctrl_apb_PRDATA;
   wire                peripheral_apb_decoder_io_input_PREADY;
   wire       [31:0]   peripheral_apb_decoder_io_input_PRDATA;
   wire       [10:0]   peripheral_apb_decoder_io_output_PADDR;
-  wire       [1:0]    peripheral_apb_decoder_io_output_PSEL;
+  wire       [2:0]    peripheral_apb_decoder_io_output_PSEL;
   wire                peripheral_apb_decoder_io_output_PENABLE;
   wire                peripheral_apb_decoder_io_output_PWRITE;
   wire       [31:0]   peripheral_apb_decoder_io_output_PWDATA;
@@ -126,6 +128,11 @@ module EndeavourSoc (
   wire                apb3Router_2_io_outputs_1_PENABLE;
   wire                apb3Router_2_io_outputs_1_PWRITE;
   wire       [31:0]   apb3Router_2_io_outputs_1_PWDATA;
+  wire       [10:0]   apb3Router_2_io_outputs_2_PADDR;
+  wire       [0:0]    apb3Router_2_io_outputs_2_PSEL;
+  wire                apb3Router_2_io_outputs_2_PENABLE;
+  wire                apb3Router_2_io_outputs_2_PWRITE;
+  wire       [31:0]   apb3Router_2_io_outputs_2_PWDATA;
   wire                peripheral_apb_bridge_input_PREADY;
   wire       [31:0]   peripheral_apb_bridge_input_PRDATA;
   wire       [10:0]   peripheral_apb_bridge_output_PADDR;
@@ -133,9 +140,6 @@ module EndeavourSoc (
   wire                peripheral_apb_bridge_output_PENABLE;
   wire                peripheral_apb_bridge_output_PWRITE;
   wire       [31:0]   peripheral_apb_bridge_output_PWDATA;
-  wire                sdcard_ctrl_sdcard_clk;
-  wire                sdcard_ctrl_apb_PREADY;
-  wire       [31:0]   sdcard_ctrl_apb_PRDATA;
   wire                ram_ctrl_arw_ready;
   wire                ram_ctrl_wready;
   wire                ram_ctrl_bvalid;
@@ -147,7 +151,6 @@ module EndeavourSoc (
   wire                ram_ctrl_ddr_ck_p;
   wire                ram_ctrl_ddr_ck_n;
   wire                ram_ctrl_ddr_cke;
-  wire                ram_ctrl_ddr_cs_n;
   wire                ram_ctrl_ddr_ras_n;
   wire                ram_ctrl_ddr_cas_n;
   wire                ram_ctrl_ddr_we_n;
@@ -332,7 +335,7 @@ module EndeavourSoc (
   wire       [31:0]   io_apb_decoder_io_input_PRDATA;
   wire                io_apb_decoder_io_input_PSLVERROR;
   wire       [11:0]   io_apb_decoder_io_output_PADDR;
-  wire       [2:0]    io_apb_decoder_io_output_PSEL;
+  wire       [1:0]    io_apb_decoder_io_output_PSEL;
   wire                io_apb_decoder_io_output_PENABLE;
   wire                io_apb_decoder_io_output_PWRITE;
   wire       [31:0]   io_apb_decoder_io_output_PWDATA;
@@ -349,11 +352,6 @@ module EndeavourSoc (
   wire                apb3Router_3_io_outputs_1_PENABLE;
   wire                apb3Router_3_io_outputs_1_PWRITE;
   wire       [31:0]   apb3Router_3_io_outputs_1_PWDATA;
-  wire       [11:0]   apb3Router_3_io_outputs_2_PADDR;
-  wire       [0:0]    apb3Router_3_io_outputs_2_PSEL;
-  wire                apb3Router_3_io_outputs_2_PENABLE;
-  wire                apb3Router_3_io_outputs_2_PWRITE;
-  wire       [31:0]   apb3Router_3_io_outputs_2_PWDATA;
   wire       [2:0]    _zz_dbus_axi_arw_payload_len;
   wire       [10:0]   peripheral_apb_PADDR;
   wire       [0:0]    peripheral_apb_PSEL;
@@ -588,6 +586,21 @@ module EndeavourSoc (
     .apb_PWDATA  (apb3Router_2_io_outputs_1_PWDATA[31:0]), //i
     .apb_PRDATA  (peripheral_audio_ctrl_apb_PRDATA[31:0])  //o
   );
+  SdcardController peripheral_sdcard_ctrl (
+    .clk            (board_ctrl_clk_peripheral              ), //i
+    .reset          (board_ctrl_reset                       ), //i
+    .sdcard_clk     (peripheral_sdcard_ctrl_sdcard_clk      ), //o
+    .sdcard_cmd     ({io_sdcard_cmd}),
+    .sdcard_data    ({io_sdcard_data}),
+    .sdcard_ndetect (io_sdcard_ndetect                      ), //i
+    .apb_PADDR      (peripheral_sdcard_ctrl_apb_PADDR[4:0]  ), //i
+    .apb_PSEL       (apb3Router_2_io_outputs_2_PSEL         ), //i
+    .apb_PENABLE    (apb3Router_2_io_outputs_2_PENABLE      ), //i
+    .apb_PREADY     (peripheral_sdcard_ctrl_apb_PREADY      ), //o
+    .apb_PWRITE     (apb3Router_2_io_outputs_2_PWRITE       ), //i
+    .apb_PWDATA     (apb3Router_2_io_outputs_2_PWDATA[31:0] ), //i
+    .apb_PRDATA     (peripheral_sdcard_ctrl_apb_PRDATA[31:0])  //o
+  );
   Apb3Decoder peripheral_apb_decoder (
     .io_input_PADDR    (peripheral_apb_PADDR[10:0]                   ), //i
     .io_input_PSEL     (peripheral_apb_PSEL                          ), //i
@@ -597,7 +610,7 @@ module EndeavourSoc (
     .io_input_PWDATA   (peripheral_apb_PWDATA[31:0]                  ), //i
     .io_input_PRDATA   (peripheral_apb_decoder_io_input_PRDATA[31:0] ), //o
     .io_output_PADDR   (peripheral_apb_decoder_io_output_PADDR[10:0] ), //o
-    .io_output_PSEL    (peripheral_apb_decoder_io_output_PSEL[1:0]   ), //o
+    .io_output_PSEL    (peripheral_apb_decoder_io_output_PSEL[2:0]   ), //o
     .io_output_PENABLE (peripheral_apb_decoder_io_output_PENABLE     ), //o
     .io_output_PREADY  (apb3Router_2_io_input_PREADY                 ), //i
     .io_output_PWRITE  (peripheral_apb_decoder_io_output_PWRITE      ), //o
@@ -606,7 +619,7 @@ module EndeavourSoc (
   );
   Apb3Router apb3Router_2 (
     .io_input_PADDR       (peripheral_apb_decoder_io_output_PADDR[10:0] ), //i
-    .io_input_PSEL        (peripheral_apb_decoder_io_output_PSEL[1:0]   ), //i
+    .io_input_PSEL        (peripheral_apb_decoder_io_output_PSEL[2:0]   ), //i
     .io_input_PENABLE     (peripheral_apb_decoder_io_output_PENABLE     ), //i
     .io_input_PREADY      (apb3Router_2_io_input_PREADY                 ), //o
     .io_input_PWRITE      (peripheral_apb_decoder_io_output_PWRITE      ), //i
@@ -626,6 +639,13 @@ module EndeavourSoc (
     .io_outputs_1_PWRITE  (apb3Router_2_io_outputs_1_PWRITE             ), //o
     .io_outputs_1_PWDATA  (apb3Router_2_io_outputs_1_PWDATA[31:0]       ), //o
     .io_outputs_1_PRDATA  (peripheral_audio_ctrl_apb_PRDATA[31:0]       ), //i
+    .io_outputs_2_PADDR   (apb3Router_2_io_outputs_2_PADDR[10:0]        ), //o
+    .io_outputs_2_PSEL    (apb3Router_2_io_outputs_2_PSEL               ), //o
+    .io_outputs_2_PENABLE (apb3Router_2_io_outputs_2_PENABLE            ), //o
+    .io_outputs_2_PREADY  (peripheral_sdcard_ctrl_apb_PREADY            ), //i
+    .io_outputs_2_PWRITE  (apb3Router_2_io_outputs_2_PWRITE             ), //o
+    .io_outputs_2_PWDATA  (apb3Router_2_io_outputs_2_PWDATA[31:0]       ), //o
+    .io_outputs_2_PRDATA  (peripheral_sdcard_ctrl_apb_PRDATA[31:0]      ), //i
     .clk_peripheral       (board_ctrl_clk_peripheral                    ), //i
     .reset                (board_ctrl_reset                             )  //i
   );
@@ -649,24 +669,9 @@ module EndeavourSoc (
     .output_PWDATA  (peripheral_apb_bridge_output_PWDATA[31:0]), //o
     .output_PRDATA  (peripheral_apb_PRDATA[31:0]              )  //i
   );
-  SdcardController sdcard_ctrl (
-    .clk         (board_ctrl_clk_cpu                    ), //i
-    .reset       (board_ctrl_reset                      ), //i
-    .sdcard_clk  (sdcard_ctrl_sdcard_clk                ), //o
-    .sdcard_cmd  ({io_sdcard_cmd}),
-    .sdcard_data ({io_sdcard_data}),
-    .apb_PADDR   (sdcard_ctrl_apb_PADDR[4:0]            ), //i
-    .apb_PSEL    (apb3Router_3_io_outputs_2_PSEL        ), //i
-    .apb_PENABLE (apb3Router_3_io_outputs_2_PENABLE     ), //i
-    .apb_PREADY  (sdcard_ctrl_apb_PREADY                ), //o
-    .apb_PWRITE  (apb3Router_3_io_outputs_2_PWRITE      ), //i
-    .apb_PWDATA  (apb3Router_3_io_outputs_2_PWDATA[31:0]), //i
-    .apb_PRDATA  (sdcard_ctrl_apb_PRDATA[31:0]          )  //o
-  );
   ddr_sdram_ctrl #(
     .ROW_BITS(14),
-    .COL_BITS(10),
-    .DQ_LEVEL(2)
+    .COL_BITS(10)
   ) ram_ctrl (
     .clk       (board_ctrl_clk_cpu                                   ), //i
     .dqs_clk   (board_ctrl_clk_ram                                   ), //i
@@ -695,7 +700,6 @@ module EndeavourSoc (
     .ddr_ck_p  (ram_ctrl_ddr_ck_p                                    ), //o
     .ddr_ck_n  (ram_ctrl_ddr_ck_n                                    ), //o
     .ddr_cke   (ram_ctrl_ddr_cke                                     ), //o
-    .ddr_cs_n  (ram_ctrl_ddr_cs_n                                    ), //o
     .ddr_ras_n (ram_ctrl_ddr_ras_n                                   ), //o
     .ddr_cas_n (ram_ctrl_ddr_cas_n                                   ), //o
     .ddr_we_n  (ram_ctrl_ddr_we_n                                    ), //o
@@ -1093,7 +1097,7 @@ module EndeavourSoc (
     .io_input_PRDATA     (io_apb_decoder_io_input_PRDATA[31:0] ), //o
     .io_input_PSLVERROR  (io_apb_decoder_io_input_PSLVERROR    ), //o
     .io_output_PADDR     (io_apb_decoder_io_output_PADDR[11:0] ), //o
-    .io_output_PSEL      (io_apb_decoder_io_output_PSEL[2:0]   ), //o
+    .io_output_PSEL      (io_apb_decoder_io_output_PSEL[1:0]   ), //o
     .io_output_PENABLE   (io_apb_decoder_io_output_PENABLE     ), //o
     .io_output_PREADY    (apb3Router_3_io_input_PREADY         ), //i
     .io_output_PWRITE    (io_apb_decoder_io_output_PWRITE      ), //o
@@ -1103,7 +1107,7 @@ module EndeavourSoc (
   );
   Apb3Router_1 apb3Router_3 (
     .io_input_PADDR         (io_apb_decoder_io_output_PADDR[11:0]    ), //i
-    .io_input_PSEL          (io_apb_decoder_io_output_PSEL[2:0]      ), //i
+    .io_input_PSEL          (io_apb_decoder_io_output_PSEL[1:0]      ), //i
     .io_input_PENABLE       (io_apb_decoder_io_output_PENABLE        ), //i
     .io_input_PREADY        (apb3Router_3_io_input_PREADY            ), //o
     .io_input_PWRITE        (io_apb_decoder_io_output_PWRITE         ), //i
@@ -1126,14 +1130,6 @@ module EndeavourSoc (
     .io_outputs_1_PWDATA    (apb3Router_3_io_outputs_1_PWDATA[31:0]  ), //o
     .io_outputs_1_PRDATA    (board_ctrl_apb_PRDATA[31:0]             ), //i
     .io_outputs_1_PSLVERROR (apb3Router_3_io_outputs_1_PSLVERROR     ), //i
-    .io_outputs_2_PADDR     (apb3Router_3_io_outputs_2_PADDR[11:0]   ), //o
-    .io_outputs_2_PSEL      (apb3Router_3_io_outputs_2_PSEL          ), //o
-    .io_outputs_2_PENABLE   (apb3Router_3_io_outputs_2_PENABLE       ), //o
-    .io_outputs_2_PREADY    (sdcard_ctrl_apb_PREADY                  ), //i
-    .io_outputs_2_PWRITE    (apb3Router_3_io_outputs_2_PWRITE        ), //o
-    .io_outputs_2_PWDATA    (apb3Router_3_io_outputs_2_PWDATA[31:0]  ), //o
-    .io_outputs_2_PRDATA    (sdcard_ctrl_apb_PRDATA[31:0]            ), //i
-    .io_outputs_2_PSLVERROR (apb3Router_3_io_outputs_2_PSLVERROR     ), //i
     .clk_cpu                (board_ctrl_clk_cpu                      ), //i
     .reset                  (board_ctrl_reset                        )  //i
   );
@@ -1151,20 +1147,20 @@ module EndeavourSoc (
   assign io_uart_tx = peripheral_uart_ctrl_uart_tx;
   assign io_audio_shdn = peripheral_audio_ctrl_shdn;
   assign io_audio_i2c_scl = peripheral_audio_ctrl_i2c_scl;
+  assign io_sdcard_clk = peripheral_sdcard_ctrl_sdcard_clk;
   assign peripheral_apb_PREADY = peripheral_apb_decoder_io_input_PREADY;
   assign peripheral_apb_PRDATA = peripheral_apb_decoder_io_input_PRDATA;
   assign peripheral_uart_ctrl_apb_PADDR = apb3Router_2_io_outputs_0_PADDR[3:0];
   assign peripheral_audio_ctrl_apb_PADDR = apb3Router_2_io_outputs_1_PADDR[2:0];
+  assign peripheral_sdcard_ctrl_apb_PADDR = apb3Router_2_io_outputs_2_PADDR[4:0];
   assign peripheral_apb_PADDR = peripheral_apb_bridge_output_PADDR;
   assign peripheral_apb_PSEL = peripheral_apb_bridge_output_PSEL;
   assign peripheral_apb_PENABLE = peripheral_apb_bridge_output_PENABLE;
   assign peripheral_apb_PWRITE = peripheral_apb_bridge_output_PWRITE;
   assign peripheral_apb_PWDATA = peripheral_apb_bridge_output_PWDATA;
-  assign io_sdcard_clk = sdcard_ctrl_sdcard_clk;
   assign io_ddr_sdram_ck_p = ram_ctrl_ddr_ck_p;
   assign io_ddr_sdram_ck_n = ram_ctrl_ddr_ck_n;
   assign io_ddr_sdram_cke = ram_ctrl_ddr_cke;
-  assign io_ddr_sdram_cs_n = ram_ctrl_ddr_cs_n;
   assign io_ddr_sdram_ras_n = ram_ctrl_ddr_ras_n;
   assign io_ddr_sdram_cas_n = ram_ctrl_ddr_cas_n;
   assign io_ddr_sdram_we_n = ram_ctrl_ddr_we_n;
@@ -1383,8 +1379,6 @@ module EndeavourSoc (
   assign apb3Router_3_io_outputs_0_PSLVERROR = 1'b0;
   assign board_ctrl_apb_PADDR = apb3Router_3_io_outputs_1_PADDR[3:0];
   assign apb3Router_3_io_outputs_1_PSLVERROR = 1'b0;
-  assign sdcard_ctrl_apb_PADDR = apb3Router_3_io_outputs_2_PADDR[4:0];
-  assign apb3Router_3_io_outputs_2_PSLVERROR = 1'b0;
   assign vexRiscv_1_softwareInterrupt = 1'b0;
   always @(posedge board_ctrl_clk_cpu or posedge board_ctrl_reset) begin
     if(board_ctrl_reset) begin
@@ -1495,7 +1489,7 @@ endmodule
 
 module Apb3Router_1 (
   input  wire [11:0]   io_input_PADDR,
-  input  wire [2:0]    io_input_PSEL,
+  input  wire [1:0]    io_input_PSEL,
   input  wire          io_input_PENABLE,
   output wire          io_input_PREADY,
   input  wire          io_input_PWRITE,
@@ -1518,14 +1512,6 @@ module Apb3Router_1 (
   output wire [31:0]   io_outputs_1_PWDATA,
   input  wire [31:0]   io_outputs_1_PRDATA,
   input  wire          io_outputs_1_PSLVERROR,
-  output wire [11:0]   io_outputs_2_PADDR,
-  output wire [0:0]    io_outputs_2_PSEL,
-  output wire          io_outputs_2_PENABLE,
-  input  wire          io_outputs_2_PREADY,
-  output wire          io_outputs_2_PWRITE,
-  output wire [31:0]   io_outputs_2_PWDATA,
-  input  wire [31:0]   io_outputs_2_PRDATA,
-  input  wire          io_outputs_2_PSLVERROR,
   input  wire          clk_cpu,
   input  wire          reset
 );
@@ -1534,25 +1520,19 @@ module Apb3Router_1 (
   reg        [31:0]   _zz_io_input_PRDATA;
   reg                 _zz_io_input_PSLVERROR;
   wire                _zz_selIndex;
-  wire                _zz_selIndex_1;
-  reg        [1:0]    selIndex;
+  reg        [0:0]    selIndex;
 
   always @(*) begin
     case(selIndex)
-      2'b00 : begin
+      1'b0 : begin
         _zz_io_input_PREADY = io_outputs_0_PREADY;
         _zz_io_input_PRDATA = io_outputs_0_PRDATA;
         _zz_io_input_PSLVERROR = io_outputs_0_PSLVERROR;
       end
-      2'b01 : begin
+      default : begin
         _zz_io_input_PREADY = io_outputs_1_PREADY;
         _zz_io_input_PRDATA = io_outputs_1_PRDATA;
         _zz_io_input_PSLVERROR = io_outputs_1_PSLVERROR;
-      end
-      default : begin
-        _zz_io_input_PREADY = io_outputs_2_PREADY;
-        _zz_io_input_PRDATA = io_outputs_2_PRDATA;
-        _zz_io_input_PSLVERROR = io_outputs_2_PSLVERROR;
       end
     endcase
   end
@@ -1567,18 +1547,12 @@ module Apb3Router_1 (
   assign io_outputs_1_PSEL[0] = io_input_PSEL[1];
   assign io_outputs_1_PWRITE = io_input_PWRITE;
   assign io_outputs_1_PWDATA = io_input_PWDATA;
-  assign io_outputs_2_PADDR = io_input_PADDR;
-  assign io_outputs_2_PENABLE = io_input_PENABLE;
-  assign io_outputs_2_PSEL[0] = io_input_PSEL[2];
-  assign io_outputs_2_PWRITE = io_input_PWRITE;
-  assign io_outputs_2_PWDATA = io_input_PWDATA;
   assign _zz_selIndex = io_input_PSEL[1];
-  assign _zz_selIndex_1 = io_input_PSEL[2];
   assign io_input_PREADY = _zz_io_input_PREADY;
   assign io_input_PRDATA = _zz_io_input_PRDATA;
   assign io_input_PSLVERROR = _zz_io_input_PSLVERROR;
   always @(posedge clk_cpu) begin
-    selIndex <= {_zz_selIndex_1,_zz_selIndex};
+    selIndex <= _zz_selIndex;
   end
 
 
@@ -1594,7 +1568,7 @@ module Apb3Decoder_1 (
   output wire [31:0]   io_input_PRDATA,
   output reg           io_input_PSLVERROR,
   output wire [11:0]   io_output_PADDR,
-  output reg  [2:0]    io_output_PSEL,
+  output reg  [1:0]    io_output_PSEL,
   output wire          io_output_PENABLE,
   input  wire          io_output_PREADY,
   output wire          io_output_PWRITE,
@@ -1612,7 +1586,6 @@ module Apb3Decoder_1 (
   always @(*) begin
     io_output_PSEL[0] = (((io_input_PADDR & (~ 12'h7ff)) == 12'h000) && io_input_PSEL[0]);
     io_output_PSEL[1] = (((io_input_PADDR & (~ 12'h00f)) == 12'h800) && io_input_PSEL[0]);
-    io_output_PSEL[2] = (((io_input_PADDR & (~ 12'h01f)) == 12'h900) && io_input_PSEL[0]);
   end
 
   always @(*) begin
@@ -1630,7 +1603,7 @@ module Apb3Decoder_1 (
     end
   end
 
-  assign when_Apb3Decoder_l88 = (io_input_PSEL[0] && (io_output_PSEL == 3'b000));
+  assign when_Apb3Decoder_l88 = (io_input_PSEL[0] && (io_output_PSEL == 2'b00));
 
 endmodule
 
@@ -9936,7 +9909,7 @@ endmodule
 
 module Apb3Router (
   input  wire [10:0]   io_input_PADDR,
-  input  wire [1:0]    io_input_PSEL,
+  input  wire [2:0]    io_input_PSEL,
   input  wire          io_input_PENABLE,
   output wire          io_input_PREADY,
   input  wire          io_input_PWRITE,
@@ -9956,6 +9929,13 @@ module Apb3Router (
   output wire          io_outputs_1_PWRITE,
   output wire [31:0]   io_outputs_1_PWDATA,
   input  wire [31:0]   io_outputs_1_PRDATA,
+  output wire [10:0]   io_outputs_2_PADDR,
+  output wire [0:0]    io_outputs_2_PSEL,
+  output wire          io_outputs_2_PENABLE,
+  input  wire          io_outputs_2_PREADY,
+  output wire          io_outputs_2_PWRITE,
+  output wire [31:0]   io_outputs_2_PWDATA,
+  input  wire [31:0]   io_outputs_2_PRDATA,
   input  wire          clk_peripheral,
   input  wire          reset
 );
@@ -9963,17 +9943,22 @@ module Apb3Router (
   reg                 _zz_io_input_PREADY;
   reg        [31:0]   _zz_io_input_PRDATA;
   wire                _zz_selIndex;
-  reg        [0:0]    selIndex;
+  wire                _zz_selIndex_1;
+  reg        [1:0]    selIndex;
 
   always @(*) begin
     case(selIndex)
-      1'b0 : begin
+      2'b00 : begin
         _zz_io_input_PREADY = io_outputs_0_PREADY;
         _zz_io_input_PRDATA = io_outputs_0_PRDATA;
       end
-      default : begin
+      2'b01 : begin
         _zz_io_input_PREADY = io_outputs_1_PREADY;
         _zz_io_input_PRDATA = io_outputs_1_PRDATA;
+      end
+      default : begin
+        _zz_io_input_PREADY = io_outputs_2_PREADY;
+        _zz_io_input_PRDATA = io_outputs_2_PRDATA;
       end
     endcase
   end
@@ -9988,11 +9973,17 @@ module Apb3Router (
   assign io_outputs_1_PSEL[0] = io_input_PSEL[1];
   assign io_outputs_1_PWRITE = io_input_PWRITE;
   assign io_outputs_1_PWDATA = io_input_PWDATA;
+  assign io_outputs_2_PADDR = io_input_PADDR;
+  assign io_outputs_2_PENABLE = io_input_PENABLE;
+  assign io_outputs_2_PSEL[0] = io_input_PSEL[2];
+  assign io_outputs_2_PWRITE = io_input_PWRITE;
+  assign io_outputs_2_PWDATA = io_input_PWDATA;
   assign _zz_selIndex = io_input_PSEL[1];
+  assign _zz_selIndex_1 = io_input_PSEL[2];
   assign io_input_PREADY = _zz_io_input_PREADY;
   assign io_input_PRDATA = _zz_io_input_PRDATA;
   always @(posedge clk_peripheral) begin
-    selIndex <= _zz_selIndex;
+    selIndex <= {_zz_selIndex_1,_zz_selIndex};
   end
 
 
@@ -10007,7 +9998,7 @@ module Apb3Decoder (
   input  wire [31:0]   io_input_PWDATA,
   output wire [31:0]   io_input_PRDATA,
   output wire [10:0]   io_output_PADDR,
-  output reg  [1:0]    io_output_PSEL,
+  output reg  [2:0]    io_output_PSEL,
   output wire          io_output_PENABLE,
   input  wire          io_output_PREADY,
   output wire          io_output_PWRITE,
@@ -10024,6 +10015,7 @@ module Apb3Decoder (
   always @(*) begin
     io_output_PSEL[0] = (((io_input_PADDR & (~ 11'h00f)) == 11'h100) && io_input_PSEL[0]);
     io_output_PSEL[1] = (((io_input_PADDR & (~ 11'h007)) == 11'h200) && io_input_PSEL[0]);
+    io_output_PSEL[2] = (((io_input_PADDR & (~ 11'h01f)) == 11'h300) && io_input_PSEL[0]);
   end
 
   always @(*) begin
@@ -10034,7 +10026,7 @@ module Apb3Decoder (
   end
 
   assign io_input_PRDATA = io_output_PRDATA;
-  assign when_Apb3Decoder_l88 = (io_input_PSEL[0] && (io_output_PSEL == 2'b00));
+  assign when_Apb3Decoder_l88 = (io_input_PSEL[0] && (io_output_PSEL == 3'b000));
 
 endmodule
 

@@ -28,20 +28,20 @@ stat.READ 0 0 1 0 0 0 0 0 0 0 0 1
 stat.RRESP 0 1 0 0 0 0 0 0 0 0 0 1 
 stat.RWAIT 1 0 0 0 0 0 0 0 0 0 0 1 
 
-State Machine - |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdtxframe:u_txframe|pstate
+State Machine - |EndeavourSoc|SdcardController:peripheral_sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdtxframe:u_txframe|pstate
 Name pstate.P_LAST pstate.P_CRC pstate.P_DATA pstate.P_IDLE 
 pstate.P_IDLE 0 0 0 0 
 pstate.P_DATA 0 0 1 1 
 pstate.P_CRC 0 1 0 1 
 pstate.P_LAST 1 0 0 1 
 
-State Machine - |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdtxframe:u_txframe|cfg_period
+State Machine - |EndeavourSoc|SdcardController:peripheral_sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdtxframe:u_txframe|cfg_period
 Name cfg_period.00 cfg_period.P_4D cfg_period.P_2D 
 cfg_period.00 0 0 0 
 cfg_period.P_2D 1 0 1 
 cfg_period.P_4D 1 1 0 
 
-State Machine - |EndeavourSoc|SdcardController:sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|pre_sel
+State Machine - |EndeavourSoc|SdcardController:peripheral_sdcard_ctrl|sdio_top:impl|sdio:u_sdio|sdwb:u_control|pre_sel
 Name pre_sel.00 pre_sel.10 pre_sel.01 
 pre_sel.00 0 0 0 
 pre_sel.01 1 0 1 
