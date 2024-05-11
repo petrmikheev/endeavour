@@ -124,8 +124,6 @@ module BoardController(
     .c3(clk_ram)
   );
   assign clk_peripheral = clk_in;
-  //assign clk_cpu = clk_in;
-  //assign clk_ram = clk_in;
 `endif
 
   reg [2:0] leds_normalized;
