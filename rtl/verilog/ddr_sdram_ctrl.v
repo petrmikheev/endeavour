@@ -21,6 +21,7 @@ module DDRSdramController #(
     output wire                          wready,
     input  wire                          wlast,
     input  wire                   [31:0] wdata,
+    input wire                     [3:0] wstrb,
     output wire                          bvalid,
     input  wire                          bready,
     output wire                          rvalid,
@@ -29,9 +30,8 @@ module DDRSdramController #(
     output wire                   [31:0] rdata,
     //
     input wire   [0:0] arw_id,
-    input wire   [2:0] arw_size,  // ignored
-    input wire   [1:0] arw_burst, // ignored
-    input wire   [3:0] wstrb,     // ignored
+    input wire   [2:0] arw_size,  // ignored, expected 4 byte (0x2)
+    input wire   [1:0] arw_burst, // ignored, expected INCR
     output reg   [0:0] bid,
     output wire  [0:0] rid,
     // DDR-SDRAM interface
@@ -270,6 +270,7 @@ reg [31:0] ddr_out;
 reg [31:0] ddr_out_buf;
 reg ddr_out_valid = 0;
 reg ddr_out_valid_buf = 0;
+reg [3:0] wstrb1, wstrb2;
 
 DDR_IO8 io_l(
   .outclock(clk),
@@ -303,7 +304,11 @@ DDR_IO2 io_dqs(
   .din({2'b00, {2{ddr_out_valid}}})
 );
 
-assign ddr_dm  = output_enable ? 2'b00 : 2'bzz;
+DDR_O2 o_dm(
+  .outclock(clk),
+  .din(~wstrb2),
+  .pad_out(ddr_dm)
+);
 
 // -------------------------------------------------------------------------------------
 //   output data latches
@@ -317,6 +322,8 @@ always @(posedge clk) begin
         ddr_out_valid_buf <= (stat==WRITE && wvalid);
         ddr_out_buf <= wdata;
         ddr_out <= ddr_out_buf;
+        wstrb1 <= wstrb;
+        wstrb2 <= wstrb1;
     end
 end
 always @(negedge clk) ddr_out_valid <= ddr_out_valid_buf;

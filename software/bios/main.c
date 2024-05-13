@@ -69,9 +69,37 @@ void print_cpu_info() {
   bios_printf(", 1 core, %uMhz\n", IO_PORT(BOARD_CPU_FREQ) / 1000000);
 }
 
-unsigned test_ram_size() {
-  // TODO
-  return 0;
+int memtest() {
+  bios_printf("RAM: %uMB\tmemtest", RAM_SIZE >> 20);
+  char* ram = (char*)RAM_ADDR;
+  const int batch_size = RAM_SIZE >> 4;
+#ifndef SIMULATION
+  const int step = 17;
+#else
+  const int step = (batch_size >> 3) + 1;
+#endif
+  int i = 8192, j = 8192;  // skip first 32KB (video memory for text mode)
+  for (int b = 0; b < 4; ++b, j -= batch_size) {
+    for (; j < batch_size; j += step, i += step) {
+      char* ptr = ram + (i << 2);
+      *(int*)ptr = i | (i << 25);  // test 4 byte write
+      *(ptr + 1) ^= 0xff;  // test 1 byte write
+    }
+    bios_putc('.');
+  }
+  int ok = 1;
+  i = 8192, j = 8192;
+  for (int b = 0; b < 4; ++b, j -= batch_size) {
+    for (; j < batch_size; j += step, i += step) {
+      char* ptr = ram + (i << 2);
+      unsigned expected = (i | (i << 25)) ^ 0xff00;
+      ok = ok && (*(ptr + 3) == (expected >> 24));  // test 1 byte read
+      ok = ok && (*(int*)ptr == expected);  // test 4 byte read
+    }
+    bios_putc('.');
+  }
+  bios_printf(ok ? " OK\n" : " FAILED\n");
+  return ok;
 }
 
 int main() {
@@ -85,7 +113,7 @@ int main() {
   while (IO_PORT(UART_RX) >= 0);  // clear UART input buffer
   IO_PORT(UART_RX) = 0;  // clear UART framing error flag
 
-  RAM_SIZE = test_ram_size();
+  RAM_SIZE = 128 * 1024 * 1024;
   // TODO initialize video in text mode
 
   bios_printf(
@@ -94,10 +122,10 @@ int main() {
       "\t\t\t=========\n\n"
   );
   print_cpu_info();
-  bios_printf("RAM: %uMB\n", RAM_SIZE >> 20);
+  int memtest_ok = memtest();
   SDCARD_SECTOR_COUNT = init_sdcard();
 
-  if ((IO_PORT(BOARD_KEYS) & 1) || SDCARD_SECTOR_COUNT < 2) {
+  if ((IO_PORT(BOARD_KEYS) & 1) || SDCARD_SECTOR_COUNT < 2 || !memtest_ok) {
     // don't boot from sdcard
   } else if (bios_sdread((unsigned*)BIOS_RAM_ADDR, 0, 2) != 2) {
     bios_printf("Failed to read SD boot sector\n");

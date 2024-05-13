@@ -83,7 +83,7 @@ set_input_delay -clock {clk48} 0 [get_ports {io_sdcard_cmd io_sdcard_data* io_sd
 
 set_output_delay -clock {clk48} -4.0 [get_ports {io_uart_tx io_audio_* io_pll*i2c*}]
 set_output_delay -clock {clk48} 0 [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data*}]
-set_output_delay -clock {clk_cpu} 0 [get_ports {io_ddr_sdram_a* io_ddr_sdram_ba* io_ddr_sdram_dm* io_ddr_sdram_cas_n io_ddr_sdram_ras_n io_ddr_sdram_we_n}]
+set_output_delay -clock {clk_cpu} 0 [get_ports {io_ddr_sdram_a* io_ddr_sdram_ba* io_ddr_sdram_cas_n io_ddr_sdram_ras_n io_ddr_sdram_we_n}]
 
 #**************************************************************
 # Set Clock Groups
@@ -96,7 +96,7 @@ set_output_delay -clock {clk_cpu} 0 [get_ports {io_ddr_sdram_a* io_ddr_sdram_ba*
 #**************************************************************
 
 set_false_path -from [get_ports {io_nreset io_keys* io_ddr_sdram_dq*}]
-set_false_path -to [get_ports {io_leds* io_dvi_* io_ddr_sdram_dq* io_ddr_sdram_ck_* io_ddr_sdram_cke}]
+set_false_path -to [get_ports {io_leds* io_dvi_* io_ddr_sdram_d* io_ddr_sdram_ck_* io_ddr_sdram_cke}]
 
 #**************************************************************
 # Set Multicycle Path
