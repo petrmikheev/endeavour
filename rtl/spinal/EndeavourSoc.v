@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.10.1    git head : 2527c7c6b0fb0f95e5e1a5722a0be732b364ce43
 // Component : EndeavourSoc
-// Git hash  : a334dbe8469e37325f78dfcc1e1fee3597ee53d4
+// Git hash  : 0178209c4e71a89a7c7d3c8c7f363e8357986b15
 
 `timescale 1ns/1ps
 
@@ -669,7 +669,7 @@ module EndeavourSoc (
     .output_PWDATA  (peripheral_apb_bridge_output_PWDATA[31:0]), //o
     .output_PRDATA  (peripheral_apb_PRDATA[31:0]              )  //i
   );
-  ddr_sdram_ctrl #(
+  DDRSdramController #(
     .ROW_BITS(14),
     .COL_BITS(10)
   ) ram_ctrl (

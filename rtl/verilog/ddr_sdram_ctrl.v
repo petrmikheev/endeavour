@@ -1,16 +1,7 @@
-// Based on https://github.com/WangXuan95/FPGA-DDR-SDRAM/blob/main/RTL/ddr_sdram_ctrl.v
-// License: GPL-3.0
+// Based on https://github.com/WangXuan95/FPGA-DDR-SDRAM/blob/main/RTL/ddr_sdram_ctrl.v (license: GPL-3.0),
+// but most of the code is rewritten.
 
-//--------------------------------------------------------------------------------------------------------
-// Module  : ddr_sdram_ctrl
-// Type    : synthesizable, IP's top
-// Standard: Verilog 2001 (IEEE1364-2001)
-// Function: DDR1 SDRAM controller
-//           with AXI4 interface
-//--------------------------------------------------------------------------------------------------------
-
-module ddr_sdram_ctrl #(
-    parameter       BA_BITS   = 2,
+module DDRSdramController #(
     parameter       ROW_BITS  = 13,
     parameter       COL_BITS  = 11,
     parameter [9:0] tREFC     = 10'd600,
@@ -21,21 +12,21 @@ module ddr_sdram_ctrl #(
     input dqs_clk,  // should be same rate as `clk` with 1/4 period delay
     input reset,
     // user interface (AXI4)
-    input  wire                                arw_valid,
-    output wire                                arw_ready,
-    input  wire  [BA_BITS+ROW_BITS+COL_BITS:0] arw_addr,   // byte address, not word address.
-    input  wire                          [7:0] arw_len,
-    input  wire                                arw_write,
-    input  wire                                wvalid,
-    output wire                                wready,
-    input  wire                                wlast,
-    input  wire                         [31:0] wdata,
-    output wire                                bvalid,
-    input  wire                                bready,
-    output wire                                rvalid,
-    input  wire                                rready,
-    output wire                                rlast,
-    output wire                         [31:0] rdata,
+    input  wire                          arw_valid,
+    output wire                          arw_ready,
+    input  wire  [ROW_BITS+COL_BITS+2:0] arw_addr,   // byte address, not word address.
+    input  wire                    [7:0] arw_len,
+    input  wire                          arw_write,
+    input  wire                          wvalid,
+    output wire                          wready,
+    input  wire                          wlast,
+    input  wire                   [31:0] wdata,
+    output wire                          bvalid,
+    input  wire                          bready,
+    output wire                          rvalid,
+    input  wire                          rready,
+    output wire                          rlast,
+    output wire                   [31:0] rdata,
     //
     input wire   [0:0] arw_id,
     input wire   [2:0] arw_size,  // ignored
@@ -49,21 +40,19 @@ module ddr_sdram_ctrl #(
     output reg                                 ddr_ras_n,
     output reg                                 ddr_cas_n,
     output reg                                 ddr_we_n,
-    output reg                   [BA_BITS-1:0] ddr_ba,
+    output reg                           [1:0] ddr_ba,
     output reg                  [ROW_BITS-1:0] ddr_a,
     output wire                          [1:0] ddr_dm,
     inout                                [1:0] ddr_dqs,
     inout                               [15:0] ddr_dq
 );
 
-reg        init_done = 1'b0;
 reg  [2:0] ref_idle = 3'd1, ref_real = 3'd0;
 reg  [9:0] ref_cnt = 10'd0;
 reg  [7:0] cnt = 8'd0;
 
 localparam [3:0] RESET     = 4'd0,
                  IDLE      = 4'd1,
-                 CLEARDLL  = 4'd2,
                  REFRESH   = 4'd3,
                  WPRE      = 4'd4,
                  WRITE     = 4'd5,
@@ -89,14 +78,6 @@ end endgenerate
 reg  output_enable=1'b0, output_enable_d1=1'b0, output_enable_dqs=1'b0;
 
 // -------------------------------------------------------------------------------------
-//   constants defination and assignment
-// -------------------------------------------------------------------------------------
-reg        [ROW_BITS-1:0] DDR_A_DEFAULT      = 'b0100_0000_0000 /* synthesis keep */;
-localparam [ROW_BITS-1:0] DDR_A_EMR          = 'b0000_0000_0010;  // 0x0 (default) or 0x2 (weak drive strength)
-localparam [ROW_BITS-1:0] DDR_A_MR0          = 'b0001_0010_1001;  // 0x29 -> CL2, burst length 2, interleave
-localparam [ROW_BITS-1:0] DDR_A_MR_CLEAR_DLL = 'b0000_0010_1001;
-
-// -------------------------------------------------------------------------------------
 //   refresh wptr self increasement
 // -------------------------------------------------------------------------------------
 always @ (posedge clk)
@@ -104,7 +85,7 @@ always @ (posedge clk)
         ref_cnt <= tREFC;
         ref_idle <= 3'd1;
     end else begin
-        if(init_done) begin
+        if (stat != RESET) begin
             if (|ref_cnt) begin
                 ref_cnt <= ref_cnt - 10'd1;
             end else begin
@@ -119,110 +100,94 @@ always @ (posedge clk)
 // -------------------------------------------------------------------------------------
 assign wready  = stat==WRITE;
 assign bvalid  = stat==WRESP;
-assign arw_ready = stat==IDLE && init_done && ref_real==ref_idle;
+assign arw_ready = stat==IDLE && ref_real==ref_idle;
 assign rid = bid;
 
 // -------------------------------------------------------------------------------------
 //   main FSM for generating DDR-SDRAM behavior
 // -------------------------------------------------------------------------------------
 always @ (posedge clk)
-    if(reset) begin
+    if( reset) begin
         ddr_cke <= 1'b0;
-        ddr_ras_n <= 1'b1;
-        ddr_cas_n <= 1'b1;
-        ddr_we_n <= 1'b1;
-        ddr_ba <= 0;
-        ddr_a <= DDR_A_DEFAULT;
+        {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111;
         col_addr <= 0;
         burst_len <= 8'd0;
-        init_done <= 1'b0;
         ref_real <= 3'd0;
         cnt <= 8'd0;
         stat <= RESET;
     end else begin
-        case(stat)
+        case (stat)
             RESET: begin
                 cnt <= cnt + 8'd1;
-                if(cnt[5:0]<8'd13) begin
-                end else if(cnt[5:0]<8'd50) begin
-                    ddr_cke <= 1'b1;
-                end else if(cnt[5:0]==8'd50) begin
-                    ddr_ras_n <= 1'b0;
-                    ddr_we_n <= 1'b0;
-                end else if(cnt[5:0]<8'd53) begin
-                    ddr_ras_n <= 1'b1;
-                    ddr_we_n <= 1'b1;
-                end else if(cnt[5:0]==8'd53) begin
-                    ddr_ras_n <= 1'b0;
-                    ddr_cas_n <= 1'b0;
-                    ddr_we_n <= 1'b0;
-                    ddr_ba <= 1;
-                    ddr_a <= DDR_A_EMR;
-                end else begin
-                    ddr_ba <= 0;
-                    ddr_a <= DDR_A_MR0;
-                    stat <= IDLE;
-                end
+                case (cnt)
+                  8'd0  : ddr_cke <= 1'b1;  // NOP
+                  8'd1  : begin             // Precharge all
+                    {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b010;
+                    ddr_a[10] <= 1'b1;
+                  end
+                  8'd2  : {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
+                  8'd4  : begin             // EMRS
+                    {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b000;
+                    ddr_ba <= 2'b01;
+                    ddr_a <= 'h2;   // 0x0 (default) or 0x2 (weak drive strength)
+                  end
+                  8'd5  : {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
+                  8'd7  : begin             // MRS, reset DLL
+                    {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b000;
+                    ddr_ba <= 2'b00;
+                    ddr_a <= 'h121; // DLL_RESET (0x100) | CL2 (0x20) | burst length 2 (0x1)
+                  end
+                  8'd8  : {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
+                  8'd9: begin               // Precharge all
+                    {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b010;
+                    ddr_a[10] <= 1'b1;
+                  end
+                  8'd10: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
+                  8'd12, 8'd140: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b001; // Auto refresh
+                  8'd13, 8'd141: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // NOPs
+                  8'd207: begin             // MRS, clear DLL reset
+                    {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b000;
+                    ddr_ba <= 2'b00;
+                    ddr_a <= 'h21;  // CL2 (0x20) | burst length 2 (0x1)
+                  end
+                  8'd208: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
+                  8'd209: stat <= IDLE;
+                endcase
             end
             IDLE: begin
-                ddr_ras_n <= 1'b1;
-                ddr_cas_n <= 1'b1;
-                ddr_we_n <= 1'b1;
-                ddr_ba <= 0;
-                ddr_a <= DDR_A_DEFAULT;
                 cnt <= 8'd0;
-                if(ref_real != ref_idle) begin
-                    ref_real <= ref_real + 3'd1;
-                    stat <= REFRESH;
-                end else if(~init_done) begin
-                    stat <= CLEARDLL;
+                if (ref_real != ref_idle) begin
+                  ref_real <= ref_real + 3'd1;
+                  stat <= REFRESH;
+                  {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b010; // Precharge all
+                  ddr_a[10] <= 1'b1;
                 end else if(arw_valid) begin
-                    ddr_ras_n <= 1'b0;
-                    {ddr_ba, ddr_a, col_addr} <= arw_addr[BA_BITS+ROW_BITS+COL_BITS:2];
-                    burst_len <= arw_len;
-                    stat <= arw_write ? WPRE : RPRE;
-                    bid <= arw_id;
-                end
-            end
-            CLEARDLL: begin
-                ddr_ras_n <= cnt!=8'd0;
-                ddr_cas_n <= cnt!=8'd0;
-                ddr_we_n <= cnt!=8'd0;
-                ddr_a <= cnt!=8'd0 ? DDR_A_DEFAULT : DDR_A_MR_CLEAR_DLL;
-                cnt <= cnt + 8'd1;
-                if(cnt==8'd255) begin
-                    init_done <= 1'b1;
-                    stat <= IDLE;
-                end
+                  {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b011; // Bank active
+                  {ddr_ba, ddr_a, col_addr} <= arw_addr[ROW_BITS+COL_BITS+2:2];
+                  burst_len <= arw_len;
+                  stat <= arw_write ? WPRE : RPRE;
+                  bid <= arw_id;
+                end else
+                  {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // NOP
             end
             REFRESH: begin
                 cnt <= cnt + 8'd1;
-                if(cnt == 8'd0) begin
-                    ddr_ras_n <= 1'b0;
-                    ddr_we_n <= 1'b0;
-                end else if(cnt < 8'd3) begin
-                    ddr_ras_n <= 1'b1;
-                    ddr_we_n <= 1'b1;
-                end else if(cnt == 8'd3) begin
-                    ddr_ras_n <= 1'b0;
-                    ddr_cas_n <= 1'b0;
-                end else if(cnt < 8'd10) begin
-                    ddr_ras_n <= 1'b1;
-                    ddr_cas_n <= 1'b1;
-                end else if(cnt == 8'd10) begin
-                    ddr_ras_n <= 1'b0;
-                    ddr_cas_n <= 1'b0;
-                end else if(cnt < 8'd17) begin
-                    ddr_ras_n <= 1'b1;
-                    ddr_cas_n <= 1'b1;
-                end else begin
-                    stat <= IDLE;
-                end
+                case (cnt[4:0])
+                  5'd0: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
+                  5'd2: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b001; // Auto refresh
+                  5'd3: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 15x NOP
+                  5'd17: stat <= IDLE;
+                endcase
             end
             WPRE: begin
-                ddr_ras_n <= 1'b1;
+                {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // NOP  TODO: if clk>110mhz then second NOP is needed
                 cnt <= 8'd0;
                 stat <= WRITE;
+            end
+            RPRE: begin
+                {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // NOP
+                cnt <= 8'd0;
+                stat <= READ;
             end
             WRITE: begin
                 ddr_a <= ddr_a_col;
@@ -252,11 +217,6 @@ always @ (posedge clk)
                 cnt <= cnt + 8'd1;
                 if(cnt>=tW2I)
                     stat <= IDLE;
-            end
-            RPRE: begin
-                ddr_ras_n <= 1'b1;
-                cnt <= 8'd0;
-                stat <= READ;
             end
             READ: begin
                 ddr_cas_n <= 1'b0;

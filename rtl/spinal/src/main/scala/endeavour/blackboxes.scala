@@ -112,7 +112,7 @@ class AudioController extends BlackBox {
   mapClockDomain(clock=io.clk, reset=io.reset)
 }
 
-class ddr_sdram_ctrl(rowBits: Int, colBits: Int) extends BlackBox {
+class DDRSdramController(rowBits: Int, colBits: Int) extends BlackBox {
   addGeneric("ROW_BITS", rowBits)
   addGeneric("COL_BITS", colBits)
   val io = new Bundle {
