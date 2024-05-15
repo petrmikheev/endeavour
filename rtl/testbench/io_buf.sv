@@ -64,7 +64,7 @@ module DDR_IO8(
   input [WIDTH-1:0] oe;
   inout [WIDTH-1:0] pad_io;
 
-  ddr_gpio_sim #(.WIDTH(WIDTH), .INCLOCK_INV(0)) impl(
+  ddr_gpio_sim #(.WIDTH(WIDTH), .INCLOCK_INV(1)) impl(
     .inclock(inclock), .dout(dout),
     .outclock(outclock), .din(din),
     .oe(oe), .pad_io(pad_io)

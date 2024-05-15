@@ -75,8 +75,6 @@ end else begin
     assign ddr_a_col = {burst_last, col_addr[8:0], 1'b0};
 end endgenerate
 
-reg  output_enable=1'b0, output_enable_d1=1'b0, output_enable_dqs=1'b0;
-
 // -------------------------------------------------------------------------------------
 //   refresh wptr self increasement
 // -------------------------------------------------------------------------------------
@@ -247,18 +245,15 @@ always @ (posedge clk)
 // -------------------------------------------------------------------------------------
 //   output enable generate
 // -------------------------------------------------------------------------------------
-always @(posedge clk) begin
-    if(reset) begin
-        output_enable <= 1'b0;
-        output_enable_d1 <= 1'b0;
-    end else begin
-        output_enable <= output_enable_d1;
-        output_enable_d1 <= stat==WRITE;
-    end
+reg  output_enable=1'b0, output_enable_d1=1'b0, output_enable_d2=1'b0, output_enable_dqs=1'b0;
+always @(posedge clk) output_enable_d1 <= stat==WRITE;
+always @(negedge clk) begin
+  output_enable <= output_enable_d2;
+  output_enable_d2 <= output_enable_d1;
 end
 
-always @(posedge dqs_clk) begin
-  output_enable_dqs <= output_enable_d1 | output_enable;
+always @(negedge dqs_clk) begin
+  output_enable_dqs <= output_enable_d2 | output_enable;
 end
 
 // -------------------------------------------------------------------------------------
@@ -278,7 +273,7 @@ DDR_IO8 io_l(
   .oe(output_enable ? 8'hff : 8'h0),
   .pad_io(ddr_dq[7:0]),
   .din({ddr_out[23:16], ddr_out[7:0]}),
-  .dout({ddr_in[23:16], ddr_in[7:0]})
+  .dout({ddr_in[7:0], ddr_in[23:16]})
 );
 
 DDR_IO8 io_h(
@@ -287,12 +282,12 @@ DDR_IO8 io_h(
   .oe(output_enable ? 8'hff : 8'h0),
   .pad_io(ddr_dq[15:8]),
   .din({ddr_out[31:24], ddr_out[15:8]}),
-  .dout({ddr_in[31:24], ddr_in[15:8]})
+  .dout({ddr_in[15:8], ddr_in[31:24]})
 );
 
 DDR_O2 o_ck(
   .outclock(dqs_clk),
-  .din(4'b1001),
+  .din(4'b0110),
   .pad_out({ddr_ck_n, ddr_ck_p})
 );
 
@@ -301,7 +296,7 @@ DDR_IO2 io_dqs(
   .inclock(dqs_clk),
   .oe({2{output_enable_dqs}}),
   .pad_io(ddr_dqs),
-  .din({2'b00, {2{ddr_out_valid}}})
+  .din({{2{ddr_out_valid}}, 2'b00})
 );
 
 DDR_O2 o_dm(
@@ -342,7 +337,6 @@ reg         i_v_d = 1'b0;
 reg         i_l_d = 1'b0;
 reg         i_v_e = 1'b0;
 reg         i_l_e = 1'b0;
-reg  [31:0] i_d_e = 0;
 
 always @ (posedge clk)
     if(reset) begin
@@ -366,11 +360,10 @@ always @ (posedge clk)
     end else begin
         i_v_e <= i_v_d;
         i_l_e <= i_l_d;
-        i_d_e <= ddr_in;
     end
 
 assign rvalid = i_v_e;
 assign rlast = i_l_e;
-assign rdata = i_d_e;
+assign rdata = ddr_in;
 
 endmodule
