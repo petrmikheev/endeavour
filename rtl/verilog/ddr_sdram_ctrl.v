@@ -29,11 +29,11 @@ module DDRSdramController #(
     output wire                          rlast,
     output wire                   [31:0] rdata,
     //
-    input wire   [0:0] arw_id,
+    input wire   [1:0] arw_id,
     input wire   [2:0] arw_size,  // ignored, expected 4 byte (0x2)
     input wire   [1:0] arw_burst, // ignored, expected INCR
-    output reg   [0:0] bid,
-    output wire  [0:0] rid,
+    output reg   [1:0] bid,
+    output wire  [1:0] rid,
     // DDR-SDRAM interface
     output wire                                ddr_ck_p, ddr_ck_n,
     output reg                                 ddr_cke,

@@ -57,6 +57,31 @@ void UART_read(char* dst, int size, unsigned expected_crc) {
   }
 }
 
+void init_text_mode() {
+  IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_BG(0);
+  IO_PORT(VIDEO_REG_VALUE) = 0;  // text styles 0x0? - black background
+  IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_FG(15);
+  IO_PORT(VIDEO_REG_VALUE) = 0x0fffffff;  // text styles 0x?F - white foreground
+  const unsigned* charmap_ptr = (const unsigned*)BIOS_CHARMAP_ADDR;
+  for (int i = 32 * 4; i < 127 * 4; ++i) {
+    IO_PORT(VIDEO_REG_INDEX) = i;
+    IO_PORT(VIDEO_REG_VALUE) = *charmap_ptr++;
+  }
+  unsigned* text_buf = (unsigned*)RAM_ADDR;
+#ifndef SIMULATION
+  for (int i = 0; i < 8192; ++i) {
+#else
+  for (int i = 0; i < 32; ++i) {
+#endif
+    text_buf[i] = (BIOS_DEFAULT_TEXT_STYLE << 8) | (BIOS_DEFAULT_TEXT_STYLE << 24);
+  }
+  BIOS_TEXT_STYLE = BIOS_DEFAULT_TEXT_STYLE;
+  BIOS_CURSOR_ADDR = RAM_ADDR;
+  BIOS_SCREEN_END_ADDR = RAM_ADDR + 512 * 48;
+  IO_PORT(VIDEO_TEXT_ADDR) = RAM_ADDR;
+  IO_PORT(VIDEO_CFG) = VIDEO_1024x768 | VIDEO_TEXT_ON | VIDEO_FONT_WIDTH(8) | VIDEO_FONT_HEIGHT(16);
+}
+
 void print_cpu_info() {
   bios_printf("CPU: rv32im");
   unsigned isa;
@@ -114,7 +139,8 @@ int main() {
   IO_PORT(UART_RX) = 0;  // clear UART framing error flag
 
   RAM_SIZE = 128 * 1024 * 1024;
-  // TODO initialize video in text mode
+
+  init_text_mode();
 
   bios_printf(
       "\n\n"

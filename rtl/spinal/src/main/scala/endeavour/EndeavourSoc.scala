@@ -116,7 +116,7 @@ class EndeavourSoc extends Component {
   val internalRam = Axi4SharedOnChipRam(
     dataWidth = 32,
     byteCount = internalRamSize,
-    idWidth = 1
+    idWidth = 2
   )
   internalRam.ram.generateAsBlackBox()
   //val internalRam = new InternalRam(internalRamSize)
@@ -124,7 +124,7 @@ class EndeavourSoc extends Component {
   val apbBridge = Axi4SharedToApb3Bridge(
     dataWidth = 32,
     addressWidth = log2Up(ioSize),
-    idWidth = 1
+    idWidth = 2
   )
 
   val axiCrossbar = Axi4CrossbarFactory()
@@ -135,7 +135,8 @@ class EndeavourSoc extends Component {
   )
   axiCrossbar.addConnections(
     iBus -> List(ram_ctrl.io.axi, internalRam.io.axi),
-    dBus -> List(ram_ctrl.io.axi, internalRam.io.axi, apbBridge.io.axi)
+    dBus -> List(ram_ctrl.io.axi, internalRam.io.axi, apbBridge.io.axi),
+    video_ctrl.io.axi -> List(ram_ctrl.io.axi)
   )
   axiCrossbar.build()
 
@@ -143,9 +144,9 @@ class EndeavourSoc extends Component {
     master = apbBridge.io.apb,
     slaves = List(
       peripheral_apb_bridge.io.input -> (0x000, 2048),
-      board_ctrl.io.apb  -> (0x800, 16)
+      board_ctrl.io.apb  -> (0x800, 16),
+      video_ctrl.io.apb  -> (0x900, 32)
       // 0xa00 timer
-      // 0xb00 video
     )
   )
 }

@@ -32,10 +32,10 @@ int main() {
     int ok = ram[i] == (i | (i << 25));
     err_count += ok ? 0 : 1;
     if (ok && !last_ok) {
-      bios_printf("ram[i] = %8x OK\n", ram[i]);
+      bios_printf("ram[%d] = %8x OK\n", i, ram[i]);
     }
     if (!ok && last_ok) {
-      bios_printf("ram[i] = %8x FAILED\n", ram[i]);
+      bios_printf("ram[%d] = %8x FAILED\n", i, ram[i]);
     }
     last_ok = ok;
   }

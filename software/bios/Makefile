@@ -1,4 +1,4 @@
-sources = start.S main.c util.c sdcard.c
+sources = start.S main.c util.c sdcard.c charmap.S
 
 .PHONY: all
 all: bios.hex bios_sim.bin
@@ -26,8 +26,16 @@ hexdump: bios.bin
 objdump: bios.elf
 	riscv64-unknown-elf-objdump -d bios.elf
 
+ter-u16.bdf:
+	wget http://downloads.sourceforge.net/project/terminus-font/terminus-font-4.49/terminus-font-4.49.1.tar.gz
+	tar xvzf terminus-font-4.49.1.tar.gz
+	ln -sf terminus-font-4.49.1/ter-u16n.bdf ter-u16.bdf
+
+charmap.S: ter-u16.bdf
+	python3 gen_charmap.py ter-u16.bdf > charmap.S
+
 .PHONY: clean
 clean:
-	rm -f *.bin *.elf bios.hex
+	rm -f *.bin *.elf bios.hex terminus-font-* ter-u16.bdf charmap.S
 
 

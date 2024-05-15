@@ -61,6 +61,23 @@ class VideoController extends BlackBox {
     val tmds_pixel_clk = in Bool()
     val tmds_x5_clk = in Bool()
     val dvi = DVI()
+    val apb = slave(Apb3(Apb3Config(
+      addressWidth  = 5,
+      dataWidth     = 32,
+      useSlaveError = false
+    )))
+    val axi = master(Axi4ReadOnly(Axi4Config(
+      addressWidth = 32,
+      dataWidth = 32,
+      useId = false,
+      useResp = false,
+      useLock = false,
+      useRegion = false,
+      useCache = false,
+      useProt = false,
+      useQos = false,
+      useSize = false
+    )))
   }
   noIoPrefix()
   mapClockDomain(clock=io.clk, reset=io.reset)
@@ -122,7 +139,7 @@ class DDRSdramController(rowBits: Int, colBits: Int) extends BlackBox {
     val axi = slave(Axi4Shared(Axi4Config(
       addressWidth = rowBits + colBits + 3,
       dataWidth = 32,
-      idWidth = 1,
+      idWidth = 2,
       useResp = false,
       useLock = false,
       useRegion = false,
@@ -159,7 +176,7 @@ class InternalRam(size: BigInt) extends BlackBox {
     val axi = slave(Axi4Shared(Axi4Config(
       addressWidth = log2Up(size),
       dataWidth = 32,
-      idWidth = 1,
+      idWidth = 2,
       useResp = false,
       useLock = false,
       useRegion = false,

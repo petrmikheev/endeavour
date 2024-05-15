@@ -7,22 +7,30 @@
 #define BIOS_RAM_ADDR 0x40002000
 #define BIOS_RAM_SIZE 0x2000
 
-#define BIOS_STACK_ADDR 0x40003FF8
+#define BIOS_CHARMAP_ADDR (*(unsigned long*)(BIOS_ROM_ADDR + 0x20))
+
+#define BIOS_STACK_ADDR 0x40003FEC
+
 #define SDCARD_SECTOR_COUNT *(unsigned*)0x40003FFC
 #define SDCARD_SECTOR_SIZE 512
 
 #define RAM_ADDR 0x80000000
 #define RAM_SIZE *(unsigned*)0x40003FF8
 
+#define BIOS_CURSOR_ADDR *(unsigned*)0x40003FF4
+#define BIOS_SCREEN_END_ADDR *(unsigned*)0x40003FF0
+#define BIOS_TEXT_STYLE *(char*)0x40003FEC
+#define BIOS_DEFAULT_TEXT_STYLE 0x0F
+
 // IO registers
 
-#define UART_RX 0x100
-#define UART_TX 0x104
+// write to RX clears framing error flag
+#define UART_RX 0x100  // negative value - buffer empty
+#define UART_TX 0x104  // negative value - buffer full
 #define UART_CFG 0x108
 
 #define AUDIO_CFG 0x200
-// write - add to stream, read - remaining buf size
-#define AUDIO_STREAM 0x204
+#define AUDIO_STREAM 0x204  // write - add to stream, read - remaining buf size
 
 #define SDCARD_CMD 0x300
 #define SDCARD_DATA 0x304
@@ -35,6 +43,12 @@
 #define BOARD_LEDS     0x800
 #define BOARD_KEYS     0x804
 #define BOARD_CPU_FREQ 0x808
+
+#define VIDEO_CFG           0x900
+#define VIDEO_TEXT_ADDR     0x904
+#define VIDEO_GRAPHIC_ADDR  0x908
+#define VIDEO_REG_INDEX     0x90C
+#define VIDEO_REG_VALUE     0x910  // write-only
 
 #define IO_PORT(X) (*(volatile int*)(X))
 
@@ -55,18 +69,34 @@
 #define AUDIO_MAX_VOLUME 15
 #define AUDIO_FLUSH 0x80000000
 
-// AUDIO_CMD flags
-#define AUDIO_CLEAR_STREAM0 1
-#define AUDIO_CLEAR_STREAM1 2
+// VIDEO_CFG flags
+#define VIDEO_640x480     1
+#define VIDEO_1024x768    2
+#define VIDEO_1280x720    3
+#define VIDEO_TEXT_ON     4
+#define VIDEO_GRAPHIC_ON  8
+#define VIDEO_FONT_HEIGHT(X) ((((X)-1)&15) << 4) // allowed range [12, 16]
+#define VIDEO_FONT_WIDTH(X) ((((X)-1)&7) << 8)   // allowed range [6, 8]
+
+// VIDEO_REG_INDEX
+#define VIDEO_COLORMAP_BG(X) (X)         // Background color RGBA8884; X in range [0, 15]
+#define VIDEO_COLORMAP_FG(X) (16 + (X))  // Foreground color RGBA8884; X in range [0, 15]; bit 28 enables alternative font (char codes 256-511)
+#define VIDEO_CHARMAP(CHAR, WORD) ((CHAR) << 2 | (WORD))  // CHAR can be in range [8, 511], WORD in range [0, 3]
 
 // builtin functions
 
 #define bios_reset   ((void (*)())                                   (BIOS_ROM_ADDR + 0x0))
 #define bios_putc    ((void (*)(char))                               (BIOS_ROM_ADDR + 0x4))
-#define bios_printf  ((void (*)(const char*, ...))                   (BIOS_ROM_ADDR + 0x8))
-#define bios_sscanf  ((int  (*)(const char*, ...))                   (BIOS_ROM_ADDR + 0xC))
+#define bios_printf  ((void (*)(const char* /*fmt*/, ...))           (BIOS_ROM_ADDR + 0x8))
+#define bios_sscanf  ((int  (*)(const char* /*fmt*/, ...))           (BIOS_ROM_ADDR + 0xC))
+// bios_sdread(dst, sector, sector_count) -> sector_count
 #define bios_sdread  ((int  (*)(unsigned*, unsigned, unsigned))      (BIOS_ROM_ADDR + 0x10))
+// bios_sdwrite(src, sector, sector_count) -> sector_count
 #define bios_sdwrite ((int  (*)(const unsigned*, unsigned, unsigned))(BIOS_ROM_ADDR + 0x14))
+// y can be negative - offset from the end of the screen
+#define bios_set_cursor_pos ((void (*)(char /*x*/, char /*y*/))      (BIOS_ROM_ADDR + 0x18))
+#define bios_scroll_text    ((void (*)(char /*line_count*/))         (BIOS_ROM_ADDR + 0x1C))
+// 0x20 used for VIDEO_REGMAP_ADDR
 
 #endif  // ENDEAVOUR_DEFS_H
 
