@@ -111,6 +111,7 @@ set_false_path -to [get_ports {io_leds* io_dvi_* io_ddr_sdram_d* io_ddr_sdram_ck
 set_max_delay -from clk_cpu -to clk48 10.000
 set_max_delay -from clk48 -to clk_cpu 10.000
 set_max_delay -from clk_cpu -to clk_tmds_pixel 30.000
+set_max_delay -from clk_tmds_pixel -to clk_cpu 30.000
 
 #**************************************************************
 # Set Minimum Delay

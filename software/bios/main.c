@@ -59,9 +59,9 @@ void UART_read(char* dst, int size, unsigned expected_crc) {
 
 void init_text_mode() {
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_BG(0);
-  IO_PORT(VIDEO_REG_VALUE) = 0;  // text styles 0x0? - black background
+  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(0, 0, 0) | VIDEO_TEXT_ALPHA(0);  // text styles 0x0? - black background
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_FG(15);
-  IO_PORT(VIDEO_REG_VALUE) = 0x0fffffff;  // text styles 0x?F - white foreground
+  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(255, 255, 255) | VIDEO_TEXT_ALPHA(15);  // text styles 0x?F - white text
   const unsigned* charmap_ptr = (const unsigned*)BIOS_CHARMAP_ADDR;
   for (int i = 32 * 4; i < 127 * 4; ++i) {
     IO_PORT(VIDEO_REG_INDEX) = i;
@@ -69,7 +69,7 @@ void init_text_mode() {
   }
   unsigned* text_buf = (unsigned*)RAM_ADDR;
 #ifndef SIMULATION
-  for (int i = 0; i < 8192; ++i) {
+  for (int i = 0; i < 6144 /* 48 lines, 512 bytes each */; ++i) {
 #else
   for (int i = 0; i < 32; ++i) {
 #endif
@@ -103,7 +103,7 @@ int memtest() {
 #else
   const int step = (batch_size >> 3) + 1;
 #endif
-  int i = 8192, j = 8192;  // skip first 32KB (video memory for text mode)
+  int i = 8192, j = 8192;  // skip first 32KB (can be currently shown on the display)
   for (int b = 0; b < 4; ++b, j -= batch_size) {
     for (; j < batch_size; j += step, i += step) {
       char* ptr = ram + (i << 2);
@@ -151,7 +151,7 @@ int main() {
   int memtest_ok = memtest();
   SDCARD_SECTOR_COUNT = init_sdcard();
 
-  if ((IO_PORT(BOARD_KEYS) & 1) || SDCARD_SECTOR_COUNT < 2 || !memtest_ok) {
+  if ((IO_PORT(BOARD_KEYS) & 2) || SDCARD_SECTOR_COUNT < 2 || !memtest_ok) {
     // don't boot from sdcard
   } else if (bios_sdread((unsigned*)BIOS_RAM_ADDR, 0, 2) != 2) {
     bios_printf("Failed to read SD boot sector\n");

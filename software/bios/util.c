@@ -1,6 +1,14 @@
 #include <endeavour_defs.h>
 
 void putc_impl(char c) {
+  if (c == '\n') {
+    BIOS_CURSOR_ADDR = (BIOS_CURSOR_ADDR & ~511) + 512;
+  } else {
+    char* cursor = (char*)BIOS_CURSOR_ADDR;
+    cursor[0] = c;
+    cursor[1] = BIOS_TEXT_STYLE;
+    BIOS_CURSOR_ADDR = (long)cursor + 2;
+  }
   while (IO_PORT(UART_TX) < 0);
   IO_PORT(UART_TX) = c;
 }

@@ -17,15 +17,15 @@ module VideoController(
   input  [31:0] apb_PWDATA,
   output [31:0] apb_PRDATA,
 
-  output        axi_ar_valid,
-  input         axi_ar_ready,
-  output [31:0] axi_ar_payload_addr,
-  output  [7:0] axi_ar_payload_len,
-  output  [1:0] axi_ar_payload_burst,
-  input         axi_r_valid,
-  output        axi_r_ready,
-  input  [31:0] axi_r_payload_data,
-  input         axi_r_payload_last
+  output reg        axi_ar_valid,
+  input             axi_ar_ready,
+  output reg [31:0] axi_ar_payload_addr,
+  output reg  [7:0] axi_ar_payload_len,
+  output      [1:0] axi_ar_payload_burst,
+  input             axi_r_valid,
+  output            axi_r_ready,
+  input      [31:0] axi_r_payload_data,
+  input             axi_r_payload_last
 );
 
   reg [10:0] hDrawEnd;
@@ -55,7 +55,7 @@ module VideoController(
 
   reg [31:0] charmap [CHARMAP_SIZE-1:0];  // 8 M9K
   reg [31:0] text_line [255:0];           // 1 M9K
-  reg [31:0] graphic_line [2047:0];       // 8 M9K
+  reg [31:0] graphic_line [1023:0];       // 4 M9K
 
   localparam PIXEL_DELAY = 1'd1;
 
@@ -125,6 +125,7 @@ module VideoController(
   reg  [5:0] vCharCounter = 0;
   reg  [2:0] char_px;
   reg  [3:0] char_py = 0;
+  reg  [6:0] text_read_len = 8'd40;
 
   reg hDraw = 0;
   reg vDraw = 0;
@@ -132,7 +133,10 @@ module VideoController(
   reg vSync = 0;
   wire DrawArea = hDraw & vDraw;
 
-  reg [7:0] red, green, blue;
+  reg pixel_group_request_parity = 0;
+  reg pixel_group_done_parity = 0;
+  reg text_line_request_parity = 0;
+  reg text_line_done_parity = 0;
 
   always @(posedge tmds_pixel_clk) begin
     if (hCounter == hLast) begin
@@ -152,8 +156,13 @@ module VideoController(
       end
     end else begin
       hCounter <= hCounter + 1'd1;
+      if (char_py == font_height && hCounter == 3'd4) text_line_request_parity = ~text_line_request_parity;
+      if (hDraw && hCounter[6:0] == 7'd127) pixel_group_request_parity = ~pixel_group_request_parity;
       if (hCounter == PIXEL_DELAY) hDraw <= 1;
-      if (hCounter == hDrawEnd) hDraw <= 0;
+      if (hCounter == hDrawEnd) begin
+        hDraw <= 0;
+        text_read_len <= hCharCounter[7:1];
+      end
       if (hCounter == hSyncStart) hSync <= 1;
       if (hCounter == hSyncEnd) begin
         hSync <= 0;
@@ -173,21 +182,31 @@ module VideoController(
 
   // *** RAM interface
 
-  assign axi_ar_valid = 1'b0;
   assign axi_ar_payload_burst = 2'd1;
   assign axi_r_ready = 1'b1;
 
+  reg [7:0] text_line_index = 0;
+  reg text_line_request_parity_buf = 0;
   always @(posedge clk) begin
-    // TODO
+    text_line_request_parity_buf <= text_line_request_parity;
+    if (text_line_request_parity_buf != text_line_done_parity) begin
+      text_line_done_parity = ~text_line_done_parity;
+      axi_ar_payload_addr <= {text_addr[31:9] + vCharCounter, text_addr[8:0]};
+      axi_ar_payload_len <= text_read_len;
+      axi_ar_valid <= 1'b1;
+      text_line_index <= {vCharCounter[0], 7'd0};
+    end else begin
+      if (axi_ar_valid & axi_ar_ready) axi_ar_valid <= 1'b0;
+      if (axi_r_valid) begin
+        text_line_index <= text_line_index + 1'b1;
+        text_line[text_line_index] <= axi_r_payload_data;
+      end
+    end
   end
 
   // *** Color calculation
 
-  wire [7:0] W = {8{hCounter[7:0]==vCounter[7:0]}};
-  wire [7:0] A = {8{hCounter[7:5]==3'h2 && vCounter[7:5]==3'h2}};
-
-  reg [31:0] gcolor, tcolor;
-  reg [31:0] tword;
+  reg [31:0] gword, tword;
   wire [7:0] tchar = hCharCounter[0] ? tword[23:16] : tword[7:0];
   wire [3:0] tfg_index = hCharCounter[0] ? tword[27:24] : tword[11:8];
   wire [3:0] tbg_index = hCharCounter[0] ? tword[31:28] : tword[15:12];
@@ -195,8 +214,13 @@ module VideoController(
   reg [31:0] charmap_rdata;
   reg [31:0] tfg, tbg, charmap_word;
   reg [7:0] char_shift;
+  wire [31:0] tcolor = char_shift[7] ? tfg : tbg;
+  wire [15:0] gcolor16 = hCounter[0] ? gword[31:16] : gword[15:0];
+  wire [23:0] gcolor24 = {gcolor16[15:11], gcolor16[15:13], gcolor16[10:5], gcolor16[10:9], gcolor16[4:0], gcolor16[4:2]};
+  reg [7:0] red, green, blue;
+
   always @(posedge tmds_pixel_clk) begin
-    tword <= {8'h0f, 8'd65, 8'h0f, 8'd66}; // text_line[hCharCounter[7:1]]; // px=0
+    if (~hCounter[0]) gword <= graphic_line[hCounter[10:1]];
     charmap_rdata <= charmap[charmap_rindex[$clog2(CHARMAP_SIZE)-1:0]];
     if (char_px == 3'd1)
       charmap_rindex <= {7'd1, tfg_index};
@@ -204,13 +228,14 @@ module VideoController(
       charmap_rindex <= {7'd0, tbg_index};
     end else if (char_px == 3'd3) begin
       tfg <= charmap_rdata;
-      charmap_rindex <= {charmap_rdata[28], tchar, char_py[3:2]};
+      charmap_rindex <= {charmap_rdata[0], tchar, char_py[3:2]};
     end else if (char_px == 3'd4) begin
       tbg <= charmap_rdata;
     end else if (char_px == 3'd5) begin
       charmap_word <= |charmap_rindex[10:5] ? charmap_rdata : 32'd0;
     end
     if (char_px == 0) begin
+      tword <= text_line[{vCharCounter[0], hCharCounter[7:1]}];
       case (char_py[1:0])
         2'd0: char_shift <= charmap_word[7:0];
         2'd1: char_shift <= charmap_word[15:8];
@@ -218,18 +243,12 @@ module VideoController(
         2'd3: char_shift <= charmap_word[31:24];
       endcase
     end else char_shift[7:1] <= char_shift[6:0];
-    gcolor <= graphic_line[hCounter];
-    tcolor = char_shift[7] ? tfg : tbg;
+
     case ({show_text, show_graphic})
-      2'b00: begin
-        // test pattern
-        red <= ({hCounter[5:0] & {6{vCounter[4:3]==~hCounter[4:3]}}, 2'b00} | W) & ~A;
-        green <= (hCounter[7:0] & {8{vCounter[6]}} | W) & ~A;
-        blue <= vCounter[7:0] | W | A;
-      end
-      2'b01: {blue, green, red} <= gcolor[23:0];
-      2'b10: {blue, green, red} <= tcolor[23:0];
-      2'b11: {blue, green, red} <= char_shift[7] ? tfg : gcolor;  // TODO blending
+      2'b00: {red, green, blue} <= 24'd0;
+      2'b01: {red, green, blue} <= gcolor24;
+      2'b10: {red, green, blue} <= tcolor[31:8];
+      2'b11: {red, green, blue} <= tcolor[7] ? tcolor[31:8] : gcolor24;  // TODO blending; alpha=tcolor[7:4]
     endcase
   end
 

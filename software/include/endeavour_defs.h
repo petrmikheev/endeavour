@@ -17,8 +17,8 @@
 #define RAM_ADDR 0x80000000
 #define RAM_SIZE *(unsigned*)0x40003FF8
 
-#define BIOS_CURSOR_ADDR *(unsigned*)0x40003FF4
-#define BIOS_SCREEN_END_ADDR *(unsigned*)0x40003FF0
+#define BIOS_CURSOR_ADDR *(unsigned long*)0x40003FF4
+#define BIOS_SCREEN_END_ADDR *(unsigned long*)0x40003FF0
 #define BIOS_TEXT_STYLE *(char*)0x40003FEC
 #define BIOS_DEFAULT_TEXT_STYLE 0x0F
 
@@ -75,13 +75,18 @@
 #define VIDEO_1280x720    3
 #define VIDEO_TEXT_ON     4
 #define VIDEO_GRAPHIC_ON  8
-#define VIDEO_FONT_HEIGHT(X) ((((X)-1)&15) << 4) // allowed range [12, 16]
+#define VIDEO_FONT_HEIGHT(X) ((((X)-1)&15) << 4) // allowed range [6, 16]
 #define VIDEO_FONT_WIDTH(X) ((((X)-1)&7) << 8)   // allowed range [6, 8]
 
 // VIDEO_REG_INDEX
-#define VIDEO_COLORMAP_BG(X) (X)         // Background color RGBA8884; X in range [0, 15]
-#define VIDEO_COLORMAP_FG(X) (16 + (X))  // Foreground color RGBA8884; X in range [0, 15]; bit 28 enables alternative font (char codes 256-511)
+#define VIDEO_COLORMAP_BG(X) (X)         // Background color RGBA (8, 8, 8, 4); bits 0-3 unused; X in range [0, 15]
+#define VIDEO_COLORMAP_FG(X) (16 + (X))  // Foreground color RGBA (8, 8, 8, 4); bits 1-3 unused, bit 0 enables alternative font (char codes 256-511); X in range [0, 15];
 #define VIDEO_CHARMAP(CHAR, WORD) ((CHAR) << 2 | (WORD))  // CHAR can be in range [8, 511], WORD in range [0, 3]
+
+// COLORMAP values
+#define VIDEO_TEXT_COLOR(R, G, B) ((R)<<24 | (G)<<16 | (B)<<8)
+#define VIDEO_TEXT_ALPHA(A) (((A)&15) << 4)
+#define VIDEO_ALTERNATIVE_FONT 1  // only in VIDEO_COLORMAP_FG(X)
 
 // builtin functions
 
