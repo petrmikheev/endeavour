@@ -1,6 +1,8 @@
 #include <endeavour_defs.h>
 
-void drop_cache();
+void drop_cache() {
+  asm volatile(".word 0x500F");
+}
 
 void print16b(int* arr) {
   bios_printf("%8x %8x %8x %8x\n", arr[0], arr[1], arr[2], arr[3]);

@@ -122,7 +122,7 @@ module VideoController(
   reg [10:0] hCounter = 11'd0;
   reg  [9:0] vCounter = 10'd0;
   reg  [7:0] hCharCounter;
-  reg  [5:0] vCharCounter = 0;
+  reg  [6:0] vCharCounter = 0;
   reg  [2:0] char_px;
   reg  [3:0] char_py = 0;
   reg  [6:0] text_read_len = 8'd40;
@@ -156,8 +156,8 @@ module VideoController(
       end
     end else begin
       hCounter <= hCounter + 1'd1;
-      if (char_py == font_height && hCounter == 3'd4) text_line_request_parity = ~text_line_request_parity;
-      if (hDraw && hCounter[6:0] == 7'd127) pixel_group_request_parity = ~pixel_group_request_parity;
+      if (show_text && char_py == font_height && hCounter == 3'd4) text_line_request_parity = ~text_line_request_parity;
+      if (show_graphic && hDraw && &hCounter[6:0]) pixel_group_request_parity = ~pixel_group_request_parity;
       if (hCounter == PIXEL_DELAY) hDraw <= 1;
       if (hCounter == hDrawEnd) begin
         hDraw <= 0;
@@ -191,10 +191,10 @@ module VideoController(
     text_line_request_parity_buf <= text_line_request_parity;
     if (text_line_request_parity_buf != text_line_done_parity) begin
       text_line_done_parity = ~text_line_done_parity;
-      axi_ar_payload_addr <= {text_addr[31:9] + vCharCounter, text_addr[8:0]};
+      axi_ar_payload_addr <= {text_addr[31:16], {7{text_addr[31:9] + vCharCounter}}, text_addr[8:0]};
       axi_ar_payload_len <= text_read_len;
       axi_ar_valid <= 1'b1;
-      text_line_index <= {vCharCounter[0], 7'd0};
+      text_line_index <= {~vCharCounter[0], 7'd0};
     end else begin
       if (axi_ar_valid & axi_ar_ready) axi_ar_valid <= 1'b0;
       if (axi_r_valid) begin
@@ -214,35 +214,40 @@ module VideoController(
   reg [31:0] charmap_rdata;
   reg [31:0] tfg, tbg, charmap_word;
   reg [7:0] char_shift;
-  wire [31:0] tcolor = char_shift[7] ? tfg : tbg;
+  reg [31:0] char_fg, char_bg;
+  wire [31:0] tcolor = char_shift[7] ? char_fg : char_bg;
   wire [15:0] gcolor16 = hCounter[0] ? gword[31:16] : gword[15:0];
   wire [23:0] gcolor24 = {gcolor16[15:11], gcolor16[15:13], gcolor16[10:5], gcolor16[10:9], gcolor16[4:0], gcolor16[4:2]};
   reg [7:0] red, green, blue;
 
   always @(posedge tmds_pixel_clk) begin
-    if (~hCounter[0]) gword <= graphic_line[hCounter[10:1]];
-    charmap_rdata <= charmap[charmap_rindex[$clog2(CHARMAP_SIZE)-1:0]];
-    if (char_px == 3'd1)
-      charmap_rindex <= {7'd1, tfg_index};
-    else if (char_px == 3'd2) begin
-      charmap_rindex <= {7'd0, tbg_index};
-    end else if (char_px == 3'd3) begin
-      tfg <= charmap_rdata;
-      charmap_rindex <= {charmap_rdata[0], tchar, char_py[3:2]};
-    end else if (char_px == 3'd4) begin
-      tbg <= charmap_rdata;
-    end else if (char_px == 3'd5) begin
-      charmap_word <= |charmap_rindex[10:5] ? charmap_rdata : 32'd0;
+    if (show_graphic & ~hCounter[0]) gword <= graphic_line[hCounter[10:1]];
+    if (show_text) begin
+      charmap_rdata <= charmap[charmap_rindex[$clog2(CHARMAP_SIZE)-1:0]];
+      if (char_px == 3'd1)
+        charmap_rindex <= {7'd1, tfg_index};
+      else if (char_px == 3'd2) begin
+        charmap_rindex <= {7'd0, tbg_index};
+      end else if (char_px == 3'd3) begin
+        tfg <= charmap_rdata;
+        charmap_rindex <= {charmap_rdata[0], tchar, char_py[3:2]};
+      end else if (char_px == 3'd4) begin
+        tbg <= charmap_rdata;
+      end else if (char_px == 3'd5) begin
+        charmap_word <= |charmap_rindex[10:5] ? charmap_rdata : 32'd0;
+      end
+      if (char_px == 0) begin
+        tword <= text_line[{vCharCounter[0], hCharCounter[7:1]}];
+        case (char_py[1:0])
+          2'd0: char_shift <= charmap_word[7:0];
+          2'd1: char_shift <= charmap_word[15:8];
+          2'd2: char_shift <= charmap_word[23:16];
+          2'd3: char_shift <= charmap_word[31:24];
+        endcase
+        char_fg <= tfg;
+        char_bg <= tbg;
+      end else char_shift[7:1] <= char_shift[6:0];
     end
-    if (char_px == 0) begin
-      tword <= text_line[{vCharCounter[0], hCharCounter[7:1]}];
-      case (char_py[1:0])
-        2'd0: char_shift <= charmap_word[7:0];
-        2'd1: char_shift <= charmap_word[15:8];
-        2'd2: char_shift <= charmap_word[23:16];
-        2'd3: char_shift <= charmap_word[31:24];
-      endcase
-    end else char_shift[7:1] <= char_shift[6:0];
 
     case ({show_text, show_graphic})
       2'b00: {red, green, blue} <= 24'd0;
@@ -325,7 +330,9 @@ module TMDS_encoder(
   wire [9:0] TMDS_data = {invert_q_m, q_m[8], q_m[7:0] ^ {8{invert_q_m}}};
   wire [9:0] TMDS_code = CD[1] ? (CD[0] ? 10'b1010101011 : 10'b0101010100) : (CD[0] ? 10'b0010101011 : 10'b1101010100);
 
-  always @(posedge clk) TMDS <= VDE ? TMDS_data : TMDS_code;
+  reg [9:0] TMDS_buf = 0;
+  always @(posedge clk) TMDS_buf <= VDE ? TMDS_data : TMDS_code;
+  always @(posedge clk) TMDS <= TMDS_buf;
   always @(posedge clk) balance_acc <= VDE ? balance_acc_new : 4'h0;
 endmodule
 
