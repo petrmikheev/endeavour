@@ -57,7 +57,7 @@ module VideoController(
   reg [31:0] text_line [255:0];           // 1 M9K
   reg [31:0] graphic_line [1023:0];       // 4 M9K
 
-  localparam PIXEL_DELAY = 1'd1;
+  localparam PIXEL_DELAY = 2'd3;
 
   // *** APB interface
 
@@ -135,8 +135,8 @@ module VideoController(
   reg vSync = 0;
   wire DrawArea = hDraw & vDraw;
 
-  reg [1:0] pixel_group_request_counter = 0;
-  reg [1:0] pixel_group_done_counter = 0;
+  reg [2:0] pixel_group_request_counter = 0;
+  reg [2:0] pixel_group_done_counter = 0;
   reg text_line_request_parity = 0;
   reg text_line_done_parity = 0;
 
@@ -190,7 +190,7 @@ module VideoController(
   reg [7:0] text_line_index = 0;
   reg [9:0] graphic_line_index = 0;
   reg text_line_request_parity_buf = 0;
-  reg [1:0] pixel_group_request_counter_buf = 0;
+  reg [2:0] pixel_group_request_counter_buf = 0;
   reg [9:0] pixel_load_y = 10'd1023;
   reg [13:0] pixel_group_addr;
   reg pixel_loading = 0;
@@ -243,15 +243,23 @@ module VideoController(
   reg [10:0] charmap_rindex;
   reg [31:0] charmap_rdata;
   reg [31:0] tfg, tbg, charmap_word;
-  reg [7:0] char_shift;
+  reg [7:0] char_shift = 0;
   reg [31:0] char_fg, char_bg;
   wire [31:0] tcolor = char_shift[7] ? char_fg : char_bg;
-  wire [15:0] gcolor16 = hCounter[0] ? gword[31:16] : gword[15:0];
+  wire [15:0] gcolor16 = hCounter[0] ? gword[15:0] : gword[31:16];
   wire [23:0] gcolor24 = {gcolor16[15:11], gcolor16[15:13], gcolor16[10:5], gcolor16[10:9], gcolor16[4:0], gcolor16[4:2]};
   reg [7:0] red, green, blue;
+  reg [7:0] gred1, ggreen1, gblue1;
+  reg [7:0] gred2, ggreen2, gblue2;
+  reg [8:0] diff_r, diff_g, diff_b;
+  reg [11:0] mul_r, mul_g, mul_b;
+  reg [4:0] alpha1;
 
   always @(posedge tmds_pixel_clk) begin
-    if (show_graphic & ~hCounter[0]) gword <= graphic_line[hCounter[10:1]];
+    if (show_graphic) begin
+      if (~hCounter[0]) gword <= graphic_line[hCounter[10:1]];
+    end else
+      gword <= 0;
     if (show_text) begin
       charmap_rdata <= charmap[charmap_rindex[$clog2(CHARMAP_SIZE)-1:0]];
       if (char_px == 3'd1)
@@ -277,14 +285,30 @@ module VideoController(
         char_fg <= tfg;
         char_bg <= tbg;
       end else char_shift[7:1] <= char_shift[6:0];
+    end else begin
+      char_fg <= 0;
+      char_bg <= 0;
     end
 
-    case ({show_text, show_graphic})
+    {gred1, ggreen1, gblue1} <= gcolor24;
+    {gred2, ggreen2, gblue2} <= {gred1, ggreen1, gblue1};
+    diff_r <= {1'b0, tcolor[31:24]} - gcolor24[23:16];
+    diff_g <= {1'b0, tcolor[23:16]} - gcolor24[15:8];
+    diff_b <= {1'b0, tcolor[15:8]}  - gcolor24[7:0];
+    alpha1 <= show_graphic ? ({1'b0, tcolor[7:4]} + 1'b1) : 5'd16;
+    mul_r <= {5'b0, diff_r} * alpha1;
+    mul_g <= {5'b0, diff_g} * alpha1;
+    mul_b <= {5'b0, diff_b} * alpha1;
+    red <= gred2 + mul_r[11:4];
+    green <= ggreen2 + mul_g[11:4];
+    blue <= gblue2 + mul_b[11:4];
+
+    /*case ({show_text, show_graphic})
       2'b00: {red, green, blue} <= 24'd0;
       2'b01: {red, green, blue} <= gcolor24;
       2'b10: {red, green, blue} <= tcolor[31:8];
       2'b11: {red, green, blue} <= tcolor[7] ? tcolor[31:8] : gcolor24;  // TODO blending; alpha=tcolor[7:4]
-    endcase
+    endcase*/
   end
 
   // *** Encode

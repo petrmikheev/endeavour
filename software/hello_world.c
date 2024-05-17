@@ -35,9 +35,9 @@ void load_wallpaper_bmp(char* dst) {
 
 int main() {
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_BG(1);
-  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(40, 40, 20) | VIDEO_TEXT_ALPHA(8);
+  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(40, 40, 20) | VIDEO_TEXT_ALPHA(4);
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_FG(1);
-  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(40, 40, 20) | VIDEO_TEXT_ALPHA(8);
+  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(40, 40, 20) | VIDEO_TEXT_ALPHA(4);
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_FG(2);
   IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(0, 255, 0) | VIDEO_TEXT_ALPHA(15);
   register_char(8, c8);
@@ -66,7 +66,7 @@ int main() {
     load_wallpaper_bmp(wallpaper_bmp);
     IO_PORT(VIDEO_GRAPHIC_ADDR) = (long)frame_buffer;
     for (int j = 0; j < 720; ++j) {
-      const char* src = wallpaper_bmp + 70 + (720-j+1) * (1280 * 2);
+      const char* src = wallpaper_bmp + 70 + (720-j-1) * (1280 * 2);
       char* dst = frame_buffer + j * (1024*4);
       for (int i = 0; i < 1280*2; ++i) dst[i] = src[i];
     }
