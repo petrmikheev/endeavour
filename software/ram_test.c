@@ -9,6 +9,7 @@ void print16b(int* arr) {
 }
 
 int main() {
+  //IO_PORT(VIDEO_CFG) = VIDEO_1280x720 | VIDEO_FONT_WIDTH(8) | VIDEO_FONT_HEIGHT(16);
   int* ram = (int*)RAM_ADDR;
   /*for (int i = 0; i < 1024 * 128; i += 1024) {
     ram[i]   = 0x5a000000 + i;
@@ -30,14 +31,19 @@ int main() {
   bios_printf("ram[0:3] = %8x %8x %8x %8x\n", ram[0], ram[1], ram[2], ram[3]);
   int err_count = 0;
   int last_ok = 1;
+  int msg = 0;
   for (int i = 0; i < 128 * 1024 * 1024 / 4; ++i) {
     int ok = ram[i] == (i | (i << 25));
     err_count += ok ? 0 : 1;
-    if (ok && !last_ok) {
-      bios_printf("ram[%d] = %8x OK\n", i, ram[i]);
-    }
-    if (!ok && last_ok) {
-      bios_printf("ram[%d] = %8x FAILED\n", i, ram[i]);
+    if (msg < 20) {
+      if (ok && !last_ok) {
+        msg++;
+        bios_printf("ram[%d] = %8x OK\n", i, ram[i]);
+      }
+      if (!ok && last_ok) {
+        msg++;
+        bios_printf("ram[%d] = %8x FAILED\n", i, ram[i]);
+      }
     }
     last_ok = ok;
   }

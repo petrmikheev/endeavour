@@ -79,7 +79,7 @@ void init_text_mode() {
   BIOS_CURSOR_ADDR = RAM_ADDR;
   BIOS_SCREEN_END_ADDR = RAM_ADDR + 512 * 48;
   IO_PORT(VIDEO_TEXT_ADDR) = RAM_ADDR;
-  IO_PORT(VIDEO_CFG) = VIDEO_1024x768 | VIDEO_TEXT_ON | VIDEO_FONT_WIDTH(8) | VIDEO_FONT_HEIGHT(16);
+  IO_PORT(VIDEO_CFG) = VIDEO_1280x720 | VIDEO_TEXT_ON | VIDEO_FONT_WIDTH(8) | VIDEO_FONT_HEIGHT(16);
 }
 
 void print_cpu_info() {
@@ -151,13 +151,13 @@ int main() {
   int memtest_ok = memtest();
   SDCARD_SECTOR_COUNT = init_sdcard();
 
-  if ((IO_PORT(BOARD_KEYS) & 2) || SDCARD_SECTOR_COUNT < 2 || !memtest_ok) {
+  if ((IO_PORT(BOARD_KEYS) & 2) || SDCARD_SECTOR_COUNT < 2) {
     // don't boot from sdcard
   } else if (bios_sdread((unsigned*)BIOS_RAM_ADDR, 0, 2) != 2) {
     bios_printf("Failed to read SD boot sector\n");
   } else if (*(unsigned*)(BIOS_RAM_ADDR + 0x3fc) != 0x405a0000) {
     bios_printf("SD boot sector has no boot signature\n");
-  } else {
+  } else if (memtest_ok) {
     bios_printf("Boot from SD card\n");
     IO_PORT(BOARD_LEDS) = 0x2;
     ((void (*)())BIOS_RAM_ADDR)();
@@ -178,7 +178,7 @@ int main() {
     char cmd[CMD_BUF_SIZE];
     int cmd_len = 0;
     char c;
-    long addr;
+    unsigned long addr;
     unsigned val;
     int size;
     do {

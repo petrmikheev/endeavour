@@ -68,6 +68,8 @@ module VideoController(
     apb_reg <= apb_PADDR[4:2];
     if (reset) begin
       video_mode <= 2'd0;
+      show_text <= 1'd0;
+      show_graphic <= 1'd0;
     end else begin
       if (apb_PSEL & apb_PENABLE & apb_PWRITE) begin
         if (apb_reg == 3'd0) begin
@@ -133,8 +135,8 @@ module VideoController(
   reg vSync = 0;
   wire DrawArea = hDraw & vDraw;
 
-  reg pixel_group_request_parity = 0;
-  reg pixel_group_done_parity = 0;
+  reg [1:0] pixel_group_request_counter = 0;
+  reg [1:0] pixel_group_done_counter = 0;
   reg text_line_request_parity = 0;
   reg text_line_done_parity = 0;
 
@@ -157,7 +159,7 @@ module VideoController(
     end else begin
       hCounter <= hCounter + 1'd1;
       if (show_text && char_py == font_height && hCounter == 3'd4) text_line_request_parity = ~text_line_request_parity;
-      if (show_graphic && hDraw && &hCounter[6:0]) pixel_group_request_parity = ~pixel_group_request_parity;
+      if (show_graphic && hDraw && &hCounter[6:0]) pixel_group_request_counter = pixel_group_request_counter + 1'b1;
       if (hCounter == PIXEL_DELAY) hDraw <= 1;
       if (hCounter == hDrawEnd) begin
         hDraw <= 0;
@@ -186,21 +188,49 @@ module VideoController(
   assign axi_r_ready = 1'b1;
 
   reg [7:0] text_line_index = 0;
+  reg [9:0] graphic_line_index = 0;
   reg text_line_request_parity_buf = 0;
+  reg [1:0] pixel_group_request_counter_buf = 0;
+  reg [9:0] pixel_load_y = 10'd1023;
+  reg [13:0] pixel_group_addr;
+  reg pixel_loading = 0;
+  reg text_loading = 0;
   always @(posedge clk) begin
     text_line_request_parity_buf <= text_line_request_parity;
-    if (text_line_request_parity_buf != text_line_done_parity) begin
-      text_line_done_parity = ~text_line_done_parity;
-      axi_ar_payload_addr <= {text_addr[31:16], {7{text_addr[31:9] + vCharCounter}}, text_addr[8:0]};
+    pixel_group_request_counter_buf <= pixel_group_request_counter;
+    if (pixel_loading | text_loading) begin
+      if (axi_ar_valid & axi_ar_ready) axi_ar_valid <= 1'b0;
+      if (axi_r_valid & text_loading) begin
+        text_line_index <= text_line_index + 1'b1;
+        text_line[text_line_index] <= axi_r_payload_data;
+        if (axi_r_payload_last) text_loading <= 1'b0;
+      end
+      if (axi_r_valid & pixel_loading) begin
+        graphic_line_index <= graphic_line_index + 1'b1;
+        graphic_line[graphic_line_index] <= axi_r_payload_data;
+        if (axi_r_payload_last) pixel_loading <= 1'b0;
+      end
+    end else if (pixel_group_request_counter_buf != pixel_group_done_counter) begin
+      pixel_group_done_counter <= pixel_group_done_counter + 1'b1;
+      pixel_loading <= 1;
+      axi_ar_valid <= 1'b1;
+      axi_ar_payload_len <= 8'd63;
+      if (pixel_load_y != vCounter) begin
+        pixel_load_y <= vCounter;
+        pixel_group_addr <= {10'(graphic_addr[21:12] + vCounter), graphic_addr[11:8]};
+        axi_ar_payload_addr <= {graphic_addr[31:22], 10'(graphic_addr[21:12] + vCounter), graphic_addr[11:0]};
+        graphic_line_index <= 0;
+      end else begin
+        pixel_group_addr <= pixel_group_addr + 1'd1;
+        axi_ar_payload_addr <= {graphic_addr[31:22], 14'(pixel_group_addr + 1'd1), graphic_addr[7:0]};
+      end
+    end else if (text_line_request_parity_buf != text_line_done_parity) begin
+      text_line_done_parity <= ~text_line_done_parity;
+      text_loading <= 1;
+      axi_ar_payload_addr <= {text_addr[31:16], 7'(text_addr[31:9] + vCharCounter), text_addr[8:0]};
       axi_ar_payload_len <= text_read_len;
       axi_ar_valid <= 1'b1;
       text_line_index <= {~vCharCounter[0], 7'd0};
-    end else begin
-      if (axi_ar_valid & axi_ar_ready) axi_ar_valid <= 1'b0;
-      if (axi_r_valid) begin
-        text_line_index <= text_line_index + 1'b1;
-        text_line[text_line_index] <= axi_r_payload_data;
-      end
     end
   end
 

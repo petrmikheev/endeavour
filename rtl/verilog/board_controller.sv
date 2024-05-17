@@ -43,7 +43,7 @@ module BoardController(
   assign pllb_i2c_scl = 1'bz;
   assign pllb_i2c_sda = 1'bz;
 
-  parameter CPU_FREQ = 88_727_000; //48_000_000;
+  parameter CPU_FREQ = 85_661_538; //92_800_000; //88_727_000; //48_000_000;
   localparam CPU_PERIOD = 1_000_000_000.0 / CPU_FREQ;
 
   parameter PERIPHERAL_FREQ = 48_000_000;
@@ -116,7 +116,7 @@ module BoardController(
   assign clk_tmds_pixel = clk_peripheral;
 `endif
 `ifdef ENDEAVOUR_BOARD_VER2
-  PLL pll(
+  PLL1280 pll(
     .inclk0(clk_in),
     .c0(clk_tmds_pixel),
     .c1(clk_tmds_x5),
