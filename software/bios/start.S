@@ -15,10 +15,6 @@ _start:
 .align 2
     j sdwrite_impl # bios_sdwrite
 .align 2
-    ret # bios_set_cursor_pos
-.align 2
-    ret # bios_scroll_text
-.align 2
     .word charmap
 start:
     li sp, BIOS_STACK_ADDR

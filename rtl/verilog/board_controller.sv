@@ -59,11 +59,11 @@ module BoardController(
 
   initial reset = 1'b1;
 
-  parameter RESET_DELAY = CPU_FREQ / 1000; // 1ms
+  parameter RESET_DELAY = PERIPHERAL_FREQ / 10; // 100ms
 
   reg [$clog2(RESET_DELAY)-1:0] reset_counter = $clog2(RESET_DELAY)'(RESET_DELAY);
 
-  always @(posedge clk_cpu) begin
+  always @(posedge clk_peripheral) begin
     if (nreset_in) begin
       if (reset_counter != 0)
         reset_counter <= reset_counter - 1'b1;

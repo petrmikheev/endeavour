@@ -198,7 +198,10 @@ module VideoController(
   always @(posedge clk) begin
     text_line_request_parity_buf <= text_line_request_parity;
     pixel_group_request_counter_buf <= pixel_group_request_counter;
-    if (pixel_loading | text_loading) begin
+    if (reset) begin
+      pixel_loading <= 0;
+      text_loading <= 0;
+    end if (pixel_loading | text_loading) begin
       if (axi_ar_valid & axi_ar_ready) axi_ar_valid <= 1'b0;
       if (axi_r_valid & text_loading) begin
         text_line_index <= text_line_index + 1'b1;
@@ -251,9 +254,9 @@ module VideoController(
   reg [7:0] red, green, blue;
   reg [7:0] gred1, ggreen1, gblue1;
   reg [7:0] gred2, ggreen2, gblue2;
-  reg [8:0] diff_r, diff_g, diff_b;
-  reg [11:0] mul_r, mul_g, mul_b;
-  reg [4:0] alpha1;
+  reg [9:0] diff_r, diff_g, diff_b;
+  reg [13:0] mul_r, mul_g, mul_b;
+  reg [6:0] alpha1, alpha2;
 
   always @(posedge tmds_pixel_clk) begin
     if (show_graphic) begin
@@ -268,7 +271,7 @@ module VideoController(
         charmap_rindex <= {7'd0, tbg_index};
       end else if (char_px == 3'd3) begin
         tfg <= charmap_rdata;
-        charmap_rindex <= {charmap_rdata[0], tchar, char_py[3:2]};
+        charmap_rindex <= {charmap_rdata[7], tchar, char_py[3:2]};
       end else if (char_px == 3'd4) begin
         tbg <= charmap_rdata;
       end else if (char_px == 3'd5) begin
@@ -292,23 +295,17 @@ module VideoController(
 
     {gred1, ggreen1, gblue1} <= gcolor24;
     {gred2, ggreen2, gblue2} <= {gred1, ggreen1, gblue1};
-    diff_r <= {1'b0, tcolor[31:24]} - gcolor24[23:16];
-    diff_g <= {1'b0, tcolor[23:16]} - gcolor24[15:8];
-    diff_b <= {1'b0, tcolor[15:8]}  - gcolor24[7:0];
-    alpha1 <= show_graphic ? ({1'b0, tcolor[7:4]} + 1'b1) : 5'd16;
-    mul_r <= {5'b0, diff_r} * alpha1;
-    mul_g <= {5'b0, diff_g} * alpha1;
-    mul_b <= {5'b0, diff_b} * alpha1;
-    red <= gred2 + mul_r[11:4];
-    green <= ggreen2 + mul_g[11:4];
-    blue <= gblue2 + mul_b[11:4];
-
-    /*case ({show_text, show_graphic})
-      2'b00: {red, green, blue} <= 24'd0;
-      2'b01: {red, green, blue} <= gcolor24;
-      2'b10: {red, green, blue} <= tcolor[31:8];
-      2'b11: {red, green, blue} <= tcolor[7] ? tcolor[31:8] : gcolor24;  // TODO blending; alpha=tcolor[7:4]
-    endcase*/
+    diff_r <= {2'b10, tcolor[31:24]} - gcolor24[23:16];
+    diff_g <= {2'b10, tcolor[23:16]} - gcolor24[15:8];
+    diff_b <= {2'b10, tcolor[15:8]}  - gcolor24[7:0];
+    alpha1 <= show_graphic ? tcolor[6:0] : 7'd64;
+    alpha2 <= alpha1;
+    mul_r <= $unsigned({4'b0, diff_r}) * $unsigned(alpha1);
+    mul_g <= $unsigned({4'b0, diff_g}) * $unsigned(alpha1);
+    mul_b <= $unsigned({4'b0, diff_b}) * $unsigned(alpha1);
+    red   <= gred2   + mul_r[13:6] - {alpha2[4:0], 3'b0};
+    green <= ggreen2 + mul_g[13:6] - {alpha2[4:0], 3'b0};
+    blue  <= gblue2  + mul_b[13:6] - {alpha2[4:0], 3'b0};
   end
 
   // *** Encode

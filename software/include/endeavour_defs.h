@@ -1,24 +1,26 @@
 #ifndef ENDEAVOUR_DEFS_H
 #define ENDEAVOUR_DEFS_H
 
-#define BIOS_ROM_ADDR 0x40000000
+#define BIOS_ROM_ADDR 0x40000000ul
 #define BIOS_ROM_SIZE 0x2000
 
-#define BIOS_RAM_ADDR 0x40002000
+#define BIOS_RAM_ADDR 0x40002000ul
 #define BIOS_RAM_SIZE 0x2000
 
-#define BIOS_CHARMAP_ADDR (*(unsigned long*)(BIOS_ROM_ADDR + 0x20))
+#define BIOS_CHARMAP_ADDR (*(unsigned long*)(BIOS_ROM_ADDR + 0x18))
 
 #define BIOS_STACK_ADDR 0x40003FEC
 
 #define SDCARD_SECTOR_COUNT *(unsigned*)0x40003FFC
 #define SDCARD_SECTOR_SIZE 512
 
-#define RAM_ADDR 0x80000000
+#define RAM_ADDR 0x80000000ul
 #define RAM_SIZE *(unsigned*)0x40003FF8
 
-#define BIOS_CURSOR_ADDR *(unsigned long*)0x40003FF4
-#define BIOS_SCREEN_END_ADDR *(unsigned long*)0x40003FF0
+#define BIOS_TEXT_BUFFER_ADDR RAM_ADDR
+#define VIDEO_TEXT_BUFFER_SIZE 0x10000  // 64KB
+#define BIOS_CURSOR_POS *(unsigned long*)0x40003FF4
+#define BIOS_SCREEN_END_POS *(unsigned long*)0x40003FF0
 #define BIOS_TEXT_STYLE *(char*)0x40003FEC
 #define BIOS_DEFAULT_TEXT_STYLE 0x0F
 
@@ -79,14 +81,14 @@
 #define VIDEO_FONT_WIDTH(X) ((((X)-1)&7) << 8)   // allowed range [6, 8]
 
 // VIDEO_REG_INDEX
-#define VIDEO_COLORMAP_BG(X) (X)         // Background color RGBA (8, 8, 8, 4); bits 0-3 unused; X in range [0, 15]
-#define VIDEO_COLORMAP_FG(X) (16 + (X))  // Foreground color RGBA (8, 8, 8, 4); bits 1-3 unused, bit 0 enables alternative font (char codes 256-511); X in range [0, 15];
+#define VIDEO_COLORMAP_BG(X) (X)         // Background color RGBA (8, 8, 8, 7); bits 7 unused; X in range [0, 15]
+#define VIDEO_COLORMAP_FG(X) (16 + (X))  // Foreground color RGBA (8, 8, 8, 7); bits 7 enables alternative font (char codes 256-511); X in range [0, 15];
 #define VIDEO_CHARMAP(CHAR, WORD) ((CHAR) << 2 | (WORD))  // CHAR can be in range [8, 511], WORD in range [0, 3]
 
 // COLORMAP values
 #define VIDEO_TEXT_COLOR(R, G, B) ((R)<<24 | (G)<<16 | (B)<<8)
-#define VIDEO_TEXT_ALPHA(A) (((A)&15) << 4)
-#define VIDEO_ALTERNATIVE_FONT 1  // only in VIDEO_COLORMAP_FG(X)
+#define VIDEO_TEXT_ALPHA(A) (A)     // 0 - 64
+#define VIDEO_ALTERNATIVE_FONT 128  // only in VIDEO_COLORMAP_FG(X)
 
 // builtin functions
 
@@ -98,10 +100,7 @@
 #define bios_sdread  ((int  (*)(unsigned*, unsigned, unsigned))      (BIOS_ROM_ADDR + 0x10))
 // bios_sdwrite(src, sector, sector_count) -> sector_count
 #define bios_sdwrite ((int  (*)(const unsigned*, unsigned, unsigned))(BIOS_ROM_ADDR + 0x14))
-// y can be negative - offset from the end of the screen
-#define bios_set_cursor_pos ((void (*)(char /*x*/, char /*y*/))      (BIOS_ROM_ADDR + 0x18))
-#define bios_scroll_text    ((void (*)(char /*line_count*/))         (BIOS_ROM_ADDR + 0x1C))
-// 0x20 used for VIDEO_REGMAP_ADDR
+// 0x18 used for BIOS_CHARMAP_ADDR
 
 #endif  // ENDEAVOUR_DEFS_H
 

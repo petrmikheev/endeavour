@@ -35,11 +35,11 @@ void load_wallpaper_bmp(char* dst) {
 
 int main() {
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_BG(1);
-  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(40, 40, 20) | VIDEO_TEXT_ALPHA(4);
+  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(40, 40, 20) | VIDEO_TEXT_ALPHA(48);
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_FG(1);
-  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(40, 40, 20) | VIDEO_TEXT_ALPHA(4);
+  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(40, 40, 20) | VIDEO_TEXT_ALPHA(48);
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_FG(2);
-  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(0, 255, 0) | VIDEO_TEXT_ALPHA(15);
+  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(0, 255, 0) | VIDEO_TEXT_ALPHA(64);
   register_char(8, c8);
   register_char(9, c9);
   register_char(10, cA);
@@ -53,8 +53,9 @@ int main() {
   hello_line(" |_| |_|\\___|_|_|\\___( )\t\\_/\\_/ \\___/|_|  |_|\\__,_(_)");
   hello_line("\t\t\t\t\t |/\t\t\t\t\t\t\t\t ");
   hello_line("\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
-  short* first_line = (short*)(BIOS_CURSOR_ADDR - 8 * 512) + 8;
-  short* last_line = (short*)(BIOS_CURSOR_ADDR - 1 * 512) + 8;
+  short* text_pos = (short*)(BIOS_TEXT_BUFFER_ADDR + BIOS_CURSOR_POS);
+  short* first_line = text_pos - 8 * 256 + 8;
+  short* last_line  = text_pos - 1 * 256 + 8;
   first_line[0] = 0x0108;
   first_line[63] = 0x0109;
   last_line[0] = 0x010A;

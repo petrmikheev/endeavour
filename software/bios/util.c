@@ -1,14 +1,50 @@
 #include <endeavour_defs.h>
 
+void init_text_mode() {
+  const int video_mode = VIDEO_1280x720;
+  const int line_count = video_mode == VIDEO_1280x720 ? 45 : (video_mode == VIDEO_1024x768 ? 48 : 30);
+  IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_BG(0);
+  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(0, 0, 0) | VIDEO_TEXT_ALPHA(0);  // text styles 0x0? - black background
+  IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_FG(15);
+  IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(255, 255, 255) | VIDEO_TEXT_ALPHA(64);  // text styles 0x?F - white text
+  const unsigned* charmap_ptr = (const unsigned*)BIOS_CHARMAP_ADDR;
+  for (int i = 32 * 4; i < 127 * 4; ++i) {
+    IO_PORT(VIDEO_REG_INDEX) = i;
+    IO_PORT(VIDEO_REG_VALUE) = *charmap_ptr++;
+  }
+  unsigned* text_buf = (unsigned*)RAM_ADDR;
+#ifndef SIMULATION
+  for (int i = 0; i < 128 * line_count; ++i) {
+#else
+  for (int i = 0; i < 32; ++i) {
+#endif
+    text_buf[i] = (BIOS_DEFAULT_TEXT_STYLE << 8) | (BIOS_DEFAULT_TEXT_STYLE << 24);
+  }
+  BIOS_TEXT_STYLE = BIOS_DEFAULT_TEXT_STYLE;
+  BIOS_CURSOR_POS = 0;
+  BIOS_SCREEN_END_POS = 512 * line_count;
+  IO_PORT(VIDEO_TEXT_ADDR) = RAM_ADDR;
+  IO_PORT(VIDEO_CFG) = video_mode | VIDEO_TEXT_ON | VIDEO_FONT_WIDTH(8) | VIDEO_FONT_HEIGHT(16);
+}
+
 void putc_impl(char c) {
+  int cursor_pos = BIOS_CURSOR_POS;
   if (c == '\n') {
-    BIOS_CURSOR_ADDR = (BIOS_CURSOR_ADDR & ~511) + 512;
+    cursor_pos = (cursor_pos & ~511) + 512;
   } else {
-    char* cursor = (char*)BIOS_CURSOR_ADDR;
+    char* cursor = (char*)(BIOS_TEXT_BUFFER_ADDR + cursor_pos);
     cursor[0] = c;
     cursor[1] = BIOS_TEXT_STYLE;
-    BIOS_CURSOR_ADDR = (long)cursor + 2;
+    cursor_pos += 2;
   }
+  cursor_pos &= (VIDEO_TEXT_BUFFER_SIZE - 1);
+  if (cursor_pos == BIOS_SCREEN_END_POS) {
+    int* line = (int*)(BIOS_TEXT_BUFFER_ADDR + cursor_pos);
+    for (int i = 0; i < 128; ++i) line[i] = (BIOS_DEFAULT_TEXT_STYLE << 8) | (BIOS_DEFAULT_TEXT_STYLE << 24);
+    BIOS_SCREEN_END_POS = (BIOS_SCREEN_END_POS + 512) & (VIDEO_TEXT_BUFFER_SIZE - 1);
+    IO_PORT(VIDEO_TEXT_ADDR) = BIOS_TEXT_BUFFER_ADDR | ((IO_PORT(VIDEO_TEXT_ADDR) + 512) & (VIDEO_TEXT_BUFFER_SIZE - 1));
+  }
+  BIOS_CURSOR_POS = cursor_pos;
   while (IO_PORT(UART_TX) < 0);
   IO_PORT(UART_TX) = c;
 }
