@@ -134,7 +134,7 @@ class DDRSdramController(rowBits: Int, colBits: Int) extends BlackBox {
   addGeneric("COL_BITS", colBits)
   val io = new Bundle {
     val clk = in Bool()
-    val dqs_clk = in Bool()
+    val clk_shifted = in Bool()
     val reset = in Bool()
     val axi = slave(Axi4Shared(Axi4Config(
       addressWidth = rowBits + colBits + 3,

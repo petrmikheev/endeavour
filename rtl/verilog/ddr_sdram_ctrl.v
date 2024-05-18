@@ -9,7 +9,7 @@ module DDRSdramController #(
     parameter [7:0] tR2I      = 8'd2
 ) (
     input clk,
-    input dqs_clk,  // should be same rate as `clk` with 1/4 period delay
+    input clk_shifted,  // should be same rate as `clk` with 1/4 period delay
     input reset,
     // user interface (AXI4)
     input  wire                          arw_valid,
@@ -80,36 +80,6 @@ reg [ROW_BITS-1:0] next_a;
 reg [1:0] next_ba;
 
 wire new_command = stat == IDLE && ref_real == ref_idle && arw_valid;
-
-wire [2:0] new_rcw_n = stat == WRITE ? (wvalid ? 3'b100 : 3'b111) : // WRITE or NOP
-                         new_command ? 3'b011 : // Bank active
-                                       {next_ras_n, next_cas_n, next_we_n};
-wire [1:0] new_ba = new_command ? arw_addr[ROW_BITS+COL_BITS+2:ROW_BITS+COL_BITS+1] : next_ba;
-wire [ROW_BITS-1:0] new_a = (stat == WRITE || stat == READ) ? ddr_a_col :
-                                                new_command ? arw_addr[ROW_BITS+COL_BITS:COL_BITS+1] : next_a;
-
-reg [2:0] buf_rcw_n;
-reg [1:0] buf_ba;
-reg [ROW_BITS-1:0] buf_a;
-
-always @(posedge clk) begin
-  buf_rcw_n <= new_rcw_n;
-  buf_ba <= new_ba;
-  buf_a <= new_a;
-end
-
-SDR_O1 sdr1(.outclock(dqs_clk), .din(buf_rcw_n[2]), .pad_out(ddr_ras_n));
-SDR_O1 sdr2(.outclock(dqs_clk), .din(buf_rcw_n[1]), .pad_out(ddr_cas_n));
-SDR_O1 sdr3(.outclock(dqs_clk), .din(buf_rcw_n[0]), .pad_out(ddr_we_n));
-SDR_O1 sdr4(.outclock(dqs_clk), .din(buf_ba[1]), .pad_out(ddr_ba[1]));
-SDR_O1 sdr5(.outclock(dqs_clk), .din(buf_ba[0]), .pad_out(ddr_ba[0]));
-
-genvar sdr_i;
-generate
-    for (sdr_i = 0; sdr_i < ROW_BITS; sdr_i = sdr_i + 1) begin : sdr_addr
-        SDR_O1 sdr_a(.outclock(dqs_clk), .din(buf_a[sdr_i]), .pad_out(ddr_a[sdr_i]));
-    end
-endgenerate
 
 // -------------------------------------------------------------------------------------
 //   refresh wptr self increasement
@@ -281,7 +251,7 @@ always @(negedge clk) begin
     output_enable_d2 <= output_enable_d1;
 end
 
-always @(negedge dqs_clk) begin
+always @(negedge clk_shifted) begin
     output_enable_dqs <= output_enable_d2 | output_enable;
 end
 
@@ -314,25 +284,52 @@ DDR_IO8 io_h(
   .dout({ddr_in[15:8], ddr_in[31:24]})
 );
 
-DDR_O2 o_ck(
-  .outclock(dqs_clk),
-  .din(4'b0110),
-  .pad_out({ddr_ck_n, ddr_ck_p})
+DDR_O1 o_ck_p(.outclock(clk_shifted), .din(2'b10), .pad_out(ddr_ck_p));
+DDR_O1 o_ck_n(.outclock(clk_shifted), .din(2'b01), .pad_out(ddr_ck_n));
+
+DDR_O1 o_dm0(.outclock(clk), .din(~{wstrb2[2], wstrb2[0]}), .pad_out(ddr_dm[0]));
+DDR_O1 o_dm1(.outclock(clk), .din(~{wstrb2[3], wstrb2[1]}), .pad_out(ddr_dm[1]));
+
+DDR_IO1 io_dqs0(
+  .outclock(clk_shifted), .inclock(clk_shifted),
+  .oe({output_enable_dqs}), .pad_io(ddr_dqs[0]), .din({ddr_out_valid, 1'b0})
+);
+DDR_IO1 io_dqs1(
+  .outclock(clk_shifted), .inclock(clk_shifted),
+  .oe({output_enable_dqs}), .pad_io(ddr_dqs[1]), .din({ddr_out_valid, 1'b0})
 );
 
-DDR_IO2 io_dqs(
-  .outclock(dqs_clk),
-  .inclock(dqs_clk),
-  .oe({2{output_enable_dqs}}),
-  .pad_io(ddr_dqs),
-  .din({{2{ddr_out_valid}}, 2'b00})
-);
+// Hardware buffers SDR_O1 are needed to have timings of A, BA, nRAS, nCAS, nWE to be aligned with DQ, DQS, CK, nCK (DDR buffers)
 
-DDR_O2 o_dm(
-  .outclock(clk),
-  .din(~wstrb2),
-  .pad_out(ddr_dm)
-);
+wire [2:0] new_rcw_n = stat == WRITE ? (wvalid ? 3'b100 : 3'b111) : // WRITE or NOP
+                         new_command ? 3'b011 : // Bank active
+                                       {next_ras_n, next_cas_n, next_we_n};
+wire [1:0] new_ba = new_command ? arw_addr[ROW_BITS+COL_BITS+2:ROW_BITS+COL_BITS+1] : next_ba;
+wire [ROW_BITS-1:0] new_a = (stat == WRITE || stat == READ) ? ddr_a_col :
+                                                new_command ? arw_addr[ROW_BITS+COL_BITS:COL_BITS+1] : next_a;
+
+reg [2:0] buf_rcw_n;
+reg [1:0] buf_ba;
+reg [ROW_BITS-1:0] buf_a;
+
+always @(posedge clk) begin
+  buf_rcw_n <= new_rcw_n;
+  buf_ba <= new_ba;
+  buf_a <= new_a;
+end
+
+SDR_O1 sdr1(.outclock(clk_shifted), .din(buf_rcw_n[2]), .pad_out(ddr_ras_n));
+SDR_O1 sdr2(.outclock(clk_shifted), .din(buf_rcw_n[1]), .pad_out(ddr_cas_n));
+SDR_O1 sdr3(.outclock(clk_shifted), .din(buf_rcw_n[0]), .pad_out(ddr_we_n));
+SDR_O1 sdr4(.outclock(clk_shifted), .din(buf_ba[1]), .pad_out(ddr_ba[1]));
+SDR_O1 sdr5(.outclock(clk_shifted), .din(buf_ba[0]), .pad_out(ddr_ba[0]));
+
+genvar sdr_i;
+generate
+    for (sdr_i = 0; sdr_i < ROW_BITS; sdr_i = sdr_i + 1) begin : sdr_addr
+        SDR_O1 sdr_a(.outclock(clk_shifted), .din(buf_a[sdr_i]), .pad_out(ddr_a[sdr_i]));
+    end
+endgenerate
 
 // -------------------------------------------------------------------------------------
 //   output data latches
@@ -353,7 +350,7 @@ end
 always @(negedge clk) ddr_out_valid <= ddr_out_valid_buf;
 
 // -------------------------------------------------------------------------------------
-//   dq sampling for input (read)
+//   read delay
 // -------------------------------------------------------------------------------------
 
 reg         i_v_a = 1'b0;

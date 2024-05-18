@@ -71,28 +71,6 @@ module DDR_IO8(
   );
 endmodule
 
-module DDR_IO2(
-  inclock, dout,
-  outclock, din,
-  oe,
-  pad_io
-);
-  localparam WIDTH = 2;
-
-  input inclock;
-  output reg [WIDTH*2-1:0] dout;
-  input outclock;
-  input [WIDTH*2-1:0] din;
-  input [WIDTH-1:0] oe;
-  inout [WIDTH-1:0] pad_io;
-
-  ddr_gpio_sim #(.WIDTH(WIDTH), .INCLOCK_INV(1)) impl(
-    .inclock(inclock), .dout(dout),
-    .outclock(outclock), .din(din),
-    .oe(oe), .pad_io(pad_io)
-  );
-endmodule
-
 module DDR_IO1(
   inclock, dout,
   outclock, din,
@@ -124,18 +102,6 @@ module DDR_O4 (
     .inclock(1'b0),
     .outclock(outclock), .din(din),
     .oe(4'b1111), .pad_io(pad_out)
-  );
-endmodule
-
-module DDR_O2 (
-  input  wire       outclock,
-  input  wire [3:0] din,
-  output wire [1:0] pad_out
-);
-  ddr_gpio_sim #(.WIDTH(2)) impl(
-    .inclock(1'b0),
-    .outclock(outclock), .din(din),
-    .oe(2'b11), .pad_io(pad_out)
   );
 endmodule
 

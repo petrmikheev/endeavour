@@ -241,9 +241,7 @@ set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_pllb_i2c_sda
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to io_nreset
 set_global_assignment -name VERILOG_MACRO "ENDEAVOUR_BOARD_VER2=<None>"
 set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/apb_clock_bridge.sv
-set_global_assignment -name QIP_FILE DDR_O2.qip
 set_global_assignment -name QIP_FILE DDR_O1.qip
-set_global_assignment -name QIP_FILE DDR_IO2.qip
 set_global_assignment -name QIP_FILE DDR_IO1.qip
 set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/board_controller.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/audio_controller.sv

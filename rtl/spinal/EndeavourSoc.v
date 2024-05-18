@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.10.1    git head : 2527c7c6b0fb0f95e5e1a5722a0be732b364ce43
 // Component : EndeavourSoc
-// Git hash  : cfaef6aea2f6714338550f44c00cf100a26e8319
+// Git hash  : a6c812a3b915852894d7bf479ff14b3403835878
 
 `timescale 1ns/1ps
 
@@ -730,41 +730,41 @@ module EndeavourSoc (
     .ROW_BITS(14),
     .COL_BITS(10)
   ) ram_ctrl (
-    .clk       (board_ctrl_clk_cpu                                   ), //i
-    .dqs_clk   (board_ctrl_clk_ram                                   ), //i
-    .reset     (board_ctrl_reset                                     ), //i
-    .arw_valid (ram_ctrl_axi_arbiter_io_output_arw_valid             ), //i
-    .arw_ready (ram_ctrl_arw_ready                                   ), //o
-    .arw_addr  (ram_ctrl_axi_arbiter_io_output_arw_payload_addr[26:0]), //i
-    .arw_id    (ram_ctrl_axi_arbiter_io_output_arw_payload_id[1:0]   ), //i
-    .arw_len   (ram_ctrl_axi_arbiter_io_output_arw_payload_len[7:0]  ), //i
-    .arw_size  (ram_ctrl_axi_arbiter_io_output_arw_payload_size[2:0] ), //i
-    .arw_burst (ram_ctrl_axi_arbiter_io_output_arw_payload_burst[1:0]), //i
-    .arw_write (ram_ctrl_axi_arbiter_io_output_arw_payload_write     ), //i
-    .wvalid    (ram_ctrl_axi_arbiter_io_output_w_valid               ), //i
-    .wready    (ram_ctrl_wready                                      ), //o
-    .wdata     (ram_ctrl_axi_arbiter_io_output_w_payload_data[31:0]  ), //i
-    .wstrb     (ram_ctrl_axi_arbiter_io_output_w_payload_strb[3:0]   ), //i
-    .wlast     (ram_ctrl_axi_arbiter_io_output_w_payload_last        ), //i
-    .bvalid    (ram_ctrl_bvalid                                      ), //o
-    .bready    (ram_ctrl_axi_arbiter_io_output_b_ready               ), //i
-    .bid       (ram_ctrl_bid[1:0]                                    ), //o
-    .rvalid    (ram_ctrl_rvalid                                      ), //o
-    .rready    (ram_ctrl_axi_arbiter_io_output_r_ready               ), //i
-    .rdata     (ram_ctrl_rdata[31:0]                                 ), //o
-    .rid       (ram_ctrl_rid[1:0]                                    ), //o
-    .rlast     (ram_ctrl_rlast                                       ), //o
-    .ddr_ck_p  (ram_ctrl_ddr_ck_p                                    ), //o
-    .ddr_ck_n  (ram_ctrl_ddr_ck_n                                    ), //o
-    .ddr_cke   (ram_ctrl_ddr_cke                                     ), //o
-    .ddr_ras_n (ram_ctrl_ddr_ras_n                                   ), //o
-    .ddr_cas_n (ram_ctrl_ddr_cas_n                                   ), //o
-    .ddr_we_n  (ram_ctrl_ddr_we_n                                    ), //o
-    .ddr_ba    (ram_ctrl_ddr_ba[1:0]                                 ), //o
-    .ddr_a     (ram_ctrl_ddr_a[13:0]                                 ), //o
-    .ddr_dm    (ram_ctrl_ddr_dm[1:0]                                 ), //o
-    .ddr_dqs   ({io_ddr_sdram_dqs}),
-    .ddr_dq    ({io_ddr_sdram_dq}) 
+    .clk         (board_ctrl_clk_cpu                                   ), //i
+    .clk_shifted (board_ctrl_clk_ram                                   ), //i
+    .reset       (board_ctrl_reset                                     ), //i
+    .arw_valid   (ram_ctrl_axi_arbiter_io_output_arw_valid             ), //i
+    .arw_ready   (ram_ctrl_arw_ready                                   ), //o
+    .arw_addr    (ram_ctrl_axi_arbiter_io_output_arw_payload_addr[26:0]), //i
+    .arw_id      (ram_ctrl_axi_arbiter_io_output_arw_payload_id[1:0]   ), //i
+    .arw_len     (ram_ctrl_axi_arbiter_io_output_arw_payload_len[7:0]  ), //i
+    .arw_size    (ram_ctrl_axi_arbiter_io_output_arw_payload_size[2:0] ), //i
+    .arw_burst   (ram_ctrl_axi_arbiter_io_output_arw_payload_burst[1:0]), //i
+    .arw_write   (ram_ctrl_axi_arbiter_io_output_arw_payload_write     ), //i
+    .wvalid      (ram_ctrl_axi_arbiter_io_output_w_valid               ), //i
+    .wready      (ram_ctrl_wready                                      ), //o
+    .wdata       (ram_ctrl_axi_arbiter_io_output_w_payload_data[31:0]  ), //i
+    .wstrb       (ram_ctrl_axi_arbiter_io_output_w_payload_strb[3:0]   ), //i
+    .wlast       (ram_ctrl_axi_arbiter_io_output_w_payload_last        ), //i
+    .bvalid      (ram_ctrl_bvalid                                      ), //o
+    .bready      (ram_ctrl_axi_arbiter_io_output_b_ready               ), //i
+    .bid         (ram_ctrl_bid[1:0]                                    ), //o
+    .rvalid      (ram_ctrl_rvalid                                      ), //o
+    .rready      (ram_ctrl_axi_arbiter_io_output_r_ready               ), //i
+    .rdata       (ram_ctrl_rdata[31:0]                                 ), //o
+    .rid         (ram_ctrl_rid[1:0]                                    ), //o
+    .rlast       (ram_ctrl_rlast                                       ), //o
+    .ddr_ck_p    (ram_ctrl_ddr_ck_p                                    ), //o
+    .ddr_ck_n    (ram_ctrl_ddr_ck_n                                    ), //o
+    .ddr_cke     (ram_ctrl_ddr_cke                                     ), //o
+    .ddr_ras_n   (ram_ctrl_ddr_ras_n                                   ), //o
+    .ddr_cas_n   (ram_ctrl_ddr_cas_n                                   ), //o
+    .ddr_we_n    (ram_ctrl_ddr_we_n                                    ), //o
+    .ddr_ba      (ram_ctrl_ddr_ba[1:0]                                 ), //o
+    .ddr_a       (ram_ctrl_ddr_a[13:0]                                 ), //o
+    .ddr_dm      (ram_ctrl_ddr_dm[1:0]                                 ), //o
+    .ddr_dqs     ({io_ddr_sdram_dqs}),
+    .ddr_dq      ({io_ddr_sdram_dq}) 
   );
   VexRiscv vexRiscv_1 (
     .timerInterrupt            (timerInterrupt                                     ), //i

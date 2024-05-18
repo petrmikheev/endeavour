@@ -92,7 +92,7 @@ class EndeavourSoc extends Component {
   val ram_ctrl = new DDRSdramController(rowBits = 14, colBits = 10)
   ram_ctrl.io.ddr <> io.ddr_sdram
   ram_ctrl.io.clk <> board_ctrl.io.clk_cpu
-  ram_ctrl.io.dqs_clk <> board_ctrl.io.clk_ram
+  ram_ctrl.io.clk_shifted <> board_ctrl.io.clk_ram
   ram_ctrl.io.reset <> board_ctrl.io.reset
 
   val cpu = new VexRiscvGen(useCache=true, resetVector=internalRamBaseAddr)
