@@ -75,10 +75,46 @@ end else begin
     assign ddr_a_col = {burst_last, col_addr[8:0], 1'b0};
 end endgenerate
 
+reg next_ras_n, next_cas_n, next_we_n;
+reg [ROW_BITS-1:0] next_a;
+reg [1:0] next_ba;
+
+wire new_command = stat == IDLE && ref_real == ref_idle && arw_valid;
+
+wire [2:0] new_rcw_n = stat == WRITE ? (wvalid ? 3'b100 : 3'b111) : // WRITE or NOP
+                         new_command ? 3'b011 : // Bank active
+                                       {next_ras_n, next_cas_n, next_we_n};
+wire [1:0] new_ba = new_command ? arw_addr[ROW_BITS+COL_BITS+2:ROW_BITS+COL_BITS+1] : next_ba;
+wire [ROW_BITS-1:0] new_a = (stat == WRITE || stat == READ) ? ddr_a_col :
+                                                new_command ? arw_addr[ROW_BITS+COL_BITS:COL_BITS+1] : next_a;
+
+reg [2:0] buf_rcw_n;
+reg [1:0] buf_ba;
+reg [ROW_BITS-1:0] buf_a;
+
+always @(posedge clk) begin
+  buf_rcw_n <= new_rcw_n;
+  buf_ba <= new_ba;
+  buf_a <= new_a;
+end
+
+SDR_O1 sdr1(.outclock(dqs_clk), .din(buf_rcw_n[2]), .pad_out(ddr_ras_n));
+SDR_O1 sdr2(.outclock(dqs_clk), .din(buf_rcw_n[1]), .pad_out(ddr_cas_n));
+SDR_O1 sdr3(.outclock(dqs_clk), .din(buf_rcw_n[0]), .pad_out(ddr_we_n));
+SDR_O1 sdr4(.outclock(dqs_clk), .din(buf_ba[1]), .pad_out(ddr_ba[1]));
+SDR_O1 sdr5(.outclock(dqs_clk), .din(buf_ba[0]), .pad_out(ddr_ba[0]));
+
+genvar sdr_i;
+generate
+    for (sdr_i = 0; sdr_i < ROW_BITS; sdr_i = sdr_i + 1) begin : sdr_addr
+        SDR_O1 sdr_a(.outclock(dqs_clk), .din(buf_a[sdr_i]), .pad_out(ddr_a[sdr_i]));
+    end
+endgenerate
+
 // -------------------------------------------------------------------------------------
 //   refresh wptr self increasement
 // -------------------------------------------------------------------------------------
-always @ (posedge clk)
+always @(posedge clk) begin
     if(reset) begin
         ref_cnt <= tREFC;
         ref_idle <= 3'd1;
@@ -92,6 +128,7 @@ always @ (posedge clk)
             end
         end
     end
+end
 
 // -------------------------------------------------------------------------------------
 //  assignment for user interface (AXI4)
@@ -107,7 +144,7 @@ assign rid = bid;
 always @ (posedge clk)
     if( reset) begin
         ddr_cke <= 1'b0;
-        {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111;
+        {next_ras_n, next_cas_n, next_we_n} <= 3'b111;
         col_addr <= 0;
         burst_len <= 8'd0;
         ref_real <= 3'd0;
@@ -118,95 +155,89 @@ always @ (posedge clk)
             RESET: begin
                 cnt <= cnt + 8'd1;
                 case (cnt)
-                  8'd0  : ddr_cke <= 1'b1;  // NOP
-                  8'd1  : begin             // Precharge all
-                    {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b010;
-                    ddr_a[10] <= 1'b1;
-                  end
-                  8'd2  : {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
-                  8'd4  : begin             // EMRS
-                    {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b000;
-                    ddr_ba <= 2'b01;
-                    ddr_a <= 'h2;   // 0x0 (default) or 0x2 (weak drive strength)
-                  end
-                  8'd5  : {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
-                  8'd7  : begin             // MRS, reset DLL
-                    {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b000;
-                    ddr_ba <= 2'b00;
-                    ddr_a <= 'h121; // DLL_RESET (0x100) | CL2 (0x20) | burst length 2 (0x1)
-                  end
-                  8'd8  : {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
-                  8'd9: begin               // Precharge all
-                    {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b010;
-                    ddr_a[10] <= 1'b1;
-                  end
-                  8'd10: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
-                  8'd12, 8'd140: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b001; // Auto refresh
-                  8'd13, 8'd141: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // NOPs
-                  8'd207: begin             // MRS, clear DLL reset
-                    {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b000;
-                    ddr_ba <= 2'b00;
-                    ddr_a <= 'h21;  // CL2 (0x20) | burst length 2 (0x1)
-                  end
-                  8'd208: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
-                  8'd209: stat <= IDLE;
+                    8'd0  : ddr_cke <= 1'b1;  // NOP
+                    8'd1  : begin             // Precharge all
+                        {next_ras_n, next_cas_n, next_we_n} <= 3'b010;
+                        next_a[10] <= 1'b1;
+                    end
+                    8'd2  : {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // 2x NOP
+                    8'd4  : begin             // EMRS
+                        {next_ras_n, next_cas_n, next_we_n} <= 3'b000;
+                        next_ba <= 2'b01;
+                        next_a <= 'h2;   // 0x0 (default) or 0x2 (weak drive strength)
+                    end
+                    8'd5  : {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // 2x NOP
+                    8'd7  : begin             // MRS, reset DLL
+                        {next_ras_n, next_cas_n, next_we_n} <= 3'b000;
+                        next_ba <= 2'b00;
+                        next_a <= 'h121; // DLL_RESET (0x100) | CL2 (0x20) | burst length 2 (0x1)
+                    end
+                    8'd8  : {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // 2x NOP
+                    8'd9: begin               // Precharge all
+                        {next_ras_n, next_cas_n, next_we_n} <= 3'b010;
+                        next_a[10] <= 1'b1;
+                    end
+                    8'd10: {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // 2x NOP
+                    8'd12, 8'd140: {next_ras_n, next_cas_n, next_we_n} <= 3'b001; // Auto refresh
+                    8'd13, 8'd141: {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // NOPs
+                    8'd207: begin             // MRS, clear DLL reset
+                        {next_ras_n, next_cas_n, next_we_n} <= 3'b000;
+                        next_ba <= 2'b00;
+                        next_a <= 'h21;  // CL2 (0x20) | burst length 2 (0x1)
+                    end
+                    8'd208: {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // 2x NOP
+                    8'd210: stat <= IDLE;
                 endcase
             end
             IDLE: begin
                 cnt <= 8'd0;
                 if (ref_real != ref_idle) begin
-                  ref_real <= ref_real + 3'd1;
-                  stat <= REFRESH;
-                  {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b010; // Precharge all
-                  ddr_a[10] <= 1'b1;
-                end else if(arw_valid) begin
-                  {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b011; // Bank active
-                  {ddr_ba, ddr_a, col_addr} <= arw_addr[ROW_BITS+COL_BITS+2:2];
-                  burst_len <= arw_len;
-                  stat <= arw_write ? WPRE : RPRE;
-                  bid <= arw_id;
+                    ref_real <= ref_real + 3'd1;
+                    stat <= REFRESH;
+                    {next_ras_n, next_cas_n, next_we_n} <= 3'b010; // Precharge all
+                    next_a[10] <= 1'b1;
                 end else
-                  {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // NOP
+                    {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // NOP
+                if (new_command) begin
+                    burst_len <= arw_len;
+                    stat <= arw_write ? WPRE : RPRE;
+                    bid <= arw_id;
+                    {next_ba, next_a, col_addr} <= arw_addr[ROW_BITS+COL_BITS+2:2];
+                end
             end
             REFRESH: begin
                 cnt <= cnt + 8'd1;
                 case (cnt[4:0])
-                  5'd0: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 2x NOP
-                  5'd2: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b001; // Auto refresh
-                  5'd3: {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // 15x NOP
-                  5'd17: stat <= IDLE;
+                    5'd0: {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // 2x NOP
+                    5'd2: {next_ras_n, next_cas_n, next_we_n} <= 3'b001; // Auto refresh
+                    5'd3: {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // 15x NOP
+                    5'd18: stat <= IDLE;
                 endcase
             end
             WPRE: begin
-                {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // NOP  TODO: if clk>110mhz then second NOP is needed
+                // Note: if clk>110mhz then second NOP is needed
+                {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // controlled in new_rcw_n assignment
                 cnt <= 8'd0;
                 stat <= WRITE;
             end
             RPRE: begin
-                {ddr_ras_n, ddr_cas_n, ddr_we_n} <= 3'b111; // NOP
+                {next_ras_n, next_cas_n, next_we_n} <= 3'b101; // READ    Note: if clk>110mhz then second NOP is needed
                 cnt <= 8'd0;
                 stat <= READ;
             end
             WRITE: begin
-                ddr_a <= ddr_a_col;
                 if(wvalid) begin
-                    ddr_cas_n <= 1'b0;
-                    ddr_we_n <= 1'b0;
                     col_addr <= col_addr + {{(COL_BITS-2){1'b0}}, 1'b1};
                     if(burst_last | wlast) begin
                         cnt <= 8'd0;
                         stat <= WRESP;
+                        {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // NOP
                     end else begin
                         cnt <= cnt + 8'd1;
                     end
-                end else begin
-                    ddr_cas_n <= 1'b1;
-                    ddr_we_n <= 1'b1;
                 end
             end
             WRESP: begin
-                ddr_cas_n <= 1'b1;
-                ddr_we_n <= 1'b1;
                 cnt <= cnt + 8'd1;
                 if(bready)
                     stat <= WWAIT;
@@ -217,18 +248,16 @@ always @ (posedge clk)
                     stat <= IDLE;
             end
             READ: begin
-                ddr_cas_n <= 1'b0;
-                ddr_a <= ddr_a_col;
                 col_addr <= col_addr + {{(COL_BITS-2){1'b0}}, 1'b1};
                 if(burst_last) begin
                     cnt <= 8'd0;
                     stat <= RRESP;
+                    {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // NOP
                 end else begin
                     cnt <= cnt + 8'd1;
                 end
             end
             RRESP: begin 
-                ddr_cas_n <= 1'b1;
                 cnt <= cnt + 8'd1;
                 if(rlast)
                     stat <= RWAIT;
@@ -248,12 +277,12 @@ always @ (posedge clk)
 reg  output_enable=1'b0, output_enable_d1=1'b0, output_enable_d2=1'b0, output_enable_dqs=1'b0;
 always @(posedge clk) output_enable_d1 <= stat==WRITE;
 always @(negedge clk) begin
-  output_enable <= output_enable_d2;
-  output_enable_d2 <= output_enable_d1;
+    output_enable <= output_enable_d2;
+    output_enable_d2 <= output_enable_d1;
 end
 
 always @(negedge dqs_clk) begin
-  output_enable_dqs <= output_enable_d2 | output_enable;
+    output_enable_dqs <= output_enable_d2 | output_enable;
 end
 
 // -------------------------------------------------------------------------------------

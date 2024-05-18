@@ -73,14 +73,16 @@ void print_cpu_info() {
 int memtest() {
   bios_printf("RAM: %uMB\tmemtest", RAM_SIZE >> 20);
   char* ram = (char*)RAM_ADDR;
-  const int batch_size = RAM_SIZE >> 4;
 #ifndef SIMULATION
-  const int step = 17;
+  const int batch_size = RAM_SIZE >> 4;
+  const int base_step = 4;
 #else
-  const int step = (batch_size >> 3) + 1;
+  const int batch_size = RAM_SIZE >> 13;
+  const int base_step = 256;
 #endif
   int i = 8192, j = 8192;  // skip first 32KB (can be currently shown on the display)
   for (int b = 0; b < 4; ++b, j -= batch_size) {
+    const int step = base_step + (b & 1);
     for (; j < batch_size; j += step, i += step) {
       char* ptr = ram + (i << 2);
       *(int*)ptr = i | (i << 25);  // test 4 byte write
@@ -91,6 +93,7 @@ int memtest() {
   int ok = 1;
   i = 8192, j = 8192;
   for (int b = 0; b < 4; ++b, j -= batch_size) {
+    const int step = base_step + (b & 1);
     for (; j < batch_size; j += step, i += step) {
       char* ptr = ram + (i << 2);
       unsigned expected = (i | (i << 25)) ^ 0xff00;

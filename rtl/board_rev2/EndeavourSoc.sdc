@@ -61,8 +61,8 @@ create_clock -name {clk48} -period 20.833 -waveform { 0.000 10.416 } [get_ports 
 
 create_generated_clock -multiply_by 116 -divide_by 75 -source [get_ports io_clk_in] -name clk_tmds_pixel [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[0]]
 create_generated_clock -multiply_by 116 -divide_by 15 -source [get_ports io_clk_in] -name clk_tmds_x5 [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[1]]
-create_generated_clock -multiply_by 116 -divide_by 65 -source [get_ports io_clk_in] -name clk_cpu [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[2]]
-create_generated_clock -multiply_by 116 -divide_by 65 -phase 90 -source [get_ports io_clk_in] -name clk_ram [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[3]]
+create_generated_clock -multiply_by 116 -divide_by 60 -source [get_ports io_clk_in] -name clk_cpu [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[2]]
+create_generated_clock -multiply_by 116 -divide_by 60 -phase 90 -source [get_ports io_clk_in] -name clk_ram [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[3]]
 
 #**************************************************************
 # Set Clock Latency
@@ -89,9 +89,6 @@ set_input_delay -clock {clk48} 0 [get_ports {io_sdcard_cmd io_sdcard_data* io_sd
 
 set_output_delay -clock {clk48} -4.0 [get_ports {io_uart_tx io_audio_* io_pll*i2c*}]
 set_output_delay -clock {clk48} 0 [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data*}]
-set_output_delay -clock {clk_cpu} 0 [get_ports {io_ddr_sdram_a* io_ddr_sdram_ba* io_ddr_sdram_cas_n io_ddr_sdram_ras_n io_ddr_sdram_we_n}]
-#set_output_delay -clock {clk_ram} -clock_fall 0 [get_ports {io_ddr_sdram_a* io_ddr_sdram_ba* io_ddr_sdram_cas_n io_ddr_sdram_ras_n io_ddr_sdram_we_n}]
-#set_output_delay -clock {clk_cpu} 0 [get_ports {io_ddr_sdram_a[4] io_ddr_sdram_a[5] io_ddr_sdram_a[6] io_ddr_sdram_a[7] io_ddr_sdram_a[8] io_ddr_sdram_a[9] io_ddr_sdram_a[11] io_ddr_sdram_a[12] io_ddr_sdram_a[13]}]
 
 #**************************************************************
 # Set Clock Groups
@@ -104,10 +101,7 @@ set_output_delay -clock {clk_cpu} 0 [get_ports {io_ddr_sdram_a* io_ddr_sdram_ba*
 #**************************************************************
 
 set_false_path -from [get_ports {io_nreset io_keys* io_ddr_sdram_dq*}]
-set_false_path -to [get_ports {io_leds* io_dvi_* io_ddr_sdram_d* io_ddr_sdram_ck_* io_ddr_sdram_cke}]
-#set_false_path -to [get_ports {io_leds* io_dvi_* io_ddr_sdram_*}]
-#set_false_path -to [get_ports {io_ddr_sdram_ba* io_ddr_sdram_cas_n io_ddr_sdram_ras_n io_ddr_sdram_we_n}]
-#set_false_path -to [get_ports {io_ddr_sdram_a[0] io_ddr_sdram_a[1] io_ddr_sdram_a[2] io_ddr_sdram_a[3] io_ddr_sdram_a[10]}]
+set_false_path -to [get_ports {io_leds* io_dvi_* io_ddr_sdram_*}]
 
 #**************************************************************
 # Set Multicycle Path

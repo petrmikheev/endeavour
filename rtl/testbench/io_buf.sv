@@ -151,4 +151,14 @@ module DDR_O1 (
   );
 endmodule
 
+module SDR_O1 (
+  input  wire  outclock,
+  input  wire  din,
+  output reg   pad_out
+);
+  always @(posedge outclock) begin
+    pad_out <= din;
+  end
+endmodule
+
 `endif
