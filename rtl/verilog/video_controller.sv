@@ -41,6 +41,7 @@ module VideoController(
   reg [1:0] video_mode;
   reg show_text = 0;
   reg show_graphic = 0;
+  reg use_graphic_alpha = 0;
   reg [3:0] font_height;
   reg [2:0] font_width;
   reg [31:0] text_addr;
@@ -73,7 +74,7 @@ module VideoController(
     end else begin
       if (apb_PSEL & apb_PENABLE & apb_PWRITE) begin
         if (apb_reg == 3'd0) begin
-          {font_width, font_height, show_graphic, show_text, video_mode} <= apb_PWDATA[10:0];
+          {use_graphic_alpha, font_width, font_height, show_graphic, show_text, video_mode} <= apb_PWDATA[11:0];
           if (apb_PWDATA[1:0] == 2'd1) begin  // 640x480
             hDrawEnd   <= 11'd640 + PIXEL_DELAY;
             hSyncStart <= 11'd656 + PIXEL_DELAY;
@@ -114,7 +115,7 @@ module VideoController(
   end
 
   assign apb_PREADY = 1'b1;
-  assign apb_PRDATA = apb_reg == 3'd0 ? {21'b0, font_width, font_height, show_graphic, show_text, video_mode} :
+  assign apb_PRDATA = apb_reg == 3'd0 ? {20'b0, use_graphic_alpha, font_width, font_height, show_graphic, show_text, video_mode} :
                       apb_reg == 3'd1 ? text_addr :
                       apb_reg == 3'd2 ? graphic_addr :
                                         {22'b0, charmap_index};
@@ -250,7 +251,11 @@ module VideoController(
   reg [31:0] char_fg, char_bg;
   wire [31:0] tcolor = char_shift[7] ? char_fg : char_bg;
   wire [15:0] gcolor16 = hCounter[0] ? gword[15:0] : gword[31:16];
-  wire [23:0] gcolor24 = {gcolor16[15:11], gcolor16[15:13], gcolor16[10:5], gcolor16[10:9], gcolor16[4:0], gcolor16[4:2]};
+  wire        galpha = use_graphic_alpha ? gcolor16[5] : 1'b0;
+  wire [23:0] gcolor24 = {
+      /*R*/ gcolor16[15:11], gcolor16[15:13],
+      /*G*/ gcolor16[10:6], (use_graphic_alpha ? gcolor16[10:8] : {gcolor16[5], gcolor16[10:9]}),
+      /*B*/ gcolor16[4:0], gcolor16[4:2]};
   reg [7:0] red, green, blue;
   reg [7:0] gred1, ggreen1, gblue1;
   reg [7:0] gred2, ggreen2, gblue2;
@@ -298,7 +303,7 @@ module VideoController(
     diff_r <= {2'b10, tcolor[31:24]} - gcolor24[23:16];
     diff_g <= {2'b10, tcolor[23:16]} - gcolor24[15:8];
     diff_b <= {2'b10, tcolor[15:8]}  - gcolor24[7:0];
-    alpha1 <= show_graphic ? tcolor[6:0] : 7'd64;
+    alpha1 <= show_graphic ? (galpha ? 7'd0 : tcolor[6:0]) : 7'd64;
     alpha2 <= alpha1;
     mul_r <= $unsigned({4'b0, diff_r}) * $unsigned(alpha1);
     mul_g <= $unsigned({4'b0, diff_g}) * $unsigned(alpha1);

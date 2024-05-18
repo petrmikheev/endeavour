@@ -143,7 +143,7 @@ int main() {
       "\nUART console. Commands:\n"
       "\tW addr val\t\t\t- save 4B to RAM\n"
       "\tR addr\t\t\t\t- load 4B from RAM\n"
-      "\tSD addr sector\t\t- load sector from sdcard to addr\n"
+      "\tSD addr sector\t\t- load SD card sector to addr\n"
       "\tUART addr size crc32  - receive size(decimal) bytes via UART\n"
       "\tJ addr\t\t\t\t- run code at addr\n\n"
   );

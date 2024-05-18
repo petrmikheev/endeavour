@@ -79,6 +79,8 @@
 #define VIDEO_GRAPHIC_ON  8
 #define VIDEO_FONT_HEIGHT(X) ((((X)-1)&15) << 4) // allowed range [6, 16]
 #define VIDEO_FONT_WIDTH(X) ((((X)-1)&7) << 8)   // allowed range [6, 8]
+#define VIDEO_RGB565      0
+#define VIDEO_RGAB5515    0x800
 
 // VIDEO_REG_INDEX
 #define VIDEO_COLORMAP_BG(X) (X)         // Background color RGBA (8, 8, 8, 7); bits 7 unused; X in range [0, 15]
