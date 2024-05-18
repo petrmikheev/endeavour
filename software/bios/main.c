@@ -162,6 +162,12 @@ int main() {
     int size;
     do {
       c = UART_getc();
+      if (c == '\r') c = '\n';
+      if (c == '\b' && cmd_len > 0) {
+        cmd_len--;
+        bios_putc('\b');
+      }
+      if (c < 32 && c != '\n') continue;
       bios_putc(c);
       cmd[cmd_len++] = c;
     } while (cmd_len < CMD_BUF_SIZE && c != '\n');

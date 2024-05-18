@@ -27,12 +27,23 @@ void init_text_mode() {
   IO_PORT(VIDEO_CFG) = video_mode | VIDEO_TEXT_ON | VIDEO_FONT_WIDTH(8) | VIDEO_FONT_HEIGHT(16);
 }
 
+static void uart_putc(char c) {
+  while (IO_PORT(UART_TX) < 0);
+  IO_PORT(UART_TX) = c;
+}
+
 void putc_impl(char c) {
   int cursor_pos = BIOS_CURSOR_POS;
+  char* cursor = (char*)(BIOS_TEXT_BUFFER_ADDR + cursor_pos);
   if (c == '\n') {
     cursor_pos = (cursor_pos & ~511) + 512;
+  } else if (c == '\b') {
+    cursor[-2] = 0;
+    cursor[-1] = BIOS_TEXT_STYLE;
+    cursor_pos -= 2;
+    uart_putc('\b');
+    uart_putc(' ');
   } else {
-    char* cursor = (char*)(BIOS_TEXT_BUFFER_ADDR + cursor_pos);
     cursor[0] = c;
     cursor[1] = BIOS_TEXT_STYLE;
     cursor_pos += 2;
@@ -45,8 +56,7 @@ void putc_impl(char c) {
     IO_PORT(VIDEO_TEXT_ADDR) = BIOS_TEXT_BUFFER_ADDR | ((IO_PORT(VIDEO_TEXT_ADDR) + 512) & (VIDEO_TEXT_BUFFER_SIZE - 1));
   }
   BIOS_CURSOR_POS = cursor_pos;
-  while (IO_PORT(UART_TX) < 0);
-  IO_PORT(UART_TX) = c;
+  uart_putc(c);
 }
 
 static void print_number(unsigned v, unsigned base, int width) {
