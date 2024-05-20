@@ -33,6 +33,12 @@ module testbench;
 
   pullup(SD_CMD);
 
+  wire USB1_DP, USB1_DN, USB2_DP, USB2_DN;
+  pulldown(USB1_DP);
+  pullup(USB1_DN);
+  pulldown(USB2_DP);
+  pulldown(USB2_DN);
+
   EndeavourSoc system(
     .io_clk_in(clk48mhz),
     .io_nreset(1'b1),
@@ -54,7 +60,11 @@ module testbench;
     .io_sdcard_clk(SD_CLK),
     .io_sdcard_cmd(SD_CMD),
     .io_sdcard_data(SD_DATA),
-    .io_sdcard_ndetect(SD_NDETECT)
+    .io_sdcard_ndetect(SD_NDETECT),
+    .io_usb1_dp(USB1_DP),
+    .io_usb1_dn(USB1_DN),
+    .io_usb2_dp(USB2_DP),
+    .io_usb2_dn(USB2_DN)
   );
 
   mdl_sdio #(.OPT_HIGH_CAPACITY(1'b1), .LGMEMSZ(27)) sdcard(

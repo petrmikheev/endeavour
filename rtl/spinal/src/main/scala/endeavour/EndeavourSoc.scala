@@ -35,6 +35,8 @@ class EndeavourSoc extends Component {
     val dvi = DVI()
     val sdcard = SDCARD()
     val ddr_sdram = DDR_SDRAM(14)
+    val usb1 = USB()
+    val usb2 = USB()
   }
 
   val board_ctrl = new BoardController()
@@ -68,6 +70,11 @@ class EndeavourSoc extends Component {
     val sdcard_ctrl = new SdcardController()
     sdcard_ctrl.io.sdcard <> io.sdcard
 
+    val usb1_ctrl = new USBHostController()
+    val usb2_ctrl = new USBHostController()
+    usb1_ctrl.io.usb <> io.usb1
+    usb2_ctrl.io.usb <> io.usb2
+
     val apb = Apb3(Apb3Config(
       addressWidth  = 11,
       dataWidth     = 32,
@@ -78,9 +85,9 @@ class EndeavourSoc extends Component {
       slaves = List(
         uart_ctrl.io.apb   -> (0x100, 16),
         audio_ctrl.io.apb  -> (0x200, 8),
-        sdcard_ctrl.io.apb  -> (0x300, 32)
-        // 0x400 USB_P1
-        // 0x500 USB_P2
+        sdcard_ctrl.io.apb -> (0x300, 32),
+        usb1_ctrl.io.apb   -> (0x400, 64),
+        usb2_ctrl.io.apb   -> (0x500, 64)
         // 0x600 reserved for USB_DEVICE
       )
     )

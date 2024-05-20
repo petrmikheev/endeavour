@@ -42,6 +42,9 @@
 #define SDCARD_FIFO0_LE 0x318  // FIFO0 with big-endian -> little-endian conversion
 #define SDCARD_FIFO1_LE 0x31C  // FIFO1 with big-endian -> little-endian conversion
 
+#define USB_P1_REGMAP 0x400 // see https://github.com/ultraembedded/core_usb_host for details
+#define USB_P2_REGMAP 0x500
+
 #define BOARD_LEDS     0x800
 #define BOARD_KEYS     0x804
 #define BOARD_CPU_FREQ 0x808

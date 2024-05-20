@@ -19,6 +19,11 @@ case class UART() extends Bundle {
   val tx = out Bool()
 }
 
+case class USB() extends Bundle {
+  val dp = inout(Analog(Bool()))
+  val dn = inout(Analog(Bool()))
+}
+
 case class DVI() extends Bundle {
   val tmds0p = out Bool()
   val tmds0m = out Bool()

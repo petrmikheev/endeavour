@@ -12,7 +12,9 @@ module SdcardController (
   output        apb_PREADY,
   input         apb_PWRITE,
   input  [31:0] apb_PWDATA,
-  output [31:0] apb_PRDATA
+  output [31:0] apb_PRDATA,
+
+  output        interrupt
 );
 
   wire stall;
@@ -49,7 +51,7 @@ module SdcardController (
 `else
     .i_card_detect(~sdcard_ndetect),
 `endif
-    //.o_int() output wire interrupt
+    .o_int(interrupt),
 
     .i_wb_addr({apb_PADDR[4] & ~apb_PADDR[3], apb_PADDR[3:2]}),
     .i_wb_data(inverse ? {apb_PWDATA[7:0], apb_PWDATA[15:8], apb_PWDATA[23:16], apb_PWDATA[31:24]} : apb_PWDATA),

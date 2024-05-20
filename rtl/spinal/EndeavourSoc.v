@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.10.1    git head : 2527c7c6b0fb0f95e5e1a5722a0be732b364ce43
 // Component : EndeavourSoc
-// Git hash  : a6c812a3b915852894d7bf479ff14b3403835878
+// Git hash  : d6d139e032e6fc828be5b28ff5a512d0a1301b73
 
 `timescale 1ns/1ps
 
@@ -46,7 +46,11 @@ module EndeavourSoc (
   output wire [13:0]   io_ddr_sdram_a,
   output wire [1:0]    io_ddr_sdram_dm,
   inout  wire [1:0]    io_ddr_sdram_dqs,
-  inout  wire [15:0]   io_ddr_sdram_dq
+  inout  wire [15:0]   io_ddr_sdram_dq,
+  inout  wire          io_usb1_dp,
+  inout  wire          io_usb1_dn,
+  inout  wire          io_usb2_dp,
+  inout  wire          io_usb2_dn
 );
 
   wire       [3:0]    board_ctrl_apb_PADDR;
@@ -54,6 +58,8 @@ module EndeavourSoc (
   wire       [3:0]    peripheral_uart_ctrl_apb_PADDR;
   wire       [2:0]    peripheral_audio_ctrl_apb_PADDR;
   wire       [4:0]    peripheral_sdcard_ctrl_apb_PADDR;
+  wire       [5:0]    peripheral_usb1_ctrl_apb_PADDR;
+  wire       [5:0]    peripheral_usb2_ctrl_apb_PADDR;
   wire       [10:0]   peripheral_apb_bridge_input_PADDR;
   wire                vexRiscv_1_softwareInterrupt;
   reg                 vexRiscv_1_dBus_cmd_ready;
@@ -118,12 +124,19 @@ module EndeavourSoc (
   wire                peripheral_audio_ctrl_apb_PREADY;
   wire       [31:0]   peripheral_audio_ctrl_apb_PRDATA;
   wire                peripheral_sdcard_ctrl_sdcard_clk;
+  wire                peripheral_sdcard_ctrl_interrupt;
   wire                peripheral_sdcard_ctrl_apb_PREADY;
   wire       [31:0]   peripheral_sdcard_ctrl_apb_PRDATA;
+  wire                peripheral_usb1_ctrl_interrupt;
+  wire                peripheral_usb1_ctrl_apb_PREADY;
+  wire       [31:0]   peripheral_usb1_ctrl_apb_PRDATA;
+  wire                peripheral_usb2_ctrl_interrupt;
+  wire                peripheral_usb2_ctrl_apb_PREADY;
+  wire       [31:0]   peripheral_usb2_ctrl_apb_PRDATA;
   wire                peripheral_apb_decoder_io_input_PREADY;
   wire       [31:0]   peripheral_apb_decoder_io_input_PRDATA;
   wire       [10:0]   peripheral_apb_decoder_io_output_PADDR;
-  wire       [2:0]    peripheral_apb_decoder_io_output_PSEL;
+  wire       [4:0]    peripheral_apb_decoder_io_output_PSEL;
   wire                peripheral_apb_decoder_io_output_PENABLE;
   wire                peripheral_apb_decoder_io_output_PWRITE;
   wire       [31:0]   peripheral_apb_decoder_io_output_PWDATA;
@@ -144,6 +157,16 @@ module EndeavourSoc (
   wire                apb3Router_2_io_outputs_2_PENABLE;
   wire                apb3Router_2_io_outputs_2_PWRITE;
   wire       [31:0]   apb3Router_2_io_outputs_2_PWDATA;
+  wire       [10:0]   apb3Router_2_io_outputs_3_PADDR;
+  wire       [0:0]    apb3Router_2_io_outputs_3_PSEL;
+  wire                apb3Router_2_io_outputs_3_PENABLE;
+  wire                apb3Router_2_io_outputs_3_PWRITE;
+  wire       [31:0]   apb3Router_2_io_outputs_3_PWDATA;
+  wire       [10:0]   apb3Router_2_io_outputs_4_PADDR;
+  wire       [0:0]    apb3Router_2_io_outputs_4_PSEL;
+  wire                apb3Router_2_io_outputs_4_PENABLE;
+  wire                apb3Router_2_io_outputs_4_PWRITE;
+  wire       [31:0]   apb3Router_2_io_outputs_4_PWDATA;
   wire                peripheral_apb_bridge_input_PREADY;
   wire       [31:0]   peripheral_apb_bridge_input_PRDATA;
   wire       [10:0]   peripheral_apb_bridge_output_PADDR;
@@ -650,6 +673,7 @@ module EndeavourSoc (
     .sdcard_cmd     ({io_sdcard_cmd}),
     .sdcard_data    ({io_sdcard_data}),
     .sdcard_ndetect (io_sdcard_ndetect                      ), //i
+    .interrupt      (peripheral_sdcard_ctrl_interrupt       ), //o
     .apb_PADDR      (peripheral_sdcard_ctrl_apb_PADDR[4:0]  ), //i
     .apb_PSEL       (apb3Router_2_io_outputs_2_PSEL         ), //i
     .apb_PENABLE    (apb3Router_2_io_outputs_2_PENABLE      ), //i
@@ -657,6 +681,34 @@ module EndeavourSoc (
     .apb_PWRITE     (apb3Router_2_io_outputs_2_PWRITE       ), //i
     .apb_PWDATA     (apb3Router_2_io_outputs_2_PWDATA[31:0] ), //i
     .apb_PRDATA     (peripheral_sdcard_ctrl_apb_PRDATA[31:0])  //o
+  );
+  USBHostController peripheral_usb1_ctrl (
+    .clk         (board_ctrl_clk_peripheral             ), //i
+    .reset       (board_ctrl_reset                      ), //i
+    .usb_dp      ({io_usb1_dp}),
+    .usb_dn      ({io_usb1_dn}),
+    .interrupt   (peripheral_usb1_ctrl_interrupt        ), //o
+    .apb_PADDR   (peripheral_usb1_ctrl_apb_PADDR[5:0]   ), //i
+    .apb_PSEL    (apb3Router_2_io_outputs_3_PSEL        ), //i
+    .apb_PENABLE (apb3Router_2_io_outputs_3_PENABLE     ), //i
+    .apb_PREADY  (peripheral_usb1_ctrl_apb_PREADY       ), //o
+    .apb_PWRITE  (apb3Router_2_io_outputs_3_PWRITE      ), //i
+    .apb_PWDATA  (apb3Router_2_io_outputs_3_PWDATA[31:0]), //i
+    .apb_PRDATA  (peripheral_usb1_ctrl_apb_PRDATA[31:0] )  //o
+  );
+  USBHostController peripheral_usb2_ctrl (
+    .clk         (board_ctrl_clk_peripheral             ), //i
+    .reset       (board_ctrl_reset                      ), //i
+    .usb_dp      ({io_usb2_dp}),
+    .usb_dn      ({io_usb2_dn}),
+    .interrupt   (peripheral_usb2_ctrl_interrupt        ), //o
+    .apb_PADDR   (peripheral_usb2_ctrl_apb_PADDR[5:0]   ), //i
+    .apb_PSEL    (apb3Router_2_io_outputs_4_PSEL        ), //i
+    .apb_PENABLE (apb3Router_2_io_outputs_4_PENABLE     ), //i
+    .apb_PREADY  (peripheral_usb2_ctrl_apb_PREADY       ), //o
+    .apb_PWRITE  (apb3Router_2_io_outputs_4_PWRITE      ), //i
+    .apb_PWDATA  (apb3Router_2_io_outputs_4_PWDATA[31:0]), //i
+    .apb_PRDATA  (peripheral_usb2_ctrl_apb_PRDATA[31:0] )  //o
   );
   Apb3Decoder peripheral_apb_decoder (
     .io_input_PADDR    (peripheral_apb_PADDR[10:0]                   ), //i
@@ -667,7 +719,7 @@ module EndeavourSoc (
     .io_input_PWDATA   (peripheral_apb_PWDATA[31:0]                  ), //i
     .io_input_PRDATA   (peripheral_apb_decoder_io_input_PRDATA[31:0] ), //o
     .io_output_PADDR   (peripheral_apb_decoder_io_output_PADDR[10:0] ), //o
-    .io_output_PSEL    (peripheral_apb_decoder_io_output_PSEL[2:0]   ), //o
+    .io_output_PSEL    (peripheral_apb_decoder_io_output_PSEL[4:0]   ), //o
     .io_output_PENABLE (peripheral_apb_decoder_io_output_PENABLE     ), //o
     .io_output_PREADY  (apb3Router_2_io_input_PREADY                 ), //i
     .io_output_PWRITE  (peripheral_apb_decoder_io_output_PWRITE      ), //o
@@ -676,7 +728,7 @@ module EndeavourSoc (
   );
   Apb3Router apb3Router_2 (
     .io_input_PADDR       (peripheral_apb_decoder_io_output_PADDR[10:0] ), //i
-    .io_input_PSEL        (peripheral_apb_decoder_io_output_PSEL[2:0]   ), //i
+    .io_input_PSEL        (peripheral_apb_decoder_io_output_PSEL[4:0]   ), //i
     .io_input_PENABLE     (peripheral_apb_decoder_io_output_PENABLE     ), //i
     .io_input_PREADY      (apb3Router_2_io_input_PREADY                 ), //o
     .io_input_PWRITE      (peripheral_apb_decoder_io_output_PWRITE      ), //i
@@ -703,6 +755,20 @@ module EndeavourSoc (
     .io_outputs_2_PWRITE  (apb3Router_2_io_outputs_2_PWRITE             ), //o
     .io_outputs_2_PWDATA  (apb3Router_2_io_outputs_2_PWDATA[31:0]       ), //o
     .io_outputs_2_PRDATA  (peripheral_sdcard_ctrl_apb_PRDATA[31:0]      ), //i
+    .io_outputs_3_PADDR   (apb3Router_2_io_outputs_3_PADDR[10:0]        ), //o
+    .io_outputs_3_PSEL    (apb3Router_2_io_outputs_3_PSEL               ), //o
+    .io_outputs_3_PENABLE (apb3Router_2_io_outputs_3_PENABLE            ), //o
+    .io_outputs_3_PREADY  (peripheral_usb1_ctrl_apb_PREADY              ), //i
+    .io_outputs_3_PWRITE  (apb3Router_2_io_outputs_3_PWRITE             ), //o
+    .io_outputs_3_PWDATA  (apb3Router_2_io_outputs_3_PWDATA[31:0]       ), //o
+    .io_outputs_3_PRDATA  (peripheral_usb1_ctrl_apb_PRDATA[31:0]        ), //i
+    .io_outputs_4_PADDR   (apb3Router_2_io_outputs_4_PADDR[10:0]        ), //o
+    .io_outputs_4_PSEL    (apb3Router_2_io_outputs_4_PSEL               ), //o
+    .io_outputs_4_PENABLE (apb3Router_2_io_outputs_4_PENABLE            ), //o
+    .io_outputs_4_PREADY  (peripheral_usb2_ctrl_apb_PREADY              ), //i
+    .io_outputs_4_PWRITE  (apb3Router_2_io_outputs_4_PWRITE             ), //o
+    .io_outputs_4_PWDATA  (apb3Router_2_io_outputs_4_PWDATA[31:0]       ), //o
+    .io_outputs_4_PRDATA  (peripheral_usb2_ctrl_apb_PRDATA[31:0]        ), //i
     .clk_peripheral       (board_ctrl_clk_peripheral                    ), //i
     .reset                (board_ctrl_reset                             )  //i
   );
@@ -1255,6 +1321,8 @@ module EndeavourSoc (
   assign peripheral_uart_ctrl_apb_PADDR = apb3Router_2_io_outputs_0_PADDR[3:0];
   assign peripheral_audio_ctrl_apb_PADDR = apb3Router_2_io_outputs_1_PADDR[2:0];
   assign peripheral_sdcard_ctrl_apb_PADDR = apb3Router_2_io_outputs_2_PADDR[4:0];
+  assign peripheral_usb1_ctrl_apb_PADDR = apb3Router_2_io_outputs_3_PADDR[5:0];
+  assign peripheral_usb2_ctrl_apb_PADDR = apb3Router_2_io_outputs_4_PADDR[5:0];
   assign peripheral_apb_PADDR = peripheral_apb_bridge_output_PADDR;
   assign peripheral_apb_PSEL = peripheral_apb_bridge_output_PSEL;
   assign peripheral_apb_PENABLE = peripheral_apb_bridge_output_PENABLE;
@@ -4281,21 +4349,25 @@ module VexRiscv (
   wire       [65:0]   _zz_writeBack_MulPlugin_result_1;
   wire       [31:0]   _zz__zz_decode_RS2_2;
   wire       [31:0]   _zz__zz_decode_RS2_2_1;
-  wire       [5:0]    _zz_memory_DivPlugin_div_counter_valueNext;
-  wire       [0:0]    _zz_memory_DivPlugin_div_counter_valueNext_1;
-  wire       [32:0]   _zz_memory_DivPlugin_div_stage_0_remainderMinusDenominator;
-  wire       [31:0]   _zz_memory_DivPlugin_div_stage_0_outRemainder;
-  wire       [31:0]   _zz_memory_DivPlugin_div_stage_0_outRemainder_1;
-  wire       [32:0]   _zz_memory_DivPlugin_div_stage_0_outNumerator;
-  wire       [32:0]   _zz_memory_DivPlugin_div_result_1;
-  wire       [32:0]   _zz_memory_DivPlugin_div_result_2;
-  wire       [32:0]   _zz_memory_DivPlugin_div_result_3;
-  wire       [32:0]   _zz_memory_DivPlugin_div_result_4;
-  wire       [0:0]    _zz_memory_DivPlugin_div_result_5;
-  wire       [32:0]   _zz_memory_DivPlugin_rs1_2;
-  wire       [0:0]    _zz_memory_DivPlugin_rs1_3;
-  wire       [31:0]   _zz_memory_DivPlugin_rs2_1;
-  wire       [0:0]    _zz_memory_DivPlugin_rs2_2;
+  wire       [4:0]    _zz_memory_MulDivIterativePlugin_div_counter_valueNext;
+  wire       [0:0]    _zz_memory_MulDivIterativePlugin_div_counter_valueNext_1;
+  wire       [32:0]   _zz_memory_MulDivIterativePlugin_div_stage_0_remainderMinusDenominator;
+  wire       [31:0]   _zz_memory_MulDivIterativePlugin_div_stage_0_outRemainder;
+  wire       [31:0]   _zz_memory_MulDivIterativePlugin_div_stage_0_outRemainder_1;
+  wire       [32:0]   _zz_memory_MulDivIterativePlugin_div_stage_0_outNumerator;
+  wire       [32:0]   _zz_memory_MulDivIterativePlugin_div_stage_1_remainderMinusDenominator;
+  wire       [31:0]   _zz_memory_MulDivIterativePlugin_div_stage_1_outRemainder;
+  wire       [31:0]   _zz_memory_MulDivIterativePlugin_div_stage_1_outRemainder_1;
+  wire       [32:0]   _zz_memory_MulDivIterativePlugin_div_stage_1_outNumerator;
+  wire       [32:0]   _zz_memory_MulDivIterativePlugin_div_result_1;
+  wire       [32:0]   _zz_memory_MulDivIterativePlugin_div_result_2;
+  wire       [32:0]   _zz_memory_MulDivIterativePlugin_div_result_3;
+  wire       [32:0]   _zz_memory_MulDivIterativePlugin_div_result_4;
+  wire       [0:0]    _zz_memory_MulDivIterativePlugin_div_result_5;
+  wire       [32:0]   _zz_memory_MulDivIterativePlugin_rs1_2;
+  wire       [0:0]    _zz_memory_MulDivIterativePlugin_rs1_3;
+  wire       [31:0]   _zz_memory_MulDivIterativePlugin_rs2_1;
+  wire       [0:0]    _zz_memory_MulDivIterativePlugin_rs2_2;
   wire       [1:0]    _zz__zz_CsrPlugin_exceptionPortCtrl_exceptionContext_code_1;
   wire       [1:0]    _zz__zz_CsrPlugin_exceptionPortCtrl_exceptionContext_code_1_1;
   wire                _zz_when;
@@ -4406,7 +4478,6 @@ module VexRiscv (
   wire                decode_IS_RS1_SIGNED;
   wire                decode_IS_DIV;
   wire                memory_IS_MUL;
-  wire                execute_IS_MUL;
   wire                decode_IS_MUL;
   wire       [1:0]    _zz_execute_to_memory_SHIFT_CTRL;
   wire       [1:0]    _zz_execute_to_memory_SHIFT_CTRL_1;
@@ -4479,6 +4550,7 @@ module VexRiscv (
   wire       [33:0]   memory_MUL_LH;
   wire       [31:0]   memory_MUL_LL;
   (* keep , syn_keep *) wire       [31:0]   execute_RS2 /* synthesis syn_keep = 1 */ ;
+  wire                execute_IS_MUL;
   wire       [31:0]   memory_SHIFT_RIGHT;
   wire       [1:0]    memory_SHIFT_CTRL;
   wire       [1:0]    _zz_memory_SHIFT_CTRL;
@@ -4786,6 +4858,11 @@ module VexRiscv (
   reg                 execute_MulPlugin_bSigned;
   wire       [31:0]   execute_MulPlugin_a;
   wire       [31:0]   execute_MulPlugin_b;
+  reg        [1:0]    execute_MulPlugin_delayLogic_counter;
+  wire                when_MulPlugin_l65;
+  wire                when_MulPlugin_l70;
+  reg        [31:0]   execute_MulPlugin_withInputBuffer_rs1;
+  reg        [31:0]   execute_MulPlugin_withInputBuffer_rs2;
   wire       [1:0]    switch_MulPlugin_l87;
   wire       [15:0]   execute_MulPlugin_aULow;
   wire       [15:0]   execute_MulPlugin_bULow;
@@ -4793,38 +4870,46 @@ module VexRiscv (
   wire       [16:0]   execute_MulPlugin_bSLow;
   wire       [16:0]   execute_MulPlugin_aHigh;
   wire       [16:0]   execute_MulPlugin_bHigh;
+  reg        [31:0]   execute_MulPlugin_withOuputBuffer_mul_ll;
+  reg        [33:0]   execute_MulPlugin_withOuputBuffer_mul_lh;
+  reg        [33:0]   execute_MulPlugin_withOuputBuffer_mul_hl;
+  reg        [33:0]   execute_MulPlugin_withOuputBuffer_mul_hh;
   wire       [65:0]   writeBack_MulPlugin_result;
   wire                when_MulPlugin_l147;
   wire       [1:0]    switch_MulPlugin_l148;
-  reg        [32:0]   memory_DivPlugin_rs1;
-  reg        [31:0]   memory_DivPlugin_rs2;
-  reg        [64:0]   memory_DivPlugin_accumulator;
-  wire                memory_DivPlugin_frontendOk;
-  reg                 memory_DivPlugin_div_needRevert;
-  reg                 memory_DivPlugin_div_counter_willIncrement;
-  reg                 memory_DivPlugin_div_counter_willClear;
-  reg        [5:0]    memory_DivPlugin_div_counter_valueNext;
-  reg        [5:0]    memory_DivPlugin_div_counter_value;
-  wire                memory_DivPlugin_div_counter_willOverflowIfInc;
-  wire                memory_DivPlugin_div_counter_willOverflow;
-  reg                 memory_DivPlugin_div_done;
+  reg        [32:0]   memory_MulDivIterativePlugin_rs1;
+  reg        [31:0]   memory_MulDivIterativePlugin_rs2;
+  reg        [64:0]   memory_MulDivIterativePlugin_accumulator;
+  wire                memory_MulDivIterativePlugin_frontendOk;
+  reg                 memory_MulDivIterativePlugin_div_needRevert;
+  reg                 memory_MulDivIterativePlugin_div_counter_willIncrement;
+  reg                 memory_MulDivIterativePlugin_div_counter_willClear;
+  reg        [4:0]    memory_MulDivIterativePlugin_div_counter_valueNext;
+  reg        [4:0]    memory_MulDivIterativePlugin_div_counter_value;
+  wire                memory_MulDivIterativePlugin_div_counter_willOverflowIfInc;
+  wire                memory_MulDivIterativePlugin_div_counter_willOverflow;
+  reg                 memory_MulDivIterativePlugin_div_done;
   wire                when_MulDivIterativePlugin_l126;
   wire                when_MulDivIterativePlugin_l126_1;
-  reg        [31:0]   memory_DivPlugin_div_result;
+  reg        [31:0]   memory_MulDivIterativePlugin_div_result;
   wire                when_MulDivIterativePlugin_l128;
   wire                when_MulDivIterativePlugin_l129;
   wire                when_MulDivIterativePlugin_l132;
-  wire       [31:0]   _zz_memory_DivPlugin_div_stage_0_remainderShifted;
-  wire       [32:0]   memory_DivPlugin_div_stage_0_remainderShifted;
-  wire       [32:0]   memory_DivPlugin_div_stage_0_remainderMinusDenominator;
-  wire       [31:0]   memory_DivPlugin_div_stage_0_outRemainder;
-  wire       [31:0]   memory_DivPlugin_div_stage_0_outNumerator;
+  wire       [31:0]   _zz_memory_MulDivIterativePlugin_div_stage_0_remainderShifted;
+  wire       [32:0]   memory_MulDivIterativePlugin_div_stage_0_remainderShifted;
+  wire       [32:0]   memory_MulDivIterativePlugin_div_stage_0_remainderMinusDenominator;
+  wire       [31:0]   memory_MulDivIterativePlugin_div_stage_0_outRemainder;
+  wire       [31:0]   memory_MulDivIterativePlugin_div_stage_0_outNumerator;
+  wire       [32:0]   memory_MulDivIterativePlugin_div_stage_1_remainderShifted;
+  wire       [32:0]   memory_MulDivIterativePlugin_div_stage_1_remainderMinusDenominator;
+  wire       [31:0]   memory_MulDivIterativePlugin_div_stage_1_outRemainder;
+  wire       [31:0]   memory_MulDivIterativePlugin_div_stage_1_outNumerator;
   wire                when_MulDivIterativePlugin_l151;
-  wire       [31:0]   _zz_memory_DivPlugin_div_result;
+  wire       [31:0]   _zz_memory_MulDivIterativePlugin_div_result;
   wire                when_MulDivIterativePlugin_l162;
-  wire                _zz_memory_DivPlugin_rs2;
-  wire                _zz_memory_DivPlugin_rs1;
-  reg        [32:0]   _zz_memory_DivPlugin_rs1_1;
+  wire                _zz_memory_MulDivIterativePlugin_rs2;
+  wire                _zz_memory_MulDivIterativePlugin_rs1;
+  reg        [32:0]   _zz_memory_MulDivIterativePlugin_rs1_1;
   wire       [1:0]    CsrPlugin_misa_base;
   wire       [25:0]   CsrPlugin_misa_extensions;
   wire       [1:0]    CsrPlugin_mtvec_mode;
@@ -5594,21 +5679,25 @@ module VexRiscv (
   assign _zz_writeBack_MulPlugin_result_1 = ({32'd0,writeBack_MUL_HH} <<< 6'd32);
   assign _zz__zz_decode_RS2_2 = writeBack_MUL_LOW[31 : 0];
   assign _zz__zz_decode_RS2_2_1 = writeBack_MulPlugin_result[63 : 32];
-  assign _zz_memory_DivPlugin_div_counter_valueNext_1 = memory_DivPlugin_div_counter_willIncrement;
-  assign _zz_memory_DivPlugin_div_counter_valueNext = {5'd0, _zz_memory_DivPlugin_div_counter_valueNext_1};
-  assign _zz_memory_DivPlugin_div_stage_0_remainderMinusDenominator = {1'd0, memory_DivPlugin_rs2};
-  assign _zz_memory_DivPlugin_div_stage_0_outRemainder = memory_DivPlugin_div_stage_0_remainderMinusDenominator[31:0];
-  assign _zz_memory_DivPlugin_div_stage_0_outRemainder_1 = memory_DivPlugin_div_stage_0_remainderShifted[31:0];
-  assign _zz_memory_DivPlugin_div_stage_0_outNumerator = {_zz_memory_DivPlugin_div_stage_0_remainderShifted,(! memory_DivPlugin_div_stage_0_remainderMinusDenominator[32])};
-  assign _zz_memory_DivPlugin_div_result_1 = _zz_memory_DivPlugin_div_result_2;
-  assign _zz_memory_DivPlugin_div_result_2 = _zz_memory_DivPlugin_div_result_3;
-  assign _zz_memory_DivPlugin_div_result_3 = ({memory_DivPlugin_div_needRevert,(memory_DivPlugin_div_needRevert ? (~ _zz_memory_DivPlugin_div_result) : _zz_memory_DivPlugin_div_result)} + _zz_memory_DivPlugin_div_result_4);
-  assign _zz_memory_DivPlugin_div_result_5 = memory_DivPlugin_div_needRevert;
-  assign _zz_memory_DivPlugin_div_result_4 = {32'd0, _zz_memory_DivPlugin_div_result_5};
-  assign _zz_memory_DivPlugin_rs1_3 = _zz_memory_DivPlugin_rs1;
-  assign _zz_memory_DivPlugin_rs1_2 = {32'd0, _zz_memory_DivPlugin_rs1_3};
-  assign _zz_memory_DivPlugin_rs2_2 = _zz_memory_DivPlugin_rs2;
-  assign _zz_memory_DivPlugin_rs2_1 = {31'd0, _zz_memory_DivPlugin_rs2_2};
+  assign _zz_memory_MulDivIterativePlugin_div_counter_valueNext_1 = memory_MulDivIterativePlugin_div_counter_willIncrement;
+  assign _zz_memory_MulDivIterativePlugin_div_counter_valueNext = {4'd0, _zz_memory_MulDivIterativePlugin_div_counter_valueNext_1};
+  assign _zz_memory_MulDivIterativePlugin_div_stage_0_remainderMinusDenominator = {1'd0, memory_MulDivIterativePlugin_rs2};
+  assign _zz_memory_MulDivIterativePlugin_div_stage_0_outRemainder = memory_MulDivIterativePlugin_div_stage_0_remainderMinusDenominator[31:0];
+  assign _zz_memory_MulDivIterativePlugin_div_stage_0_outRemainder_1 = memory_MulDivIterativePlugin_div_stage_0_remainderShifted[31:0];
+  assign _zz_memory_MulDivIterativePlugin_div_stage_0_outNumerator = {_zz_memory_MulDivIterativePlugin_div_stage_0_remainderShifted,(! memory_MulDivIterativePlugin_div_stage_0_remainderMinusDenominator[32])};
+  assign _zz_memory_MulDivIterativePlugin_div_stage_1_remainderMinusDenominator = {1'd0, memory_MulDivIterativePlugin_rs2};
+  assign _zz_memory_MulDivIterativePlugin_div_stage_1_outRemainder = memory_MulDivIterativePlugin_div_stage_1_remainderMinusDenominator[31:0];
+  assign _zz_memory_MulDivIterativePlugin_div_stage_1_outRemainder_1 = memory_MulDivIterativePlugin_div_stage_1_remainderShifted[31:0];
+  assign _zz_memory_MulDivIterativePlugin_div_stage_1_outNumerator = {memory_MulDivIterativePlugin_div_stage_0_outNumerator,(! memory_MulDivIterativePlugin_div_stage_1_remainderMinusDenominator[32])};
+  assign _zz_memory_MulDivIterativePlugin_div_result_1 = _zz_memory_MulDivIterativePlugin_div_result_2;
+  assign _zz_memory_MulDivIterativePlugin_div_result_2 = _zz_memory_MulDivIterativePlugin_div_result_3;
+  assign _zz_memory_MulDivIterativePlugin_div_result_3 = ({memory_MulDivIterativePlugin_div_needRevert,(memory_MulDivIterativePlugin_div_needRevert ? (~ _zz_memory_MulDivIterativePlugin_div_result) : _zz_memory_MulDivIterativePlugin_div_result)} + _zz_memory_MulDivIterativePlugin_div_result_4);
+  assign _zz_memory_MulDivIterativePlugin_div_result_5 = memory_MulDivIterativePlugin_div_needRevert;
+  assign _zz_memory_MulDivIterativePlugin_div_result_4 = {32'd0, _zz_memory_MulDivIterativePlugin_div_result_5};
+  assign _zz_memory_MulDivIterativePlugin_rs1_3 = _zz_memory_MulDivIterativePlugin_rs1;
+  assign _zz_memory_MulDivIterativePlugin_rs1_2 = {32'd0, _zz_memory_MulDivIterativePlugin_rs1_3};
+  assign _zz_memory_MulDivIterativePlugin_rs2_2 = _zz_memory_MulDivIterativePlugin_rs2;
+  assign _zz_memory_MulDivIterativePlugin_rs2_1 = {31'd0, _zz_memory_MulDivIterativePlugin_rs2_2};
   assign _zz__zz_CsrPlugin_exceptionPortCtrl_exceptionContext_code_1 = (_zz_CsrPlugin_exceptionPortCtrl_exceptionContext_code & (~ _zz__zz_CsrPlugin_exceptionPortCtrl_exceptionContext_code_1_1));
   assign _zz__zz_CsrPlugin_exceptionPortCtrl_exceptionContext_code_1_1 = (_zz_CsrPlugin_exceptionPortCtrl_exceptionContext_code - 2'b01);
   assign _zz__zz_IBusCachedPlugin_jump_pcLoad_payload_1 = (_zz_IBusCachedPlugin_jump_pcLoad_payload - 4'b0001);
@@ -6706,10 +6795,10 @@ module VexRiscv (
   assign memory_MEMORY_STORE_DATA_RF = execute_to_memory_MEMORY_STORE_DATA_RF;
   assign execute_MEMORY_STORE_DATA_RF = _zz_execute_MEMORY_STORE_DATA_RF;
   assign memory_MUL_HH = execute_to_memory_MUL_HH;
-  assign execute_MUL_HH = ($signed(execute_MulPlugin_aHigh) * $signed(execute_MulPlugin_bHigh));
-  assign execute_MUL_HL = ($signed(execute_MulPlugin_aHigh) * $signed(execute_MulPlugin_bSLow));
-  assign execute_MUL_LH = ($signed(execute_MulPlugin_aSLow) * $signed(execute_MulPlugin_bHigh));
-  assign execute_MUL_LL = (execute_MulPlugin_aULow * execute_MulPlugin_bULow);
+  assign execute_MUL_HH = execute_MulPlugin_withOuputBuffer_mul_hh;
+  assign execute_MUL_HL = execute_MulPlugin_withOuputBuffer_mul_hl;
+  assign execute_MUL_LH = execute_MulPlugin_withOuputBuffer_mul_lh;
+  assign execute_MUL_LL = execute_MulPlugin_withOuputBuffer_mul_ll;
   assign execute_SHIFT_RIGHT = _zz_execute_SHIFT_RIGHT;
   assign execute_BRANCH_CALC = {execute_BranchPlugin_branchAdder[31 : 1],1'b0};
   assign execute_BRANCH_DO = ((execute_PREDICTION_HAD_BRANCHED2 != execute_BRANCH_COND_RESULT) || execute_BranchPlugin_missAlignedTarget);
@@ -6740,7 +6829,6 @@ module VexRiscv (
   assign decode_IS_RS1_SIGNED = _zz_decode_IS_SFENCE_VMA2[23];
   assign decode_IS_DIV = _zz_decode_IS_SFENCE_VMA2[22];
   assign memory_IS_MUL = execute_to_memory_IS_MUL;
-  assign execute_IS_MUL = decode_to_execute_IS_MUL;
   assign decode_IS_MUL = _zz_decode_IS_SFENCE_VMA2[21];
   assign _zz_execute_to_memory_SHIFT_CTRL = _zz_execute_to_memory_SHIFT_CTRL_1;
   assign decode_SHIFT_CTRL = _zz_decode_SHIFT_CTRL;
@@ -6852,6 +6940,7 @@ module VexRiscv (
   assign memory_MUL_LH = execute_to_memory_MUL_LH;
   assign memory_MUL_LL = execute_to_memory_MUL_LL;
   assign execute_RS2 = decode_to_execute_RS2;
+  assign execute_IS_MUL = decode_to_execute_IS_MUL;
   assign memory_SHIFT_RIGHT = execute_to_memory_SHIFT_RIGHT;
   assign memory_SHIFT_CTRL = _zz_memory_SHIFT_CTRL;
   assign execute_SHIFT_CTRL = _zz_execute_SHIFT_CTRL;
@@ -6884,7 +6973,7 @@ module VexRiscv (
       endcase
     end
     if(when_MulDivIterativePlugin_l128) begin
-      _zz_decode_RS2_1 = memory_DivPlugin_div_result;
+      _zz_decode_RS2_1 = memory_MulDivIterativePlugin_div_result;
     end
   end
 
@@ -7060,6 +7149,9 @@ module VexRiscv (
 
   always @(*) begin
     execute_arbitration_haltItself = 1'b0;
+    if(when_MulPlugin_l65) begin
+      execute_arbitration_haltItself = 1'b1;
+    end
     if(when_CsrPlugin_l1519) begin
       if(when_CsrPlugin_l1521) begin
         execute_arbitration_haltItself = 1'b1;
@@ -7763,8 +7855,10 @@ module VexRiscv (
     _zz_decode_RS2_3[31] = memory_SHIFT_RIGHT[0];
   end
 
-  assign execute_MulPlugin_a = execute_RS1;
-  assign execute_MulPlugin_b = execute_RS2;
+  assign when_MulPlugin_l65 = ((execute_arbitration_isValid && execute_IS_MUL) && (execute_MulPlugin_delayLogic_counter != 2'b10));
+  assign when_MulPlugin_l70 = ((! execute_arbitration_isStuck) || execute_arbitration_isStuckByOthers);
+  assign execute_MulPlugin_a = execute_MulPlugin_withInputBuffer_rs1;
+  assign execute_MulPlugin_b = execute_MulPlugin_withInputBuffer_rs2;
   assign switch_MulPlugin_l87 = execute_INSTRUCTION[13 : 12];
   always @(*) begin
     case(switch_MulPlugin_l87)
@@ -7803,54 +7897,58 @@ module VexRiscv (
   assign writeBack_MulPlugin_result = ($signed(_zz_writeBack_MulPlugin_result) + $signed(_zz_writeBack_MulPlugin_result_1));
   assign when_MulPlugin_l147 = (writeBack_arbitration_isValid && writeBack_IS_MUL);
   assign switch_MulPlugin_l148 = writeBack_INSTRUCTION[13 : 12];
-  assign memory_DivPlugin_frontendOk = 1'b1;
+  assign memory_MulDivIterativePlugin_frontendOk = 1'b1;
   always @(*) begin
-    memory_DivPlugin_div_counter_willIncrement = 1'b0;
+    memory_MulDivIterativePlugin_div_counter_willIncrement = 1'b0;
     if(when_MulDivIterativePlugin_l128) begin
       if(when_MulDivIterativePlugin_l132) begin
-        memory_DivPlugin_div_counter_willIncrement = 1'b1;
+        memory_MulDivIterativePlugin_div_counter_willIncrement = 1'b1;
       end
     end
   end
 
   always @(*) begin
-    memory_DivPlugin_div_counter_willClear = 1'b0;
+    memory_MulDivIterativePlugin_div_counter_willClear = 1'b0;
     if(when_MulDivIterativePlugin_l162) begin
-      memory_DivPlugin_div_counter_willClear = 1'b1;
+      memory_MulDivIterativePlugin_div_counter_willClear = 1'b1;
     end
   end
 
-  assign memory_DivPlugin_div_counter_willOverflowIfInc = (memory_DivPlugin_div_counter_value == 6'h21);
-  assign memory_DivPlugin_div_counter_willOverflow = (memory_DivPlugin_div_counter_willOverflowIfInc && memory_DivPlugin_div_counter_willIncrement);
+  assign memory_MulDivIterativePlugin_div_counter_willOverflowIfInc = (memory_MulDivIterativePlugin_div_counter_value == 5'h11);
+  assign memory_MulDivIterativePlugin_div_counter_willOverflow = (memory_MulDivIterativePlugin_div_counter_willOverflowIfInc && memory_MulDivIterativePlugin_div_counter_willIncrement);
   always @(*) begin
-    if(memory_DivPlugin_div_counter_willOverflow) begin
-      memory_DivPlugin_div_counter_valueNext = 6'h00;
+    if(memory_MulDivIterativePlugin_div_counter_willOverflow) begin
+      memory_MulDivIterativePlugin_div_counter_valueNext = 5'h00;
     end else begin
-      memory_DivPlugin_div_counter_valueNext = (memory_DivPlugin_div_counter_value + _zz_memory_DivPlugin_div_counter_valueNext);
+      memory_MulDivIterativePlugin_div_counter_valueNext = (memory_MulDivIterativePlugin_div_counter_value + _zz_memory_MulDivIterativePlugin_div_counter_valueNext);
     end
-    if(memory_DivPlugin_div_counter_willClear) begin
-      memory_DivPlugin_div_counter_valueNext = 6'h00;
+    if(memory_MulDivIterativePlugin_div_counter_willClear) begin
+      memory_MulDivIterativePlugin_div_counter_valueNext = 5'h00;
     end
   end
 
-  assign when_MulDivIterativePlugin_l126 = (memory_DivPlugin_div_counter_value == 6'h20);
+  assign when_MulDivIterativePlugin_l126 = (memory_MulDivIterativePlugin_div_counter_value == 5'h10);
   assign when_MulDivIterativePlugin_l126_1 = (! memory_arbitration_isStuck);
   assign when_MulDivIterativePlugin_l128 = (memory_arbitration_isValid && memory_IS_DIV);
-  assign when_MulDivIterativePlugin_l129 = ((! memory_DivPlugin_frontendOk) || (! memory_DivPlugin_div_done));
-  assign when_MulDivIterativePlugin_l132 = (memory_DivPlugin_frontendOk && (! memory_DivPlugin_div_done));
-  assign _zz_memory_DivPlugin_div_stage_0_remainderShifted = memory_DivPlugin_rs1[31 : 0];
-  assign memory_DivPlugin_div_stage_0_remainderShifted = {memory_DivPlugin_accumulator[31 : 0],_zz_memory_DivPlugin_div_stage_0_remainderShifted[31]};
-  assign memory_DivPlugin_div_stage_0_remainderMinusDenominator = (memory_DivPlugin_div_stage_0_remainderShifted - _zz_memory_DivPlugin_div_stage_0_remainderMinusDenominator);
-  assign memory_DivPlugin_div_stage_0_outRemainder = ((! memory_DivPlugin_div_stage_0_remainderMinusDenominator[32]) ? _zz_memory_DivPlugin_div_stage_0_outRemainder : _zz_memory_DivPlugin_div_stage_0_outRemainder_1);
-  assign memory_DivPlugin_div_stage_0_outNumerator = _zz_memory_DivPlugin_div_stage_0_outNumerator[31:0];
-  assign when_MulDivIterativePlugin_l151 = (memory_DivPlugin_div_counter_value == 6'h20);
-  assign _zz_memory_DivPlugin_div_result = (memory_INSTRUCTION[13] ? memory_DivPlugin_accumulator[31 : 0] : memory_DivPlugin_rs1[31 : 0]);
+  assign when_MulDivIterativePlugin_l129 = ((! memory_MulDivIterativePlugin_frontendOk) || (! memory_MulDivIterativePlugin_div_done));
+  assign when_MulDivIterativePlugin_l132 = (memory_MulDivIterativePlugin_frontendOk && (! memory_MulDivIterativePlugin_div_done));
+  assign _zz_memory_MulDivIterativePlugin_div_stage_0_remainderShifted = memory_MulDivIterativePlugin_rs1[31 : 0];
+  assign memory_MulDivIterativePlugin_div_stage_0_remainderShifted = {memory_MulDivIterativePlugin_accumulator[31 : 0],_zz_memory_MulDivIterativePlugin_div_stage_0_remainderShifted[31]};
+  assign memory_MulDivIterativePlugin_div_stage_0_remainderMinusDenominator = (memory_MulDivIterativePlugin_div_stage_0_remainderShifted - _zz_memory_MulDivIterativePlugin_div_stage_0_remainderMinusDenominator);
+  assign memory_MulDivIterativePlugin_div_stage_0_outRemainder = ((! memory_MulDivIterativePlugin_div_stage_0_remainderMinusDenominator[32]) ? _zz_memory_MulDivIterativePlugin_div_stage_0_outRemainder : _zz_memory_MulDivIterativePlugin_div_stage_0_outRemainder_1);
+  assign memory_MulDivIterativePlugin_div_stage_0_outNumerator = _zz_memory_MulDivIterativePlugin_div_stage_0_outNumerator[31:0];
+  assign memory_MulDivIterativePlugin_div_stage_1_remainderShifted = {memory_MulDivIterativePlugin_div_stage_0_outRemainder,memory_MulDivIterativePlugin_div_stage_0_outNumerator[31]};
+  assign memory_MulDivIterativePlugin_div_stage_1_remainderMinusDenominator = (memory_MulDivIterativePlugin_div_stage_1_remainderShifted - _zz_memory_MulDivIterativePlugin_div_stage_1_remainderMinusDenominator);
+  assign memory_MulDivIterativePlugin_div_stage_1_outRemainder = ((! memory_MulDivIterativePlugin_div_stage_1_remainderMinusDenominator[32]) ? _zz_memory_MulDivIterativePlugin_div_stage_1_outRemainder : _zz_memory_MulDivIterativePlugin_div_stage_1_outRemainder_1);
+  assign memory_MulDivIterativePlugin_div_stage_1_outNumerator = _zz_memory_MulDivIterativePlugin_div_stage_1_outNumerator[31:0];
+  assign when_MulDivIterativePlugin_l151 = (memory_MulDivIterativePlugin_div_counter_value == 5'h10);
+  assign _zz_memory_MulDivIterativePlugin_div_result = (memory_INSTRUCTION[13] ? memory_MulDivIterativePlugin_accumulator[31 : 0] : memory_MulDivIterativePlugin_rs1[31 : 0]);
   assign when_MulDivIterativePlugin_l162 = (! memory_arbitration_isStuck);
-  assign _zz_memory_DivPlugin_rs2 = (execute_RS2[31] && execute_IS_RS2_SIGNED);
-  assign _zz_memory_DivPlugin_rs1 = (1'b0 || ((execute_IS_DIV && execute_RS1[31]) && execute_IS_RS1_SIGNED));
+  assign _zz_memory_MulDivIterativePlugin_rs2 = (execute_RS2[31] && execute_IS_RS2_SIGNED);
+  assign _zz_memory_MulDivIterativePlugin_rs1 = (1'b0 || ((execute_IS_DIV && execute_RS1[31]) && execute_IS_RS1_SIGNED));
   always @(*) begin
-    _zz_memory_DivPlugin_rs1_1[32] = (execute_IS_RS1_SIGNED && execute_RS1[31]);
-    _zz_memory_DivPlugin_rs1_1[31 : 0] = execute_RS1;
+    _zz_memory_MulDivIterativePlugin_rs1_1[32] = (execute_IS_RS1_SIGNED && execute_RS1[31]);
+    _zz_memory_MulDivIterativePlugin_rs1_1[31 : 0] = execute_RS1;
   end
 
   always @(*) begin
@@ -9336,7 +9434,7 @@ module VexRiscv (
     if(reset) begin
       _zz_5 <= 1'b1;
       HazardSimplePlugin_writeBackBuffer_valid <= 1'b0;
-      memory_DivPlugin_div_counter_value <= 6'h00;
+      memory_MulDivIterativePlugin_div_counter_value <= 5'h00;
       CsrPlugin_mtvec_base <= 30'h10000000;
       CsrPlugin_mstatus_MIE <= 1'b0;
       CsrPlugin_mstatus_MPIE <= 1'b0;
@@ -9397,7 +9495,7 @@ module VexRiscv (
     end else begin
       _zz_5 <= 1'b0;
       HazardSimplePlugin_writeBackBuffer_valid <= HazardSimplePlugin_writeBackWrites_valid;
-      memory_DivPlugin_div_counter_value <= memory_DivPlugin_div_counter_valueNext;
+      memory_MulDivIterativePlugin_div_counter_value <= memory_MulDivIterativePlugin_div_counter_valueNext;
       CsrPlugin_mcycle <= (CsrPlugin_mcycle + 64'h0000000000000001);
       if(writeBack_arbitration_isFiring) begin
         CsrPlugin_minstret <= (CsrPlugin_minstret + 64'h0000000000000001);
@@ -9763,26 +9861,36 @@ module VexRiscv (
   always @(posedge clk_cpu) begin
     HazardSimplePlugin_writeBackBuffer_payload_address <= HazardSimplePlugin_writeBackWrites_payload_address;
     HazardSimplePlugin_writeBackBuffer_payload_data <= HazardSimplePlugin_writeBackWrites_payload_data;
+    execute_MulPlugin_delayLogic_counter <= (execute_MulPlugin_delayLogic_counter + 2'b01);
+    if(when_MulPlugin_l70) begin
+      execute_MulPlugin_delayLogic_counter <= 2'b00;
+    end
+    execute_MulPlugin_withInputBuffer_rs1 <= execute_RS1;
+    execute_MulPlugin_withInputBuffer_rs2 <= execute_RS2;
+    execute_MulPlugin_withOuputBuffer_mul_ll <= (execute_MulPlugin_aULow * execute_MulPlugin_bULow);
+    execute_MulPlugin_withOuputBuffer_mul_lh <= ($signed(execute_MulPlugin_aSLow) * $signed(execute_MulPlugin_bHigh));
+    execute_MulPlugin_withOuputBuffer_mul_hl <= ($signed(execute_MulPlugin_aHigh) * $signed(execute_MulPlugin_bSLow));
+    execute_MulPlugin_withOuputBuffer_mul_hh <= ($signed(execute_MulPlugin_aHigh) * $signed(execute_MulPlugin_bHigh));
     if(when_MulDivIterativePlugin_l126) begin
-      memory_DivPlugin_div_done <= 1'b1;
+      memory_MulDivIterativePlugin_div_done <= 1'b1;
     end
     if(when_MulDivIterativePlugin_l126_1) begin
-      memory_DivPlugin_div_done <= 1'b0;
+      memory_MulDivIterativePlugin_div_done <= 1'b0;
     end
     if(when_MulDivIterativePlugin_l128) begin
       if(when_MulDivIterativePlugin_l132) begin
-        memory_DivPlugin_rs1[31 : 0] <= memory_DivPlugin_div_stage_0_outNumerator;
-        memory_DivPlugin_accumulator[31 : 0] <= memory_DivPlugin_div_stage_0_outRemainder;
+        memory_MulDivIterativePlugin_rs1[31 : 0] <= memory_MulDivIterativePlugin_div_stage_1_outNumerator;
+        memory_MulDivIterativePlugin_accumulator[31 : 0] <= memory_MulDivIterativePlugin_div_stage_1_outRemainder;
         if(when_MulDivIterativePlugin_l151) begin
-          memory_DivPlugin_div_result <= _zz_memory_DivPlugin_div_result_1[31:0];
+          memory_MulDivIterativePlugin_div_result <= _zz_memory_MulDivIterativePlugin_div_result_1[31:0];
         end
       end
     end
     if(when_MulDivIterativePlugin_l162) begin
-      memory_DivPlugin_accumulator <= 65'h00000000000000000;
-      memory_DivPlugin_rs1 <= ((_zz_memory_DivPlugin_rs1 ? (~ _zz_memory_DivPlugin_rs1_1) : _zz_memory_DivPlugin_rs1_1) + _zz_memory_DivPlugin_rs1_2);
-      memory_DivPlugin_rs2 <= ((_zz_memory_DivPlugin_rs2 ? (~ execute_RS2) : execute_RS2) + _zz_memory_DivPlugin_rs2_1);
-      memory_DivPlugin_div_needRevert <= ((_zz_memory_DivPlugin_rs1 ^ (_zz_memory_DivPlugin_rs2 && (! execute_INSTRUCTION[13]))) && (! (((execute_RS2 == 32'h00000000) && execute_IS_RS2_SIGNED) && (! execute_INSTRUCTION[13]))));
+      memory_MulDivIterativePlugin_accumulator <= 65'h00000000000000000;
+      memory_MulDivIterativePlugin_rs1 <= ((_zz_memory_MulDivIterativePlugin_rs1 ? (~ _zz_memory_MulDivIterativePlugin_rs1_1) : _zz_memory_MulDivIterativePlugin_rs1_1) + _zz_memory_MulDivIterativePlugin_rs1_2);
+      memory_MulDivIterativePlugin_rs2 <= ((_zz_memory_MulDivIterativePlugin_rs2 ? (~ execute_RS2) : execute_RS2) + _zz_memory_MulDivIterativePlugin_rs2_1);
+      memory_MulDivIterativePlugin_div_needRevert <= ((_zz_memory_MulDivIterativePlugin_rs1 ^ (_zz_memory_MulDivIterativePlugin_rs2 && (! execute_INSTRUCTION[13]))) && (! (((execute_RS2 == 32'h00000000) && execute_IS_RS2_SIGNED) && (! execute_INSTRUCTION[13]))));
     end
     CsrPlugin_mip_MEIP <= externalInterrupt;
     CsrPlugin_mip_MTIP <= timerInterrupt;
@@ -10257,7 +10365,7 @@ endmodule
 
 module Apb3Router (
   input  wire [10:0]   io_input_PADDR,
-  input  wire [2:0]    io_input_PSEL,
+  input  wire [4:0]    io_input_PSEL,
   input  wire          io_input_PENABLE,
   output wire          io_input_PREADY,
   input  wire          io_input_PWRITE,
@@ -10284,6 +10392,20 @@ module Apb3Router (
   output wire          io_outputs_2_PWRITE,
   output wire [31:0]   io_outputs_2_PWDATA,
   input  wire [31:0]   io_outputs_2_PRDATA,
+  output wire [10:0]   io_outputs_3_PADDR,
+  output wire [0:0]    io_outputs_3_PSEL,
+  output wire          io_outputs_3_PENABLE,
+  input  wire          io_outputs_3_PREADY,
+  output wire          io_outputs_3_PWRITE,
+  output wire [31:0]   io_outputs_3_PWDATA,
+  input  wire [31:0]   io_outputs_3_PRDATA,
+  output wire [10:0]   io_outputs_4_PADDR,
+  output wire [0:0]    io_outputs_4_PSEL,
+  output wire          io_outputs_4_PENABLE,
+  input  wire          io_outputs_4_PREADY,
+  output wire          io_outputs_4_PWRITE,
+  output wire [31:0]   io_outputs_4_PWDATA,
+  input  wire [31:0]   io_outputs_4_PRDATA,
   input  wire          clk_peripheral,
   input  wire          reset
 );
@@ -10292,21 +10414,31 @@ module Apb3Router (
   reg        [31:0]   _zz_io_input_PRDATA;
   wire                _zz_selIndex;
   wire                _zz_selIndex_1;
-  reg        [1:0]    selIndex;
+  wire                _zz_selIndex_2;
+  wire                _zz_selIndex_3;
+  reg        [2:0]    selIndex;
 
   always @(*) begin
     case(selIndex)
-      2'b00 : begin
+      3'b000 : begin
         _zz_io_input_PREADY = io_outputs_0_PREADY;
         _zz_io_input_PRDATA = io_outputs_0_PRDATA;
       end
-      2'b01 : begin
+      3'b001 : begin
         _zz_io_input_PREADY = io_outputs_1_PREADY;
         _zz_io_input_PRDATA = io_outputs_1_PRDATA;
       end
-      default : begin
+      3'b010 : begin
         _zz_io_input_PREADY = io_outputs_2_PREADY;
         _zz_io_input_PRDATA = io_outputs_2_PRDATA;
+      end
+      3'b011 : begin
+        _zz_io_input_PREADY = io_outputs_3_PREADY;
+        _zz_io_input_PRDATA = io_outputs_3_PRDATA;
+      end
+      default : begin
+        _zz_io_input_PREADY = io_outputs_4_PREADY;
+        _zz_io_input_PRDATA = io_outputs_4_PRDATA;
       end
     endcase
   end
@@ -10326,12 +10458,24 @@ module Apb3Router (
   assign io_outputs_2_PSEL[0] = io_input_PSEL[2];
   assign io_outputs_2_PWRITE = io_input_PWRITE;
   assign io_outputs_2_PWDATA = io_input_PWDATA;
-  assign _zz_selIndex = io_input_PSEL[1];
-  assign _zz_selIndex_1 = io_input_PSEL[2];
+  assign io_outputs_3_PADDR = io_input_PADDR;
+  assign io_outputs_3_PENABLE = io_input_PENABLE;
+  assign io_outputs_3_PSEL[0] = io_input_PSEL[3];
+  assign io_outputs_3_PWRITE = io_input_PWRITE;
+  assign io_outputs_3_PWDATA = io_input_PWDATA;
+  assign io_outputs_4_PADDR = io_input_PADDR;
+  assign io_outputs_4_PENABLE = io_input_PENABLE;
+  assign io_outputs_4_PSEL[0] = io_input_PSEL[4];
+  assign io_outputs_4_PWRITE = io_input_PWRITE;
+  assign io_outputs_4_PWDATA = io_input_PWDATA;
+  assign _zz_selIndex = io_input_PSEL[3];
+  assign _zz_selIndex_1 = io_input_PSEL[4];
+  assign _zz_selIndex_2 = (io_input_PSEL[1] || _zz_selIndex);
+  assign _zz_selIndex_3 = (io_input_PSEL[2] || _zz_selIndex);
   assign io_input_PREADY = _zz_io_input_PREADY;
   assign io_input_PRDATA = _zz_io_input_PRDATA;
   always @(posedge clk_peripheral) begin
-    selIndex <= {_zz_selIndex_1,_zz_selIndex};
+    selIndex <= {_zz_selIndex_1,{_zz_selIndex_3,_zz_selIndex_2}};
   end
 
 
@@ -10346,7 +10490,7 @@ module Apb3Decoder (
   input  wire [31:0]   io_input_PWDATA,
   output wire [31:0]   io_input_PRDATA,
   output wire [10:0]   io_output_PADDR,
-  output reg  [2:0]    io_output_PSEL,
+  output reg  [4:0]    io_output_PSEL,
   output wire          io_output_PENABLE,
   input  wire          io_output_PREADY,
   output wire          io_output_PWRITE,
@@ -10364,6 +10508,8 @@ module Apb3Decoder (
     io_output_PSEL[0] = (((io_input_PADDR & (~ 11'h00f)) == 11'h100) && io_input_PSEL[0]);
     io_output_PSEL[1] = (((io_input_PADDR & (~ 11'h007)) == 11'h200) && io_input_PSEL[0]);
     io_output_PSEL[2] = (((io_input_PADDR & (~ 11'h01f)) == 11'h300) && io_input_PSEL[0]);
+    io_output_PSEL[3] = (((io_input_PADDR & (~ 11'h03f)) == 11'h400) && io_input_PSEL[0]);
+    io_output_PSEL[4] = (((io_input_PADDR & (~ 11'h03f)) == 11'h500) && io_input_PSEL[0]);
   end
 
   always @(*) begin
@@ -10374,7 +10520,7 @@ module Apb3Decoder (
   end
 
   assign io_input_PRDATA = io_output_PRDATA;
-  assign when_Apb3Decoder_l88 = (io_input_PSEL[0] && (io_output_PSEL == 3'b000));
+  assign when_Apb3Decoder_l88 = (io_input_PSEL[0] && (io_output_PSEL == 5'h00));
 
 endmodule
 

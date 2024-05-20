@@ -103,6 +103,7 @@ class SdcardController extends BlackBox {
     val clk = in Bool()
     val reset = in Bool()
     val sdcard = SDCARD()
+    val interrupt = out Bool()
     val apb = slave(Apb3(Apb3Config(
       addressWidth  = 5,
       dataWidth     = 32,
@@ -121,6 +122,22 @@ class AudioController extends BlackBox {
     val i2c = I2C()
     val apb = slave(Apb3(Apb3Config(
       addressWidth  = 3,
+      dataWidth     = 32,
+      useSlaveError = false
+    )))
+  }
+  noIoPrefix()
+  mapClockDomain(clock=io.clk, reset=io.reset)
+}
+
+class USBHostController extends BlackBox {
+  val io = new Bundle {
+    val clk = in Bool()
+    val reset = in Bool()
+    val usb = USB()
+    val interrupt = out Bool()
+    val apb = slave(Apb3(Apb3Config(
+      addressWidth  = 6,
       dataWidth     = 32,
       useSlaveError = false
     )))

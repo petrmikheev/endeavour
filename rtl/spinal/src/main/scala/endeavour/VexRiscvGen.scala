@@ -38,8 +38,16 @@ class VexRiscvGen(useCache: Boolean, resetVector: BigInt) {
       pessimisticAddressMatch = false
     ),
     new FullBarrelShifterPlugin,
-    new MulPlugin,
-    new DivPlugin,
+    new MulPlugin(
+      inputBuffer = true,
+      outputBuffer = true
+    ),
+    new MulDivIterativePlugin(
+      genMul = false,
+      genDiv = true,
+      mulUnrollFactor = 1,
+      divUnrollFactor = 2
+    ),
     new CsrPlugin(CsrPluginConfig(
       catchIllegalAccess = false,
       mvendorid      = null,

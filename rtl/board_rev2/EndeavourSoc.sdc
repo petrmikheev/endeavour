@@ -81,14 +81,14 @@ derive_clock_uncertainty
 #**************************************************************
 
 set_input_delay -clock {clk48} 0 [get_ports {io_uart_rx io_*_i2c_sda io_plla_clk* io_pllb_clk*}]
-set_input_delay -clock {clk48} 0 [get_ports {io_sdcard_cmd io_sdcard_data* io_sdcard_ndetect}]
+set_input_delay -clock {clk48} 0 [get_ports {io_sdcard_cmd io_sdcard_data* io_sdcard_ndetect io_usb*}]
 
 #**************************************************************
 # Set Output Delay
 #**************************************************************
 
 set_output_delay -clock {clk48} -4.0 [get_ports {io_uart_tx io_audio_* io_pll*i2c*}]
-set_output_delay -clock {clk48} 0 [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data*}]
+set_output_delay -clock {clk48} 0 [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data* io_usb*}]
 
 #**************************************************************
 # Set Clock Groups

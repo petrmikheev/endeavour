@@ -1,0 +1,6 @@
+[submodule "extern/core_usb_host"]
+	path = extern/core_usb_host
+	url = https://github.com/ultraembedded/core_usb_host.git
+[submodule "extern/core_usb_fs_phy"]
+	path = extern/core_usb_fs_phy
+	url = https://github.com/ultraembedded/core_usb_fs_phy.git

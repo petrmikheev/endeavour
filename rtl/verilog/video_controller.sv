@@ -128,7 +128,7 @@ module VideoController(
   reg  [6:0] vCharCounter = 0;
   reg  [2:0] char_px;
   reg  [3:0] char_py = 0;
-  reg  [6:0] text_read_len = 8'd40;
+  reg  [6:0] text_read_len = 7'd40;
 
   reg hDraw = 0;
   reg vDraw = 0;
