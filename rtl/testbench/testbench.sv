@@ -139,9 +139,12 @@ module testbench;
 
   initial begin
     $dumpfile("dump.vcd");
-    $dumpvars(0, testbench);
+    if ($test$plusargs("dump_all"))
+      $dumpvars(0, testbench);
+    else
+      $dumpvars(1, testbench);
 
-    #4000000;
+    #10000000;
     $finish;
   end
 
@@ -156,6 +159,26 @@ module testbench;
     end
   end
 
+  // Initialize RAM content
+  integer ram_file;
+  reg [511:0] ram_file_path;
+  integer ram_offset = 0;
+  initial begin
+    if ($value$plusargs("ram=%s", ram_file_path)) begin
+      if (!$value$plusargs("ram_offset=%x", ram_offset))
+        ram_offset = 0;
+      ram_offset = ram_offset / 2;
+      ram_file = $fopen(ram_file_path, "rb");
+      while (!$feof(ram_file)) begin
+        ram.mem_array[ram_offset + 1][7:0] = $fgetc(ram_file);
+        ram.mem_array[ram_offset + 1][15:8] = $fgetc(ram_file);
+        ram.mem_array[ram_offset][7:0] = $fgetc(ram_file);
+        ram.mem_array[ram_offset][15:8] = $fgetc(ram_file);
+        ram_offset = ram_offset + 2;
+      end
+    end
+  end
+
   // Send uart
   integer uart_send_count = 0;
   integer uart_file = -1;
@@ -167,10 +190,10 @@ module testbench;
   end
 
   reg [7:0] uart_byte;
-  parameter UART_BAUD_RATE = 24_000_000;
+  parameter UART_BAUD_RATE = 16_000_000;
   localparam UART_BIT_TIME = 1_000_000_000.0 / UART_BAUD_RATE;
   initial begin
-    #500000;
+    #400000;
     while (uart_file != -1 && !$feof(uart_file)) begin
       uart_send_count = uart_send_count + 1;
       #UART_BIT_TIME;

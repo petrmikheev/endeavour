@@ -9,7 +9,7 @@ import vexriscv.{plugin, VexRiscv, VexRiscvConfig}
 import vexriscv.ip.{DataCacheConfig, InstructionCacheConfig}
 import vexriscv.ip.fpu.FpuParameter
 
-class VexRiscvGen(useCache: Boolean, resetVector: BigInt) {
+class VexRiscvGen(useCache: Boolean, compressedGen: Boolean, resetVector: BigInt) {
   val plugins = ArrayBuffer(
     new DecoderSimplePlugin(
       catchIllegalInstruction = true
@@ -49,33 +49,48 @@ class VexRiscvGen(useCache: Boolean, resetVector: BigInt) {
       divUnrollFactor = 2
     ),
     new CsrPlugin(CsrPluginConfig(
-      catchIllegalAccess = false,
+      catchIllegalAccess = true,
+      pipelineCsrRead = false,
       mvendorid      = null,
       marchid        = null,
       mimpid         = null,
       mhartid        = null,
-      misaExtensionsInit = (1<<8 /*I*/) | (1<<12 /*M*/),
-      misaAccess     = CsrAccess.READ_ONLY,
-      mtvecAccess    = CsrAccess.WRITE_ONLY,
       mtvecInit      = resetVector,
-      mepcAccess     = CsrAccess.NONE,
-      mscratchGen    = false,
-      mcauseAccess   = CsrAccess.READ_ONLY,
-      mbadaddrAccess = CsrAccess.NONE,
+      misaExtensionsInit = (1<<8 /*I*/) | (1<<12 /*M*/) | (1<<0 /*A*/) | (1<<2 /*C*/) | (1<<18 /*S*/) | (1<<20 /*U*/),
+      misaAccess     = CsrAccess.READ_ONLY,
+      medelegAccess  = CsrAccess.READ_WRITE,
+      midelegAccess  = CsrAccess.READ_WRITE,
+      mtvecAccess    = CsrAccess.READ_WRITE,
+      mepcAccess     = CsrAccess.READ_WRITE,
+      mcauseAccess   = CsrAccess.READ_WRITE,
+      mbadaddrAccess = CsrAccess.READ_WRITE,
+      stvecAccess    = CsrAccess.READ_WRITE,
+      sepcAccess     = CsrAccess.READ_WRITE,
+      scauseAccess   = CsrAccess.READ_WRITE,
+      sbadaddrAccess = CsrAccess.READ_WRITE,
+      userGen        = true,
+      supervisorGen  = true,
+      mscratchGen    = true,
+      sscratchGen    = true,
+      ecallGen       = true,
+      ebreakGen      = true,
+      wfiGenAsWait   = true,
       mcycleAccess   = CsrAccess.READ_ONLY,
       minstretAccess = CsrAccess.READ_ONLY,
-      ecallGen       = false,
-      wfiGenAsWait   = true,
+      scycleAccess   = CsrAccess.READ_ONLY,
+      sinstretAccess = CsrAccess.READ_ONLY,
       ucycleAccess   = CsrAccess.READ_ONLY,
-      uinstretAccess = CsrAccess.READ_ONLY
+      uinstretAccess = CsrAccess.READ_ONLY,
+      utimeAccess    = CsrAccess.READ_ONLY
     ))
     //new FpuPlugin(p = FpuParameter(withDouble = false)),
-    //PMP plugin?
   )
   if (useCache) {
     plugins += new IBusCachedPlugin(
       resetVector = resetVector,
-      compressedGen = false,
+      compressedGen = compressedGen,
+      injectorStage = compressedGen,
+      relaxedPcCalculation = compressedGen,
       prediction = STATIC,
       config = InstructionCacheConfig(
         cacheSize = 4096,
@@ -108,19 +123,16 @@ class VexRiscvGen(useCache: Boolean, resetVector: BigInt) {
         catchAccessError  = true,
         catchIllegal      = true,
         catchUnaligned    = true,
-        withLrSc = true,
-        asyncTagMemory = true,
-        withAmo = true,
+        withLrSc          = true,
+        asyncTagMemory    = true,
+        withAmo           = true,
         withWriteAggregation = false // TODO try true
       ),
       memoryTranslatorPortConfig = MmuPortConfig(
         portTlbSize = 4
       )
     )
-    plugins += new MmuPlugin(
-      virtualRange = _(31 downto 30) === 0x3,
-      ioRange      = _(31 downto 30) === 0x0
-    )
+    plugins += new MmuPlugin(ioRange = _(31 downto 30) === 0x0)
   } else {
     plugins += new IBusSimplePlugin(
       resetVector = resetVector,
@@ -128,7 +140,7 @@ class VexRiscvGen(useCache: Boolean, resetVector: BigInt) {
       cmdForkPersistence = true,
       prediction = NONE,
       catchAccessFault = false,
-      compressedGen = false
+      compressedGen = compressedGen
     )
     plugins += new DBusSimplePlugin
   }

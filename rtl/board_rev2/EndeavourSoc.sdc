@@ -100,8 +100,14 @@ set_output_delay -clock {clk48} 0 [get_ports {io_sdcard_clk io_sdcard_cmd io_sdc
 # Set False Path
 #**************************************************************
 
-set_false_path -from [get_ports {io_nreset io_keys* io_ddr_sdram_dq*}]
-set_false_path -to [get_ports {io_leds* io_dvi_* io_ddr_sdram_*}]
+set_false_path -from [get_ports {io_nreset io_keys*}]
+set_false_path -to [get_ports {io_leds*}]
+set_false_path -to [get_ports {io_dvi_*}]
+
+set_false_path -from [get_ports {io_ddr_sdram_dq*}]
+
+#set_false_path -setup -to [get_ports {io_ddr_sdram_*}]
+set_false_path -hold -to [get_ports {io_ddr_sdram_*}]
 
 #**************************************************************
 # Set Multicycle Path
@@ -117,6 +123,11 @@ set_max_delay -from clk_cpu -to clk48 10.000
 set_max_delay -from clk48 -to clk_cpu 10.000
 set_max_delay -from clk_cpu -to clk_tmds_pixel 30.000
 set_max_delay -from clk_tmds_pixel -to clk_cpu 30.000
+
+set_min_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 6
+set_max_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 7
+set_min_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 6
+set_max_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 7
 
 #**************************************************************
 # Set Minimum Delay

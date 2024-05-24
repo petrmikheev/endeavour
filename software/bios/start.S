@@ -15,7 +15,32 @@ _start:
 .align 2
     j sdwrite_impl # bios_sdwrite
 .align 2
-    .word charmap
+    .word charmap  # BIOS_CHARMAP_ADDR
+.align 2
+    j gets_impl    # bios_gets
+.align 2
+    j uart_read    # bios_read_uart
+.align 2
+wait_reset:        # bios_wait_reset
+    jal uart_flush
+    jal uart_getc
+    # continue to start (reset)
 start:
     li sp, BIOS_STACK_ADDR
+    la t0, trap
+    csrw mtvec, t0
     j main
+trap:
+    csrr a1, mcause
+    la a0, trap_msg
+    csrr a2, mtval
+    csrr a3, mepc
+    mv a4, sp
+    mv a5, ra
+    li sp, BIOS_STACK_ADDR
+    jal printf_impl
+    j wait_reset
+
+.section .rodata
+
+trap_msg: .ascii "TRAP\n\tcause = %8x\n\ttval  = %8x\n\tepc   = %8x\n\tsp\t= %8x\n\tra\t= %8x\n\0"

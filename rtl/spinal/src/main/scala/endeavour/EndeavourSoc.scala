@@ -102,7 +102,7 @@ class EndeavourSoc extends Component {
   ram_ctrl.io.clk_shifted <> board_ctrl.io.clk_ram
   ram_ctrl.io.reset <> board_ctrl.io.reset
 
-  val cpu = new VexRiscvGen(useCache=true, resetVector=internalRamBaseAddr)
+  val cpu = new VexRiscvGen(useCache=true, compressedGen=true, resetVector=internalRamBaseAddr)
 
   var iBus : Axi4ReadOnly = null
   var dBus : Axi4Shared = null
@@ -115,7 +115,9 @@ class EndeavourSoc extends Component {
     case plugin : DBusCachedPlugin => dBus = plugin.dBus.toAxi4Shared(true)
     case plugin : CsrPlugin        => {
       plugin.externalInterrupt := externalInterrupt
+      plugin.externalInterruptS := externalInterrupt
       plugin.timerInterrupt := timerInterrupt
+      plugin.utime := board_ctrl.io.utime
     }
     case _ =>
   }

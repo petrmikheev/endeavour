@@ -96,6 +96,8 @@ module micron_ddr_sdram_model (
     parameter DQS_BITS         = (DQ_BITS + 4) / 8;
     parameter DM_BITS          = DQS_BITS;
 
+`define FULL_MEM
+
 `define sg5B
 
 `ifdef sg5B                               //              Timing Parameters for -5B (CL = 3)

@@ -37,6 +37,8 @@ class BoardController extends BlackBox {
     //val clk_ram_bus = out Bool()
     val clk_peripheral = out Bool()  // uart, audio, usb, sdcard
 
+    val utime = out UInt(64 bits)
+
     val video_mode = in Bits(2 bits)
     val clk_tmds_pixel = out Bool()
     val clk_tmds_x5 = out Bool()

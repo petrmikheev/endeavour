@@ -313,21 +313,24 @@ reg [1:0] buf_ba;
 reg [ROW_BITS-1:0] buf_a;
 
 always @(posedge clk) begin
+//always @(negedge clk_shifted) begin
   buf_rcw_n <= new_rcw_n;
   buf_ba <= new_ba;
   buf_a <= new_a;
 end
 
-SDR_O1 sdr1(.outclock(clk_shifted), .din(buf_rcw_n[2]), .pad_out(ddr_ras_n));
-SDR_O1 sdr2(.outclock(clk_shifted), .din(buf_rcw_n[1]), .pad_out(ddr_cas_n));
-SDR_O1 sdr3(.outclock(clk_shifted), .din(buf_rcw_n[0]), .pad_out(ddr_we_n));
-SDR_O1 sdr4(.outclock(clk_shifted), .din(buf_ba[1]), .pad_out(ddr_ba[1]));
-SDR_O1 sdr5(.outclock(clk_shifted), .din(buf_ba[0]), .pad_out(ddr_ba[0]));
+wire sdr_clock = ~clk;
+
+SDR_O1 sdr1(.outclock(sdr_clock), .din(buf_rcw_n[2]), .pad_out(ddr_ras_n));
+SDR_O1 sdr2(.outclock(sdr_clock), .din(buf_rcw_n[1]), .pad_out(ddr_cas_n));
+SDR_O1 sdr3(.outclock(sdr_clock), .din(buf_rcw_n[0]), .pad_out(ddr_we_n));
+SDR_O1 sdr4(.outclock(sdr_clock), .din(buf_ba[1]), .pad_out(ddr_ba[1]));
+SDR_O1 sdr5(.outclock(sdr_clock), .din(buf_ba[0]), .pad_out(ddr_ba[0]));
 
 genvar sdr_i;
 generate
     for (sdr_i = 0; sdr_i < ROW_BITS; sdr_i = sdr_i + 1) begin : sdr_addr
-        SDR_O1 sdr_a(.outclock(clk_shifted), .din(buf_a[sdr_i]), .pad_out(ddr_a[sdr_i]));
+        SDR_O1 sdr_a(.outclock(sdr_clock), .din(buf_a[sdr_i]), .pad_out(ddr_a[sdr_i]));
     end
 endgenerate
 

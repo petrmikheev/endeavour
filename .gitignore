@@ -24,3 +24,4 @@ rtl/board_rev2/output_files
 rtl/board_rev2/simulation
 software/.clangd
 software/bios/ter*
+software/bootloader/endeavour.dtb

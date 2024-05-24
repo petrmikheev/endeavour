@@ -13,7 +13,6 @@ module UartController (
   output [31:0] apb_PRDATA
 );
 
-  parameter OVERRIDE_DIVISOR = 16'd0;
   parameter FIFO_SIZE = 1024;
   localparam FBITS = $clog2(FIFO_SIZE);
 
@@ -37,6 +36,7 @@ module UartController (
   reg selbuf_conf;
   reg selbuf_receiver;
   reg selbuf_transmitter;
+  reg pwrite_buf;
 
   reg [15:0] divisor;
   reg use_parity;
@@ -52,16 +52,17 @@ module UartController (
   reg [3:0] write_bit_num = 0;
   reg [15:0] write_state = 0;
   reg [8:0] write_data = 0;
-  assign apb_PREADY = ~selbuf_conf | (tx_empty && write_bit_num == 0);
+  assign apb_PREADY = ~selbuf_conf | (tx_empty && write_bit_num == 0) | ~pwrite_buf;
   assign apb_PRDATA = selbuf_conf     ? {13'b0, cstopb, parity_odd, use_parity, divisor} :
                       selbuf_receiver ? {rx_empty, 21'b0, rx_err, rx_outv} :
                                         {tx_full, 31'b0};
 
-  wire rx_err_clear = selbuf_receiver & apb_PENABLE & apb_PWRITE;
+  wire rx_err_clear = selbuf_receiver & apb_PENABLE & pwrite_buf;
 
   always @(posedge clk) begin
+    pwrite_buf <= apb_PWRITE;
     if (reset) begin
-      divisor <= 16'd9;
+      divisor <= 16'd415;
       use_parity <= 0;
       cstopb <= 0;
       selbuf_conf <= 0;
@@ -87,10 +88,8 @@ module UartController (
       selbuf_transmitter <= apb_PSEL && apb_PADDR[3:2] == 2'd1;
       selbuf_conf <= apb_PSEL && apb_PADDR[3:2] == 2'd2;
       if (selbuf_conf) begin
-        // Note: in simulation we ignore apb_PWDATA value and use a small divisor,
-        // otherwise simulation is too slow.
         if (apb_PWRITE & apb_PENABLE) begin
-          divisor <= OVERRIDE_DIVISOR ? OVERRIDE_DIVISOR : apb_PWDATA[15:0];
+          divisor <= apb_PWDATA[15:0];
           {cstopb, parity_odd, use_parity} <= apb_PWDATA[18:16];
         end
       end else if (selbuf_receiver) begin

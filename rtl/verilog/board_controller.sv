@@ -27,6 +27,8 @@ module BoardController(
   output reg clk_tmds_pixel,
   output reg clk_tmds_x5,
 
+  output reg [63:0] utime,
+
   input [1:0] video_mode,
 
   input   [3:0] apb_PADDR,
@@ -63,6 +65,10 @@ module BoardController(
 
   reg [$clog2(RESET_DELAY)-1:0] reset_counter = $clog2(RESET_DELAY)'(RESET_DELAY);
 
+  reg [5:0] utime_counter;
+  reg [63:0] utime_value;
+  reg utime_read_allowed;
+
   always @(posedge clk_peripheral) begin
     if (nreset_in) begin
       if (reset_counter != 0)
@@ -73,6 +79,23 @@ module BoardController(
       reset <= 1;
       reset_counter <= $clog2(RESET_DELAY)'(RESET_DELAY);
     end
+    if (reset) begin
+      utime_counter <= 6'd0;
+      utime_value <= 64'd0;
+      utime_read_allowed <= 0;
+    end else begin
+      if (utime_counter == 6'd16) utime_read_allowed <= 1;
+      else if (utime_counter == 6'd32) utime_read_allowed <= 0;
+      if (utime_counter == 6'd47) begin
+        utime_counter <= 6'd0;
+        utime_value <= utime_value + 1'b1;
+      end else
+        utime_counter <= utime_counter + 1'd1;
+    end
+  end
+
+  always @(posedge clk_cpu) begin
+    if (utime_read_allowed) utime <= utime_value;
   end
 
 `ifdef IVERILOG

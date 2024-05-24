@@ -150,3 +150,81 @@ int sscanf_impl(const char* str, const char* fmt, unsigned* a1, unsigned* a2, un
   }
   return arg - args;
 }
+
+static void wait(volatile int i) {
+  while (i > 0) i--;
+}
+
+void uart_flush() {
+  while (1) {
+    wait(16384);
+    if (IO_PORT(UART_RX) < 0) {
+      IO_PORT(UART_RX) = 0;
+      return;
+    }
+    while (IO_PORT(UART_RX) >= 0);
+  }
+}
+
+int uart_getc() {
+  int x;
+  do { x = IO_PORT(UART_RX); } while (x < 0);
+  if (x > 0xff) IO_PORT(BOARD_LEDS) |= 0x4;  // third LED means UART error
+  return x;
+}
+
+int uart_read(char* dst, int size, unsigned expected_crc, int divisor) {
+  unsigned uart_cfg = IO_PORT(UART_CFG);
+  if (divisor >= 0) {
+    IO_PORT(UART_CFG) = (IO_PORT(UART_CFG) & 0xffff0000) | divisor;
+  }
+  unsigned ncrc = 0xffffffff;
+  for (int i = 0; i < size; ++i) {
+    int x = uart_getc();
+    if (x < 0x100) {
+      *(dst++) = (char)x;
+    } else {
+      uart_flush();
+      IO_PORT(UART_CFG) = uart_cfg;
+      bios_printf("Error %d at pos %d\n", x>>8, i);
+      return 0;
+    }
+    if (expected_crc) {
+      for (int j = 0; j < 8; ++j) {
+        int b = (x ^ ncrc) & 1;
+        ncrc >>= 1;
+        x >>= 1;
+        if (b) ncrc ^= 0xedb88320;
+      }
+    }
+  }
+  IO_PORT(UART_CFG) = uart_cfg;
+  if (expected_crc) {
+    unsigned crc = ~ncrc;
+    if (expected_crc == crc) {
+      bios_printf("CRC OK\n");
+    } else {
+      bios_printf("CRC error %8x != %8x\n", crc, expected_crc);
+      uart_flush();
+      return 0;
+    }
+  }
+  return 1;
+}
+
+int gets_impl(char* buf, int max_size) {
+  char c;
+  int size = 0;
+  do {
+    c = uart_getc();
+    if (c == '\r') c = '\n';
+    if (c == '\b' && size > 0) {
+      size--;
+      bios_putc('\b');
+    }
+    if (c < 32 && c != '\n') continue;
+    bios_putc(c);
+    buf[size++] = c;
+  } while (size < max_size && c != '\n');
+  return size;
+}
