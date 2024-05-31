@@ -198,7 +198,10 @@ int uart_read(char* dst, int size, unsigned expected_crc, int divisor) {
       }
     }
   }
-  IO_PORT(UART_CFG) = uart_cfg;
+  if (divisor >= 0) {
+    IO_PORT(UART_CFG) = uart_cfg;
+    wait(2<<18);
+  }
   if (expected_crc) {
     unsigned crc = ~ncrc;
     if (expected_crc == crc) {

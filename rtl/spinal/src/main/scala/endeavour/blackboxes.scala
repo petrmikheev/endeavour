@@ -38,6 +38,7 @@ class BoardController extends BlackBox {
     val clk_peripheral = out Bool()  // uart, audio, usb, sdcard
 
     val utime = out UInt(64 bits)
+    val timer_interrupt = out Bool()
 
     val video_mode = in Bits(2 bits)
     val clk_tmds_pixel = out Bool()
@@ -47,7 +48,7 @@ class BoardController extends BlackBox {
     val keys = in Bits(2 bits)
 
     val apb = slave(Apb3(Apb3Config(
-      addressWidth  = 4,
+      addressWidth  = 5,
       dataWidth     = 32,
       useSlaveError = false
     )))
@@ -90,6 +91,7 @@ class UartController extends BlackBox {
     val clk = in Bool()
     val reset = in Bool()
     val uart = UART()
+    val interrupt = out Bool()
     val apb = slave(Apb3(Apb3Config(
       addressWidth  = 4,
       dataWidth     = 32,
@@ -122,6 +124,7 @@ class AudioController extends BlackBox {
     val reset = in Bool()
     val shdn = out Bool()
     val i2c = I2C()
+    val interrupt = out Bool()
     val apb = slave(Apb3(Apb3Config(
       addressWidth  = 3,
       dataWidth     = 32,

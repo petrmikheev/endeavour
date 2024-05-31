@@ -26,6 +26,7 @@ wait_reset:        # bios_wait_reset
     jal uart_getc
     # continue to start (reset)
 start:
+    csrci mstatus, 8
     li sp, BIOS_STACK_ADDR
     la t0, trap
     csrw mtvec, t0

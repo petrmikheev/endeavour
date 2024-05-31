@@ -22,22 +22,41 @@ run_kernel:
 
     # delegate all interrupts to S mode
     li t0, -1
+    csrw mie, t0
     csrw mideleg, t0
 
     # delegate some exceptions to S mode
-    li t0, (1<<12) | (1<<13) | (1<<15)
+    li t0, (1<<8) | (1<<12) | (1<<13) | (1<<15)
     csrw medeleg, t0
 
-    # switch to S mode and jump to kernel addr
+    csrwi satp, 0  # turn off virtual memory in S mode
     fence.i
-    mret
+    mret           # switch to S mode and jump to kernel addr
 
 trap:
-    # save context
+    # save sp, t0, t1
     csrw mscratch, sp
     li sp, BIOS_STACK_ADDR - 56
     sw t0, 0(sp)
     sw t1, 4(sp)
+
+    # check timer interrupt
+    li t0, (1<<31) | 7
+    csrr t1, mcause
+    beq t0, t1, timer_interrupt
+
+    li t0, 9
+    bne t0, t1, fatal_trap
+
+    # ecall
+    csrr t0, mepc
+    addi t0, t0, 4
+    csrw mepc, t0  # set mepc to next command to prevent loop
+
+    li t0, 0x54494D45 # timer extension
+    beq t0, a7, set_timer
+
+    # save the rest of the context before calling C code
     sw t2, 8(sp)
     sw t3, 12(sp)
     sw t4, 16(sp)
@@ -51,29 +70,11 @@ trap:
     sw a7, 48(sp)
     sw ra, 52(sp)
 
-    li t0, 9
-    csrr t1, mcause
-    beq t0, t1, ecall
-    mv   a0, t1       # mcause
-    csrr a1, mtval    # mtval
-    csrr a2, mepc     # mepc
-    csrr a3, mscratch # sp
-    mv   a4, ra       # ra
-    jal fatal_trap_handler
-infloop:
-    j infloop
-
-ecall:
-    csrr t0, mepc
-    addi t0, t0, 4
-    csrw mepc, t0
     mv a2, a6
     mv a3, a7
     jal sbi_handler
 
     # restore context
-    lw t0, 0(sp)
-    lw t1, 4(sp)
     lw t2, 8(sp)
     lw t3, 12(sp)
     lw t4, 16(sp)
@@ -86,9 +87,43 @@ ecall:
     lw a6, 44(sp)
     lw a7, 48(sp)
     lw ra, 52(sp)
-    csrr sp, mscratch
+    j trap_ret
 
+set_timer:
+    la t0, BOARD_TIMECMP
+    li t1, -1
+    sw t1, 4(t0)
+    sw a0, 0(t0)
+    sw a1, 4(t0)
+    li t0, 1<<5
+    csrc mip, t0  # clear S timer interrupt
+    li a0, 0
+    li a1, 0
+    j trap_ret
+
+timer_interrupt:
+    la t0, BOARD_TIMECMPH
+    li t1, -1
+    sw t1, 0(t0)  # disable timer to prevent loop
+    li t0, 1<<5
+    csrs mip, t0  # trigger S timer interrupt
+    # continue to trap_ret
+
+trap_ret:
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    csrr sp, mscratch
     mret
+
+fatal_trap:
+    mv   a0, t1       # mcause
+    csrr a1, mtval    # mtval
+    csrr a2, mepc     # mepc
+    csrr a3, mscratch # sp
+    mv   a4, ra       # ra
+    jal fatal_trap_handler
+infloop:
+    j infloop
 
 .global dtb
 .align 3

@@ -11,7 +11,9 @@ module AudioController (
   output        apb_PREADY,
   input         apb_PWRITE,
   input  [31:0] apb_PWDATA,
-  output [31:0] apb_PRDATA
+  output [31:0] apb_PRDATA,
+
+  output reg    interrupt
 );
 
   parameter I2C_ADDR = 7'b1100000;
@@ -63,6 +65,7 @@ module AudioController (
 
   always @(posedge clk) begin
     if (reset) begin
+      interrupt <= 0;
       divisor <= 0;
       counter <= 0;
       ina <= 0;

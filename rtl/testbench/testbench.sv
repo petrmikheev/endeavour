@@ -144,7 +144,7 @@ module testbench;
     else
       $dumpvars(1, testbench);
 
-    #10000000;
+    #100000000;
     $finish;
   end
 
@@ -195,21 +195,23 @@ module testbench;
   initial begin
     #400000;
     while (uart_file != -1 && !$feof(uart_file)) begin
-      uart_send_count = uart_send_count + 1;
-      #UART_BIT_TIME;
-      uart_rx = 0; #UART_BIT_TIME;
       uart_byte = $fgetc(uart_file);
-      for (uart_i = 0; uart_i < 8; uart_i = uart_i + 1) begin
-        uart_rx = uart_byte[uart_i]; #UART_BIT_TIME;
+      if (!$feof(uart_file)) begin
+        uart_send_count = uart_send_count + 1;
+        #UART_BIT_TIME;
+        uart_rx = 0; #UART_BIT_TIME;
+        for (uart_i = 0; uart_i < 8; uart_i = uart_i + 1) begin
+          uart_rx = uart_byte[uart_i]; #UART_BIT_TIME;
+        end
+        uart_rx = ^uart_byte;
+        // if (uart_send_count == 40) uart_rx = ~uart_rx;  // simulate parity error
+        #UART_BIT_TIME;  // parity bit
+        /*if (uart_send_count == 57) begin  // simulate framing error
+          uart_rx = 0;
+          #(UART_BIT_TIME*2/3);
+        end*/
+        uart_rx = 1; #UART_BIT_TIME;
       end
-      uart_rx = ^uart_byte;
-      // if (uart_send_count == 40) uart_rx = ~uart_rx;  // simulate parity error
-      #UART_BIT_TIME;  // parity bit
-      /*if (uart_send_count == 57) begin  // simulate framing error
-        uart_rx = 0;
-        #(UART_BIT_TIME*2/3);
-      end*/
-      uart_rx = 1; #UART_BIT_TIME;
     end
   end
 

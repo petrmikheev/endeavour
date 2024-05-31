@@ -48,6 +48,8 @@
 #define BOARD_LEDS     0x800
 #define BOARD_KEYS     0x804
 #define BOARD_CPU_FREQ 0x808
+#define BOARD_TIMECMP  0x80C
+#define BOARD_TIMECMPH 0x810
 
 #define VIDEO_CFG           0x900
 #define VIDEO_TEXT_ADDR     0x904

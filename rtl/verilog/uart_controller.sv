@@ -10,7 +10,9 @@ module UartController (
   output        apb_PREADY,
   input         apb_PWRITE,
   input  [31:0] apb_PWDATA,
-  output [31:0] apb_PRDATA
+  output [31:0] apb_PRDATA,
+
+  output reg    interrupt
 );
 
   parameter FIFO_SIZE = 1024;
@@ -62,6 +64,7 @@ module UartController (
   always @(posedge clk) begin
     pwrite_buf <= apb_PWRITE;
     if (reset) begin
+      interrupt <= 0;
       divisor <= 16'd415;
       use_parity <= 0;
       cstopb <= 0;
@@ -88,7 +91,7 @@ module UartController (
       selbuf_transmitter <= apb_PSEL && apb_PADDR[3:2] == 2'd1;
       selbuf_conf <= apb_PSEL && apb_PADDR[3:2] == 2'd2;
       if (selbuf_conf) begin
-        if (apb_PWRITE & apb_PENABLE) begin
+        if (apb_PWRITE & apb_PENABLE & tx_empty & (write_bit_num == 0)) begin
           divisor <= apb_PWDATA[15:0];
           {cstopb, parity_odd, use_parity} <= apb_PWDATA[18:16];
         end

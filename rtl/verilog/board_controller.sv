@@ -28,10 +28,11 @@ module BoardController(
   output reg clk_tmds_x5,
 
   output reg [63:0] utime,
+  output reg timer_interrupt,
 
   input [1:0] video_mode,
 
-  input   [3:0] apb_PADDR,
+  input   [4:0] apb_PADDR,
   input         apb_PSEL,
   input         apb_PENABLE,
   output        apb_PREADY,
@@ -68,6 +69,7 @@ module BoardController(
   reg [5:0] utime_counter;
   reg [63:0] utime_value;
   reg utime_read_allowed;
+  reg [63:0] utime_cmp;
 
   always @(posedge clk_peripheral) begin
     if (nreset_in) begin
@@ -94,8 +96,13 @@ module BoardController(
     end
   end
 
+  reg tih, tihe, til;
   always @(posedge clk_cpu) begin
     if (utime_read_allowed) utime <= utime_value;
+    tih <= utime[63:32] > utime_cmp[63:32];
+    tihe <= utime[63:32] == utime_cmp[63:32];
+    til <= utime[31:0] >= utime_cmp[31:0];
+    timer_interrupt <= tih | (tihe & til);
   end
 
 `ifdef IVERILOG
@@ -165,15 +172,23 @@ module BoardController(
 `endif
 `endif
 
-  assign apb_PRDATA = apb_PADDR[3] ? 32'(CPU_FREQ) :
-                      apb_PADDR[2] ? {30'b0, keys_normalized} : {29'b0, leds_normalized};
+  reg [2:0] addr;
+  assign apb_PRDATA = addr == 3'd0 ? {29'b0, leds_normalized} :
+                      addr == 3'd1 ? {30'b0, keys_normalized} :
+                      addr == 3'd2 ? 32'(CPU_FREQ) :
+                      addr == 3'd3 ? utime_cmp[31:0] : utime_cmp[63:32];
   assign apb_PREADY = 1'b1;
 
   always @(posedge clk_cpu) begin
-    if (reset)
+    addr <= apb_PADDR[4:2];
+    if (reset) begin
       leds_normalized <= 3'b0;
-    else if (apb_PSEL & apb_PENABLE & apb_PWRITE & apb_PADDR[3:2] == 0)
-      leds_normalized <= apb_PWDATA[2:0];
+      utime_cmp <= '1;
+    end else if (apb_PSEL & apb_PENABLE & apb_PWRITE) begin
+      if (addr == 3'd0) leds_normalized <= apb_PWDATA[2:0];
+      if (addr == 3'd3) utime_cmp[31:0] <= apb_PWDATA;
+      if (addr == 3'd4) utime_cmp[63:32] <= apb_PWDATA;
+    end
   end
 
 endmodule

@@ -106,18 +106,23 @@ class EndeavourSoc extends Component {
 
   var iBus : Axi4ReadOnly = null
   var dBus : Axi4Shared = null
-  val timerInterrupt = False // TODO
-  val externalInterrupt = False // TODO
   for(plugin <- cpu.plugins) plugin match{
     case plugin : IBusSimplePlugin => iBus = plugin.iBus.toAxi4ReadOnly()
     case plugin : IBusCachedPlugin => iBus = plugin.iBus.toAxi4ReadOnly()
     case plugin : DBusSimplePlugin => dBus = plugin.dBus.toAxi4Shared()
     case plugin : DBusCachedPlugin => dBus = plugin.dBus.toAxi4Shared(true)
     case plugin : CsrPlugin        => {
-      plugin.externalInterrupt := externalInterrupt
-      plugin.externalInterruptS := externalInterrupt
-      plugin.timerInterrupt := timerInterrupt
+      plugin.externalInterrupt := False
+      plugin.externalInterruptS := False
+      plugin.timerInterrupt := board_ctrl.io.timer_interrupt
       plugin.utime := board_ctrl.io.utime
+    }
+    case plugin : UserInterruptPlugin => {
+      if (plugin.interrupt.getName() == "uart_interrupt")   { plugin.interrupt := peripheral.uart_ctrl.io.interrupt }
+      if (plugin.interrupt.getName() == "audio_interrupt")   { plugin.interrupt := peripheral.audio_ctrl.io.interrupt }
+      if (plugin.interrupt.getName() == "sdcard_interrupt") { plugin.interrupt := peripheral.sdcard_ctrl.io.interrupt }
+      if (plugin.interrupt.getName() == "usb1_interrupt")   { plugin.interrupt := peripheral.usb1_ctrl.io.interrupt }
+      if (plugin.interrupt.getName() == "usb2_interrupt")   { plugin.interrupt := peripheral.usb2_ctrl.io.interrupt }
     }
     case _ =>
   }
@@ -153,7 +158,7 @@ class EndeavourSoc extends Component {
     master = apbBridge.io.apb,
     slaves = List(
       peripheral_apb_bridge.io.input -> (0x000, 2048),
-      board_ctrl.io.apb  -> (0x800, 16),
+      board_ctrl.io.apb  -> (0x800, 32),
       video_ctrl.io.apb  -> (0x900, 32)
       // 0xa00 timer
     )

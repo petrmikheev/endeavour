@@ -56,7 +56,7 @@ class VexRiscvGen(useCache: Boolean, compressedGen: Boolean, resetVector: BigInt
       mimpid         = null,
       mhartid        = null,
       mtvecInit      = resetVector,
-      misaExtensionsInit = (1<<8 /*I*/) | (1<<12 /*M*/) | (1<<0 /*A*/) | (1<<2 /*C*/) | (1<<18 /*S*/) | (1<<20 /*U*/),
+      misaExtensionsInit = (1<<8 /*I*/) | (1<<12 /*M*/) | (1<<0 /*A*/) | (if (compressedGen) 1<<2 /*C*/ else 0) | (1<<18 /*S*/) | (1<<20 /*U*/),
       misaAccess     = CsrAccess.READ_ONLY,
       medelegAccess  = CsrAccess.READ_WRITE,
       midelegAccess  = CsrAccess.READ_WRITE,
@@ -82,8 +82,13 @@ class VexRiscvGen(useCache: Boolean, compressedGen: Boolean, resetVector: BigInt
       ucycleAccess   = CsrAccess.READ_ONLY,
       uinstretAccess = CsrAccess.READ_ONLY,
       utimeAccess    = CsrAccess.READ_ONLY
-    ))
-    //new FpuPlugin(p = FpuParameter(withDouble = false)),
+    )),
+    new UserInterruptPlugin("uart_interrupt", 0x11),
+    new UserInterruptPlugin("audio_interrupt", 0x12),
+    new UserInterruptPlugin("sdcard_interrupt", 0x13),
+    new UserInterruptPlugin("usb1_interrupt", 0x14),
+    new UserInterruptPlugin("usb2_interrupt", 0x15)
+    //new FpuPlugin(p = FpuParameter(withDouble = false))
   )
   if (useCache) {
     plugins += new IBusCachedPlugin(
