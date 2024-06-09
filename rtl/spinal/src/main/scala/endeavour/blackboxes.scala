@@ -124,7 +124,6 @@ class AudioController extends BlackBox {
     val reset = in Bool()
     val shdn = out Bool()
     val i2c = I2C()
-    val interrupt = out Bool()
     val apb = slave(Apb3(Apb3Config(
       addressWidth  = 3,
       dataWidth     = 32,

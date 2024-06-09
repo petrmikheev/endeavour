@@ -61,8 +61,8 @@ create_clock -name {clk48} -period 20.833 -waveform { 0.000 10.416 } [get_ports 
 
 create_generated_clock -multiply_by 116 -divide_by 75 -source [get_ports io_clk_in] -name clk_tmds_pixel [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[0]]
 create_generated_clock -multiply_by 116 -divide_by 15 -source [get_ports io_clk_in] -name clk_tmds_x5 [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[1]]
-create_generated_clock -multiply_by 116 -divide_by 60 -source [get_ports io_clk_in] -name clk_cpu [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[2]]
-create_generated_clock -multiply_by 116 -divide_by 60 -phase 90 -source [get_ports io_clk_in] -name clk_ram [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[3]]
+create_generated_clock -multiply_by 116 -divide_by 65 -source [get_ports io_clk_in] -name clk_cpu [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[2]]
+create_generated_clock -multiply_by 116 -divide_by 65 -phase 90 -source [get_ports io_clk_in] -name clk_ram [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[3]]
 
 #**************************************************************
 # Set Clock Latency

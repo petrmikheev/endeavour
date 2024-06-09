@@ -37,7 +37,7 @@ static struct uart_driver endeavour_uart_driver = {
   .owner = THIS_MODULE,
   .driver_name = KBUILD_MODNAME,
   .dev_name = "ttyS",
-  .major = 0,
+  .major = 100,
   .minor = 0,
   .nr = 1,
   .cons = &endeavour_console,
@@ -49,7 +49,7 @@ static void endeavour_uart_stop_tx(struct uart_port *port) {
 }
 
 static void endeavour_uart_putchar(struct uart_port *port, unsigned char ch) {
-  while (ioread32(port->membase + REG_TX) < 0)
+  while ((int)ioread32(port->membase + REG_TX) < 0)
     cpu_relax();
   iowrite32(ch, port->membase + REG_TX);
 }
@@ -76,7 +76,7 @@ static void endeavour_uart_set_termios(struct uart_port *port, struct ktermios *
   if (new->c_cflag & CSTOPB) new_cfg |= CFG_CSTOPB;
   if (new->c_cflag & PARENB) new_cfg |= CFG_PARITY_EN;
   if (new->c_cflag & PARODD) new_cfg |= CFG_PARITY_ODD;
-  printk("set_termios %s CFG=0x%x\n", port->name, new_cfg);
+  printk(KERN_INFO "set_termios %s CFG=0x%x\n", port->name, new_cfg);
 
   unsigned long flags;
   uart_port_lock_irqsave(port, &flags);
@@ -229,7 +229,7 @@ static int endeavour_uart_console_setup(struct console *co, char *options)
       output_to_sbi = true;
       uart_options += 4;
     }
-    printk("endeavour console options: %s\n", options);
+    printk(KERN_INFO "endeavour console options: %s\n", options);
     uart_parse_options(uart_options, &baud, &parity, &bits, &flow);
   }
 

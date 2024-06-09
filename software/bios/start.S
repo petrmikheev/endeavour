@@ -21,8 +21,11 @@ _start:
 .align 2
     j uart_read    # bios_read_uart
 .align 2
+    j crc32_impl   # bios_crc32
+.align 2
 wait_reset:        # bios_wait_reset
     jal uart_flush
+    li a0, 0
     jal uart_getc
     # continue to start (reset)
 start:

@@ -102,15 +102,16 @@ int main() {
       "\tW addr val\t\t\t- save 4B to RAM\n"
       "\tR addr\t\t\t\t- load 4B from RAM\n"
       "\tSD addr sector\t\t- load SD card sector to addr\n"
-      "\tUART addr size crc32  - receive size(decimal) bytes via UART\n"
-      "\tFUART addr size crc32 - UART with baud rate 6Mhz\n"
+      "\tUART addr size\t\t- receive size(decimal) bytes via UART\n"
+      "\tFUART addr size\t   - UART with baud rate 12Mhz\n"
+      "\tCRC32 addr size [expected] - calculate crc of data in RAM\n"
       "\tJ addr\t\t\t\t- run code at addr\n\n"
   );
 #endif
 
   while (1) {
     bios_printf("> ");
-    #define CMD_BUF_SIZE 40
+    #define CMD_BUF_SIZE 64
     char cmd[CMD_BUF_SIZE];
     unsigned long addr;
     unsigned val;
@@ -139,15 +140,26 @@ int main() {
         break;
       case 'U':
       case 'F':
-        val = 0;
-        c = bios_sscanf(cmd + fast_uart, "UART %x %d %x", &addr, &size, &val);
-        if (c == 2 || c == 3) {
+        if (bios_sscanf(cmd + fast_uart, "UART %x %d", &addr, &size) == 2) {
           if (addr < BIOS_RAM_ADDR || addr + size <= addr) {
             bios_printf("Invalid destination\n");
             uart_flush();
           } else {
-            bios_read_uart((char*)addr, size, val, fast_uart ? UART_BAUD_RATE(6000000) : -1);
+            bios_read_uart((char*)addr, size, fast_uart ? UART_BAUD_RATE(12000000) : -1);
           }
+          continue;
+        }
+        break;
+      case 'C':
+        val = 0;
+        c = bios_sscanf(cmd + fast_uart, "CRC32 %x %d %x", &addr, &size, &val);
+        if (c == 2 || c == 3) {
+          unsigned crc = bios_crc32((char*)addr, size);
+          bios_printf("%8x", crc);
+          if (val) {
+            bios_printf(crc == val ? " OK" : " ERROR");
+          }
+          bios_putc('\n');
           continue;
         }
         break;

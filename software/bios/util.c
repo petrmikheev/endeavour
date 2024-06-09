@@ -166,51 +166,45 @@ void uart_flush() {
   }
 }
 
-int uart_getc() {
+int uart_getc(int show_cursor) {
   int x;
-  do { x = IO_PORT(UART_RX); } while (x < 0);
+  char* cursor = (char*)(BIOS_TEXT_BUFFER_ADDR + BIOS_CURSOR_POS);
+  if (show_cursor) cursor[1] = BIOS_TEXT_STYLE;
+  do {
+    if (show_cursor) {
+      unsigned time;
+      asm volatile("csrr %0, time" : "=r" (time));
+      cursor[0] = (time & (1<<19)) ? '_' : 0;
+    }
+    x = IO_PORT(UART_RX);
+  } while (x < 0);
+  if (show_cursor) cursor[0] = 0;
   if (x > 0xff) IO_PORT(BOARD_LEDS) |= 0x4;  // third LED means UART error
   return x;
 }
 
-int uart_read(char* dst, int size, unsigned expected_crc, int divisor) {
+int uart_read(char* dst, int size, int divisor) {
   unsigned uart_cfg = IO_PORT(UART_CFG);
   if (divisor >= 0) {
     IO_PORT(UART_CFG) = (IO_PORT(UART_CFG) & 0xffff0000) | divisor;
   }
-  unsigned ncrc = 0xffffffff;
   for (int i = 0; i < size; ++i) {
-    int x = uart_getc();
+    int x = uart_getc(0);
     if (x < 0x100) {
       *(dst++) = (char)x;
     } else {
       uart_flush();
-      IO_PORT(UART_CFG) = uart_cfg;
+      if (divisor >= 0) {
+        IO_PORT(UART_CFG) = uart_cfg;
+        wait(2<<18);
+      }
       bios_printf("Error %d at pos %d\n", x>>8, i);
       return 0;
-    }
-    if (expected_crc) {
-      for (int j = 0; j < 8; ++j) {
-        int b = (x ^ ncrc) & 1;
-        ncrc >>= 1;
-        x >>= 1;
-        if (b) ncrc ^= 0xedb88320;
-      }
     }
   }
   if (divisor >= 0) {
     IO_PORT(UART_CFG) = uart_cfg;
     wait(2<<18);
-  }
-  if (expected_crc) {
-    unsigned crc = ~ncrc;
-    if (expected_crc == crc) {
-      bios_printf("CRC OK\n");
-    } else {
-      bios_printf("CRC error %8x != %8x\n", crc, expected_crc);
-      uart_flush();
-      return 0;
-    }
   }
   return 1;
 }
@@ -219,7 +213,7 @@ int gets_impl(char* buf, int max_size) {
   char c;
   int size = 0;
   do {
-    c = uart_getc();
+    c = uart_getc(1);
     if (c == '\r') c = '\n';
     if (c == '\b' && size > 0) {
       size--;
@@ -230,4 +224,28 @@ int gets_impl(char* buf, int max_size) {
     buf[size++] = c;
   } while (size < max_size && c != '\n');
   return size;
+}
+
+unsigned crc32_impl(const char* data, int size) {
+  unsigned table[16];
+  for (int i = 0; i < 16; ++i) {
+    unsigned c = i;
+    unsigned crc = 0;
+    for (int j = 0; j < 4; ++j) {
+      int b = (c ^ crc) & 1;
+      crc >>= 1;
+      if (b) crc = crc ^ 0xedb88320;
+      c >>= 1;
+    }
+    table[i] = crc;
+  }
+
+  unsigned ncrc = 0xffffffff;
+  for (int i = 0; i < size; ++i) {
+    unsigned c = data[i];
+    ncrc = (ncrc>>4) ^ table[(c^ncrc) & 0xf];
+    c >>= 4;
+    ncrc = (ncrc>>4) ^ table[(c^ncrc) & 0xf];
+  }
+  return ~ncrc;
 }

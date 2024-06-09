@@ -12,7 +12,7 @@ module UartController (
   input  [31:0] apb_PWDATA,
   output [31:0] apb_PRDATA,
 
-  output reg    interrupt
+  output        interrupt
 );
 
   parameter FIFO_SIZE = 1024;
@@ -26,6 +26,7 @@ module UartController (
   reg rx_empty, tx_empty;
   reg tx_full;
   reg rx_err;
+  assign interrupt = ~rx_empty;
 
   always @(posedge clk) begin
     rx_outv <= fifo_rx[rx_outa];
@@ -64,7 +65,6 @@ module UartController (
   always @(posedge clk) begin
     pwrite_buf <= apb_PWRITE;
     if (reset) begin
-      interrupt <= 0;
       divisor <= 16'd415;
       use_parity <= 0;
       cstopb <= 0;

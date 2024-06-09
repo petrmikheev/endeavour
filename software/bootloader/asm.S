@@ -1,9 +1,15 @@
 #include "../include/endeavour_defs.h"
 
+#define STACK_ADDR 0x40002400
+
 .section .text.startup
 .global _start
 _start:
-    li sp, BIOS_STACK_ADDR
+.option push
+.option norelax
+    la gp, __global_pointer$
+.option pop
+    li sp, STACK_ADDR
     la t0, trap
     csrw mtvec, t0
     j main
@@ -14,19 +20,20 @@ run_kernel:
     li a0, 0       # hartid
     la a1, dtb
 
-    # mstatus.mpp = 01 (S mode)
-    li t0, 0x1000
+    # mstatus.mpp = 01 (S mode), unset mie/mpie
+    li t0, 0x1000 | (1<<3) | (1<<7)
     li t1, 0x0800
     csrc mstatus, t0
     csrs mstatus, t1
 
-    # delegate all interrupts to S mode
-    li t0, -1
+    # delegate interrupts to S mode
+    li t0, ~(1<<11)
     csrw mie, t0
+    li t0, -1
     csrw mideleg, t0
 
-    # delegate some exceptions to S mode
-    li t0, (1<<8) | (1<<12) | (1<<13) | (1<<15)
+    # delegate exceptions to S mode
+    li t0, (1<<3) | (1<<5) | (1<<8) | (1<<12) | (1<<13) | (1<<15)
     csrw medeleg, t0
 
     csrwi satp, 0  # turn off virtual memory in S mode
@@ -36,7 +43,7 @@ run_kernel:
 trap:
     # save sp, t0, t1
     csrw mscratch, sp
-    li sp, BIOS_STACK_ADDR - 56
+    li sp, STACK_ADDR - 56
     sw t0, 0(sp)
     sw t1, 4(sp)
 
@@ -125,6 +132,7 @@ fatal_trap:
 infloop:
     j infloop
 
+.section .rodata
 .global dtb
 .align 3
 dtb:

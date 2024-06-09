@@ -82,12 +82,7 @@ class VexRiscvGen(useCache: Boolean, compressedGen: Boolean, resetVector: BigInt
       ucycleAccess   = CsrAccess.READ_ONLY,
       uinstretAccess = CsrAccess.READ_ONLY,
       utimeAccess    = CsrAccess.READ_ONLY
-    )),
-    new UserInterruptPlugin("uart_interrupt", 0x11),
-    new UserInterruptPlugin("audio_interrupt", 0x12),
-    new UserInterruptPlugin("sdcard_interrupt", 0x13),
-    new UserInterruptPlugin("usb1_interrupt", 0x14),
-    new UserInterruptPlugin("usb2_interrupt", 0x15)
+    ))
     //new FpuPlugin(p = FpuParameter(withDouble = false))
   )
   if (useCache) {

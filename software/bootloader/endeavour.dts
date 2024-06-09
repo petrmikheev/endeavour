@@ -8,7 +8,7 @@
 
   chosen {
     bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi debug root=/dev/ram";
-    //bootargs = "console=ttyS0,115200e debug root=/dev/ram init=/bin/busybox -- sh";
+    //bootargs = "console=ttyS0,sbi:115200e root=/dev/ram";
     linux,initrd-start = <0x87000000>;
     linux,initrd-end   = <0x87400000>;
   };
@@ -25,7 +25,7 @@
       riscv,isa-base = "rv32i";
       riscv,isa-extensions = "i", "m", "a", "c", "zicntr", "zicsr", "zifencei";
       mmu-type = "riscv,sv32";
-      cpu0_intc: interrupt-controller {
+      intc0: interrupt-controller {
         #interrupt-cells = <1>;
         interrupt-controller;
         compatible = "riscv,cpu-intc";
@@ -33,10 +33,50 @@
     };
   };
 
-  uart0: serial@100 {
-    compatible = "endeavour,uart";
-    reg = <0x100 0xc>;
+  plic: interrupt-controller@4000000 {
+    compatible = "riscv,plic0";
+    reg = <0x4000000 0x4000000>;
+    #address-cells = <0>;
+    #size-cells = <0>;
+    #interrupt-cells = <1>;
+    interrupt-controller;
+    interrupts-extended = <&intc0 9>;
+    riscv,ndev = <4>;
   };
+
+  uart: serial@100 {
+    compatible = "endeavour,uart";
+    reg = <0x100 12>;
+    interrupts-extended = <&plic 1>;
+  };
+
+  /*audio: audio@200 {
+    compatible = "endeavour,audio";
+    reg = <0x200 8>;
+  };*/
+
+  /*mmcblk: mmcblk@300 {
+    compatible = "endeavour,mmcblk";
+    reg = <0x300 32>;
+    interrupts-extended = <&plic 2>;
+  };*/
+
+  usb1: usb@400 {
+    compatible = "ue11-hcd";
+    reg = <0x400 0x40>;
+    interrupts-extended = <&plic 3>;
+  };
+
+  usb2: usb@500 {
+    compatible = "ue11-hcd";
+    reg = <0x500 0x40>;
+    interrupts-extended = <&plic 4>;
+  };
+
+  /*display: display@900 {
+    compatible = "endeavour,display";
+    reg = <0x900 20>;
+  };*/
 
   memory@80000000 {
     device_type = "memory";

@@ -34,8 +34,8 @@ module testbench;
   pullup(SD_CMD);
 
   wire USB1_DP, USB1_DN, USB2_DP, USB2_DN;
-  pulldown(USB1_DP);
-  pullup(USB1_DN);
+  pulldown(USB1_DN);
+  pullup(USB1_DP);
   pulldown(USB2_DP);
   pulldown(USB2_DN);
 

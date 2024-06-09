@@ -5,6 +5,7 @@ import spinal.lib._
 import spinal.lib.bus.amba3.apb._
 import spinal.lib.bus.amba4.axi._
 import spinal.lib.bus.misc.SizeMapping
+import spinal.lib.misc.plic._
 
 import vexriscv.plugin._
 
@@ -13,7 +14,10 @@ import endeavour.blackboxes._
 
 class EndeavourSoc extends Component {
   val ioBaseAddr = 0x0
-  val ioSize = 4096
+  val ioSize = 0x8000000
+
+  val plicAddr = 0x4000000
+  val plicSize = 0x4000000
 
   val internalRamBaseAddr = 0x40000000L
   val internalRamSize = 16 * 1024
@@ -54,7 +58,6 @@ class EndeavourSoc extends Component {
   video_ctrl.io.tmds_pixel_clk <> board_ctrl.io.clk_tmds_pixel
   video_ctrl.io.tmds_x5_clk <> board_ctrl.io.clk_tmds_x5
   video_ctrl.io.dvi <> io.dvi
-  //board_ctrl.io.video_mode := B(0, 2 bits)
 
   val peripheral = new ClockingArea(ClockDomain(
       clock = board_ctrl.io.clk_peripheral,
@@ -102,6 +105,25 @@ class EndeavourSoc extends Component {
   ram_ctrl.io.clk_shifted <> board_ctrl.io.clk_ram
   ram_ctrl.io.reset <> board_ctrl.io.reset
 
+  val plicPriorityWidth = 1
+  val plic_gateways = List(
+    PlicGatewayActiveHigh(source = peripheral.uart_ctrl.io.interrupt, id = 1, priorityWidth = plicPriorityWidth),
+    PlicGatewayActiveHigh(source = peripheral.sdcard_ctrl.io.interrupt, id = 2, priorityWidth = plicPriorityWidth),
+    PlicGatewayActiveHigh(source = peripheral.usb1_ctrl.io.interrupt, id = 3, priorityWidth = plicPriorityWidth),
+    PlicGatewayActiveHigh(source = peripheral.usb2_ctrl.io.interrupt, id = 4, priorityWidth = plicPriorityWidth)
+  )
+  val plic_target = PlicTarget(id = 0, gateways = plic_gateways, priorityWidth = plicPriorityWidth)
+
+  val plic_apb = Apb3(Apb3Config(
+    addressWidth  = log2Up(plicSize),
+    dataWidth     = 32,
+    useSlaveError = false
+  ))
+  val plic = PlicMapper(Apb3SlaveFactory(plic_apb), PlicMapping.sifive)(
+    gateways = plic_gateways,
+    targets = List(plic_target)
+  )
+
   val cpu = new VexRiscvGen(useCache=true, compressedGen=true, resetVector=internalRamBaseAddr)
 
   var iBus : Axi4ReadOnly = null
@@ -112,17 +134,10 @@ class EndeavourSoc extends Component {
     case plugin : DBusSimplePlugin => dBus = plugin.dBus.toAxi4Shared()
     case plugin : DBusCachedPlugin => dBus = plugin.dBus.toAxi4Shared(true)
     case plugin : CsrPlugin        => {
-      plugin.externalInterrupt := False
-      plugin.externalInterruptS := False
+      plugin.externalInterrupt := plic_target.iep
+      plugin.externalInterruptS := plic_target.iep
       plugin.timerInterrupt := board_ctrl.io.timer_interrupt
       plugin.utime := board_ctrl.io.utime
-    }
-    case plugin : UserInterruptPlugin => {
-      if (plugin.interrupt.getName() == "uart_interrupt")   { plugin.interrupt := peripheral.uart_ctrl.io.interrupt }
-      if (plugin.interrupt.getName() == "audio_interrupt")   { plugin.interrupt := peripheral.audio_ctrl.io.interrupt }
-      if (plugin.interrupt.getName() == "sdcard_interrupt") { plugin.interrupt := peripheral.sdcard_ctrl.io.interrupt }
-      if (plugin.interrupt.getName() == "usb1_interrupt")   { plugin.interrupt := peripheral.usb1_ctrl.io.interrupt }
-      if (plugin.interrupt.getName() == "usb2_interrupt")   { plugin.interrupt := peripheral.usb2_ctrl.io.interrupt }
     }
     case _ =>
   }
@@ -159,8 +174,8 @@ class EndeavourSoc extends Component {
     slaves = List(
       peripheral_apb_bridge.io.input -> (0x000, 2048),
       board_ctrl.io.apb  -> (0x800, 32),
-      video_ctrl.io.apb  -> (0x900, 32)
-      // 0xa00 timer
+      video_ctrl.io.apb  -> (0x900, 32),
+      plic_apb           -> (plicAddr, plicSize)
     )
   )
 }
