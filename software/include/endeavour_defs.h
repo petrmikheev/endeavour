@@ -9,8 +9,9 @@
 
 #define BIOS_CHARMAP_ADDR (*(unsigned long*)(BIOS_ROM_ADDR + 0x18))
 
-#define BIOS_STACK_ADDR 0x40003FEC
+#define BIOS_STACK_ADDR 0x40003FE8
 
+#define SDCARD_RCA *(unsigned*)0x40003FE8
 #define SDCARD_SECTOR_COUNT *(unsigned*)0x40003FFC
 #define SDCARD_SECTOR_SIZE 512
 

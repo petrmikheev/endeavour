@@ -16,6 +16,7 @@ endeavour_flash.svf: output_files/EndeavourSoc.sof
 
 .PHONY: write
 write: endeavour.svf
+#write:
 	sudo rmmod ftdi_sio
 	sudo ../../mbftdi/mbftdi endeavour.svf
 	sudo modprobe ftdi_sio

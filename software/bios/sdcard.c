@@ -135,6 +135,7 @@ unsigned init_sdcard() {
   IO_PORT(SDCARD_PHY) = phy;
   while ((phy & 0xff) != (IO_PORT(SDCARD_PHY) & 0xff));
 
+  SDCARD_RCA = rca;
   return sector_count;
 }
 
@@ -180,6 +181,18 @@ unsigned sdread_impl(unsigned* dst, unsigned sector, unsigned sector_count) {
   return sector_count;
 }
 
+static void postwrite_wait() {
+  int counter = 0;
+  while (1) {
+    unsigned status = command(SDIO_R1 | 13, SDCARD_RCA);
+    if (status & (1<<8)) return;
+    if (++counter > 10000000) {
+      bios_printf("sdwrite: postwrite timeout\n");
+      return;
+    }
+  }
+}
+
 unsigned sdwrite_impl(const unsigned* src, unsigned sector, unsigned sector_count) {
   if (sector_count == 0) return 0;
   for (int i = 0; i < 128; ++i) IO_PORT(SDCARD_FIFO0_LE) = *src++;
@@ -192,7 +205,12 @@ unsigned sdwrite_impl(const unsigned* src, unsigned sector, unsigned sector_coun
     for (int i = 0; i < 128; ++i) IO_PORT(port) = *src++;
     while (IO_PORT(SDCARD_CMD) & SDIO_BUSY);
     if (IO_PORT(SDCARD_CMD) & SDIO_ERR) return b;
+    postwrite_wait();
   }
   command((SDIO_CMD | SDIO_R1 | SDIO_ERR | SDIO_WRITE | SDIO_MEM | 24) | fifo, sector);
-  return (IO_PORT(SDCARD_CMD) & SDIO_ERR) ? sector_count - 1 : sector_count;
+  if (IO_PORT(SDCARD_CMD) & SDIO_ERR) {
+    return sector_count - 1;
+  }
+  postwrite_wait();
+  return sector_count;
 }

@@ -1,87 +1,192 @@
-#ifdef NOT_IMPLEMENTED
-#include <linux/genhd.h>
+#include <linux/platform_device.h>
 #include <linux/blkdev.h>
 #include <linux/fs.h>
+#include <linux/of.h>
 
-void block_dev_init()
-{
-    spinlock_t *lk;  /* Main lock for the device */
-    struct gendisk *gdisk;
-    int major_number = register_blkdev(101, "mmcblk");
+static spinlock_t mmc_lk;
+static void __iomem * mmc_membase;
+static unsigned mmc_sector_count;
+static unsigned mmc_rca;
 
-    gdisk = alloc_disk(1);
+#define SDCARD_CMD 0x0
+#define SDCARD_DATA 0x4
+#define SDCARD_FIFO0 0x8
+#define SDCARD_FIFO1 0xC
+#define SDCARD_PHY 0x10
+#define SDCARD_FIFO0_LE 0x18  // FIFO0 with big-endian -> little-endian conversion
+#define SDCARD_FIFO1_LE 0x1C  // FIFO1 with big-endian -> little-endian conversion
 
-    if (!gdisk) {
-        return;
+static unsigned* receive_sector(unsigned* ptr, unsigned port) {
+  unsigned* end = ptr + 128;
+  while (ptr < end) {
+    ptr[0] = ioread32(mmc_membase + port);
+    ptr[1] = ioread32(mmc_membase + port);
+    ptr[2] = ioread32(mmc_membase + port);
+    ptr[3] = ioread32(mmc_membase + port);
+    ptr += 4;
+  }
+  return ptr;
+}
+
+static const unsigned* send_sector(const unsigned* ptr, unsigned port) {
+  const unsigned* end = ptr + 128;
+  while (ptr < end) {
+    iowrite32(ptr[0], mmc_membase + port);
+    iowrite32(ptr[1], mmc_membase + port);
+    iowrite32(ptr[2], mmc_membase + port);
+    iowrite32(ptr[3], mmc_membase + port);
+    ptr += 4;
+  }
+  return ptr;
+}
+
+static const unsigned
+    SDIO_CMD      = 0x00000040,
+    SDIO_R1       = 0x00000100,
+    SDIO_WRITE    = 0x00000400,
+    SDIO_MEM      = 0x00000800,
+    SDIO_FIFO     = 0x00001000,
+    SDIO_ERR      = 0x00008000,
+    SDIO_BUSY     = 0x00104800;
+
+static void command(unsigned cmd, unsigned arg) {
+  iowrite32(arg, mmc_membase + SDCARD_DATA);
+  iowrite32(SDIO_CMD | SDIO_ERR | cmd, mmc_membase + SDCARD_CMD);
+  while (ioread32(mmc_membase + SDCARD_CMD) & SDIO_BUSY);
+}
+
+static void postwrite_wait(void) {
+  int counter = 0;
+  while (1) {
+    command(SDIO_R1 | 13, mmc_rca);
+    if (ioread32(mmc_membase + SDCARD_DATA) & (1<<8)) return;
+    if (++counter > 10000000) {
+      printk("mmcblk postwrite failed\n");
+      return;
     }
-
-    spin_lock_init(&lk);
-
-    snprintf(gdisk->disk_name, 8, "blockdev");  /* Block device file name: "/dev/blockdev" */
-
-    gdisk->flags = GENHD_FL_NO_PART_SCAN;  /* Kernel won't scan for partitions on the new disk */
-    gdisk->major = major_number;
-    gdisk->fops = &blockdev_ops;  /* Block device file operations, see below */
-    gdisk->first_minor = 0;
-
-    gdisk->queue = blk_init_queue(req_fun, &lk);  /* Init I/O queue, see below */
-
-    set_capacity(block_device->gdisk, 1024 * 512);  /* Set some random capacity, 1024 sectors (with size of 512 bytes) */
-
-    add_disk(gdisk);
+  }
 }
 
-
-int blockdev_open(struct block_device *dev, fmode_t mode)
-{
-    printk("Device %s opened"\n, dev->bd_disk->disk_name);
-    return 0;
+static unsigned sdread_impl(unsigned* dst, unsigned sector, unsigned sector_count) {
+  if (sector_count == 0) return 0;
+  command(SDIO_CMD | SDIO_R1 | SDIO_MEM | 17, sector);
+  unsigned fifo = SDIO_FIFO;
+  unsigned cmd;
+  for (unsigned b = 0; b < sector_count - 1; ++b) {
+    if (ioread32(mmc_membase + SDCARD_CMD) & SDIO_ERR) {
+      return b;
+    }
+    iowrite32(++sector, mmc_membase + SDCARD_DATA);
+    iowrite32((SDIO_CMD | SDIO_R1 | SDIO_MEM | 17) | fifo, mmc_membase + SDCARD_CMD);
+    dst = receive_sector(dst, fifo ? SDCARD_FIFO0_LE : SDCARD_FIFO1_LE);
+    while ((cmd=ioread32(mmc_membase + SDCARD_CMD)) & SDIO_BUSY);
+    fifo ^= SDIO_FIFO;
+  }
+  if (ioread32(mmc_membase + SDCARD_CMD) & SDIO_ERR) return sector_count - 1;
+  receive_sector(dst, fifo ? SDCARD_FIFO0_LE : SDCARD_FIFO1_LE);
+  return sector_count;
 }
 
-void blockdev_release(struct gendisk *gdisk, fmode_t mode)
-{
-    printk("Device %s closed"\n, dev->bd_disk->disk_name);
+static unsigned sdwrite_impl(const unsigned* src, unsigned sector, unsigned sector_count) {
+  if (sector_count == 0) return 0;
+  src = send_sector(src, SDCARD_FIFO0_LE);
+  unsigned fifo = 0;
+  for (unsigned b = 0; b < sector_count - 1; ++b) {
+    iowrite32(sector++, mmc_membase + SDCARD_DATA);
+    iowrite32((SDIO_CMD | SDIO_R1 | SDIO_ERR | SDIO_WRITE | SDIO_MEM | 24) | fifo, mmc_membase + SDCARD_CMD);
+    fifo ^= SDIO_FIFO;
+    src = send_sector(src, fifo ? SDCARD_FIFO1_LE : SDCARD_FIFO0_LE);
+    while (ioread32(mmc_membase + SDCARD_CMD) & SDIO_BUSY);
+    if (ioread32(mmc_membase + SDCARD_CMD) & SDIO_ERR) return b;
+    postwrite_wait();
+  }
+  command((SDIO_CMD | SDIO_R1 | SDIO_ERR | SDIO_WRITE | SDIO_MEM | 24) | fifo, sector);
+  if (ioread32(mmc_membase + SDCARD_CMD) & SDIO_ERR) return sector_count - 1;
+  postwrite_wait();
+  return sector_count;
 }
 
-int blockdev_ioctl (struct block_device *dev, fmode_t mode, unsigned cmd, unsigned long arg)
-{
-    return -ENOTTY; /* ioctl not supported */
+static bool process_segment(void* ptr, unsigned sector, unsigned sector_count, bool write) {
+  if (write)
+    return sdwrite_impl((unsigned*)ptr, sector, sector_count) == sector_count;
+  else
+    return sdread_impl((unsigned*)ptr, sector, sector_count) == sector_count;
 }
 
-static struct block_device_operations blockdev_ops = {
-    .owner = THIS_MODULE,
-    .open = blockdev_open,
-    .release = blockdev_release,
-    .ioctl = blockdev_ioctl
+static void mmcblk_submit_bio(struct bio *bio) {
+  struct bio_vec bvec;
+  struct bvec_iter iter;
+  if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE) {
+    printk("mmcblk unsupported op %d\n", bio_op(bio));
+  }
+  bool write = bio_data_dir(bio) == WRITE;
+
+  bio_for_each_segment(bvec, bio, iter) {
+    char *ptr = bvec_virt(&bvec);
+    if ((unsigned)ptr & 3) printk("mmcblk: wrong buffer alignment\n");
+    unsigned sector = iter.bi_sector;
+    unsigned sector_count = bvec.bv_len >> 9;
+    if (!process_segment(ptr, sector, sector_count, write)) {
+      printk("mmcblk error write=%d  ptr=0x%x  sector=%d  count=%d\n", (int)write, (unsigned)ptr, sector, sector_count);
+      bio_io_error(bio);
+    }
+  }
+
+  bio_endio(bio);
+}
+
+static struct block_device_operations mmcblk_ops = {
+  .owner = THIS_MODULE,
+  .submit_bio = mmcblk_submit_bio
 };
 
-static void block_request(struct request_queue *q)
-{
-    int direction;
-    int err = -EIO;
-    u8 *data;
-    struct request *req = blk_fetch_request(q); /* get one top request from the queue */
-
-    while (req) {
-        if (__blk_end_request_cur(req, err)) {  /* check for the end */
-            break;
-        }
-
-        /* Data processing */
-
-        direction = rq_data_dir(req);
-
-        if (direction == WRITE) {
-            printk("Writing data to the block device\n");
-        } else {
-            printk("Reading data from the block devicen\n");
-        }
-
-        data = bio_data(req->bio); /* Data buffer to perform I/O operations */
-
-        /* */
-
-        req = blk_fetch_request(q); /* get next request from the queue */
-    }
+static unsigned sbi_get_val(int arg) {
+  register uintptr_t a1 asm ("a1") = (uintptr_t)(0);
+  register uintptr_t a6 asm ("a6") = (uintptr_t)(arg);
+  register uintptr_t a7 asm ("a7") = (uintptr_t)(0x0A000000);
+  asm volatile ("ecall" : "=r" (a1) : "r" (a6), "r" (a7));
+  return a1;
 }
-#endif
+
+static int mmcblk_probe(struct platform_device *dev)
+{
+  // Note: sdcard is already initialized by BIOS
+  mmc_membase = devm_platform_get_and_ioremap_resource(dev, 0, NULL);
+  if (IS_ERR(mmc_membase))
+    return PTR_ERR(mmc_membase);
+  mmc_sector_count = sbi_get_val(1);
+  mmc_rca = sbi_get_val(2);
+  printk("mmcblk  reg 0x%x  rca 0x%04x  size %u MB\n", (unsigned)dev->resource[0].start, mmc_rca >> 16, mmc_sector_count >> 11);
+
+  int major_number = register_blkdev(101, "mmcblk");
+
+  struct gendisk *mmc = blk_alloc_disk(NULL, NUMA_NO_NODE);
+  if (!mmc) return -ENOMEM;
+
+  spin_lock_init(&mmc_lk);
+
+  snprintf(mmc->disk_name, 8, "mmcblk0");  // /dev/mmcblk0
+
+  mmc->flags = 0;
+  mmc->major = major_number;
+  mmc->fops = &mmcblk_ops;
+  mmc->first_minor = 0;
+
+  set_capacity(mmc, mmc_sector_count);
+
+  return add_disk(mmc);
+}
+
+static const struct of_device_id mmcblk_match[] = {
+  { .compatible = "endeavour,mmcblk" },
+  {}
+};
+
+static struct platform_driver mmcblk_driver = {
+  .driver = {
+    .name           = "endeavour-mmcblk",
+    .of_match_table = mmcblk_match,
+  },
+  .probe = mmcblk_probe,
+};
+builtin_platform_driver(mmcblk_driver);

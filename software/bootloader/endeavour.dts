@@ -7,10 +7,11 @@
   model = "Endeavour";
 
   chosen {
-    bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi debug root=/dev/ram";
+    //bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi debug root=/dev/ram";
+    bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi debug root=/dev/mmcblk0p1";
     //bootargs = "console=ttyS0,sbi:115200e root=/dev/ram";
-    linux,initrd-start = <0x87000000>;
-    linux,initrd-end   = <0x87400000>;
+    //linux,initrd-start = <0x87000000>;
+    //linux,initrd-end   = <0x87400000>;
   };
 
   cpus {
@@ -55,13 +56,13 @@
     reg = <0x200 8>;
   };*/
 
-  /*mmcblk: mmcblk@300 {
+  mmcblk: mmcblk@300 {
     compatible = "endeavour,mmcblk";
     reg = <0x300 32>;
     interrupts-extended = <&plic 2>;
-  };*/
+  };
 
-  usb1: usb@400 {
+  /*usb1: usb@400 {
     compatible = "ue11-hcd";
     reg = <0x400 0x40>;
     interrupts-extended = <&plic 3>;
@@ -71,7 +72,7 @@
     compatible = "ue11-hcd";
     reg = <0x500 0x40>;
     interrupts-extended = <&plic 4>;
-  };
+  };*/
 
   /*display: display@900 {
     compatible = "endeavour,display";

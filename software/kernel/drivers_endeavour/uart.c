@@ -168,9 +168,9 @@ static int endeavour_uart_probe(struct platform_device *pdev)
   return uart_add_one_port(&endeavour_uart_driver, &data->port);
 }
 
-static void endeavour_uart_remove(struct platform_device *pdev) {
+/*static void endeavour_uart_remove(struct platform_device *pdev) {
   printk("endeavour_uart_remove\n");  // should never happen
-}
+}*/
 
 static const struct of_device_id endeavour_uart_of_match[] = {
   { .compatible = "endeavour,uart" },
@@ -180,7 +180,7 @@ MODULE_DEVICE_TABLE(of, endeavour_uart_of_match);
 
 static struct platform_driver endeavour_uart_platform_driver = {
   .probe = endeavour_uart_probe,
-  .remove_new = endeavour_uart_remove,
+  //.remove_new = endeavour_uart_remove,
   .driver = {
     .name = KBUILD_MODNAME,
     .of_match_table = endeavour_uart_of_match,

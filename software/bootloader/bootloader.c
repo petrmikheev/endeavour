@@ -204,8 +204,11 @@ struct sbiret sbi_handler(int arg, int argh, int fn_id, int ext_id) {
       bios_putc(arg);
       return (struct sbiret){SBI_OK, 0};
     }
-    if (fn_id == 1) {  // get sdcard size
+    if (fn_id == 1) {
       return (struct sbiret){SBI_OK, SDCARD_SECTOR_COUNT};
+    }
+    if (fn_id == 2) {
+      return (struct sbiret){SBI_OK, SDCARD_RCA};
     }
   }
   if (ext_id == 0x10) {
