@@ -1,0 +1,6 @@
+#!/bin/sh
+
+mount -t sysfs none /sys
+mount proc /proc -t proc
+mount -o remount,noatime,rw /
+sh
