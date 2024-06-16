@@ -12,4 +12,4 @@ cd $TOOLS_DIR
 git clone https://github.com/riscv/riscv-gnu-toolchain
 cd riscv-gnu-toolchain
 ./configure --prefix=$TOOLS_DIR/rv32imac-linux-toolchain --with-arch=rv32imac --with-abi=ilp32
-make -j$(nproc) linux
+make -j$(nproc) linux-native
