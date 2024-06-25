@@ -5,3 +5,4 @@ mount proc /proc -t proc
 mount -o remount,noatime,rw /
 export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/libexec/gcc/riscv32-unknown-linux-gnu/13.2.0
 sh
+# setsid sh -c 'exec sh </dev/ttyp0 >/dev/ttyp0 2>&1'

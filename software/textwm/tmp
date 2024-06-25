@@ -1,0 +1,21 @@
+fgcolor0 #000000 0
+fgcolor1 #DE382B 64
+fgcolor2 #39B54A 64
+fgcolor3 #FFC706 64
+fgcolor4 #006FB8 64
+fgcolor5 #762671 64
+fgcolor6 #2CB5E9 64
+fgcolor7 #FFFFFF 64
+
+bgcolor0 #000000 48
+bgcolor1 #DE382B 48
+bgcolor2 #39B54A 48
+bgcolor3 #FFC706 48
+bgcolor4 #006FB8 48
+bgcolor5 #762671 48
+bgcolor6 #2CB5E9 48
+bgcolor7 #FFFFFF 48
+
+screen_color        #808080 0
+window_color        #000008 40
+active_window_color #080000 48

@@ -189,6 +189,9 @@ static struct platform_driver endeavour_uart_platform_driver = {
 
 static bool output_to_sbi = false;
 
+void set_endeavour_sbi_console(bool v);
+void set_endeavour_sbi_console(bool v) { output_to_sbi = v; }
+
 static void endeavour_console_write(struct console *con, const char *s, unsigned int count)
 {
   if (output_to_sbi || !global_port) {

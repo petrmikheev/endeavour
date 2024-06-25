@@ -15,8 +15,7 @@ endeavour_flash.svf: output_files/EndeavourSoc.sof
 	quartus_cpf -c -q 10MHz -g 3.3 -n p output_files/EndeavourSoc.pof $@
 
 .PHONY: write
-write: endeavour.svf
-#write:
+write:
 	sudo rmmod ftdi_sio
 	sudo ../../mbftdi/mbftdi endeavour.svf
 	sudo modprobe ftdi_sio
@@ -24,7 +23,7 @@ write: endeavour.svf
 	../../scripts/setup_uart.sh
 
 .PHONY: write_flash
-write_flash: endeavour_flash.svf
+write_flash:
 	sudo rmmod ftdi_sio
 	sudo ../../mbftdi/mbftdi endeavour_flash.svf
 	sudo modprobe ftdi_sio

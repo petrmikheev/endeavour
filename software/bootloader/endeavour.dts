@@ -10,8 +10,8 @@
     //bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi debug root=/dev/ram";
     bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi debug root=/dev/mmcblk0p1";
     //bootargs = "console=ttyS0,sbi:115200e root=/dev/ram";
-    //linux,initrd-start = <0x87000000>;
-    //linux,initrd-end   = <0x87400000>;
+    linux,initrd-start = <0x87000000>;
+    linux,initrd-end   = <0x87400000>;
   };
 
   cpus {
@@ -74,10 +74,10 @@
     interrupts-extended = <&plic 4>;
   };*/
 
-  /*display: display@900 {
+  display: display@900 {
     compatible = "endeavour,display";
     reg = <0x900 20>;
-  };*/
+  };
 
   memory@80000000 {
     device_type = "memory";
