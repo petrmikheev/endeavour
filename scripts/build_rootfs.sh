@@ -20,7 +20,7 @@ cp -r $TOOLCHAIN/sysroot/sbin/* rootfs/sbin/
 cp -r $TOOLCHAIN/sysroot/usr/{bin,include,lib,libexec} rootfs/usr/
 cp -r $TOOLCHAIN/native/include/* rootfs/usr/include/
 cp -r $TOOLCHAIN/native/lib/gcc rootfs/usr/lib/
-cp -r $TOOLCHAIN/native/lib/gcc/riscv32-unknown-linux-gnu/13.2.0/include/* rootfs/usr/include/
+#cp -r $TOOLCHAIN/native/lib/gcc/riscv32-unknown-linux-gnu/13.2.0/include/* rootfs/usr/include/
 cp -r $TOOLCHAIN/native/share/* rootfs/usr/share/
 cp -r $TOOLCHAIN/native/libexec/* rootfs/usr/libexec/
 cp -r $TOOLCHAIN/native/bin/{ar,objcopy,gfortran,gprof,elfedit,gcc,strip,readelf,as,gcc-ranlib,c++filt,size,addr2line,objdump,gdbserver,g++,gcov,ranlib,gcc-nm,nm,strings,gcc-ar,gcov-tool,cpp,ld} rootfs/usr/bin/

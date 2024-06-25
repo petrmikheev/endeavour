@@ -33,7 +33,7 @@ int text_width, text_height;
 #define IOCTL_SET_CHARMAP 0xaa6
 #define IOCTL_DISABLE_SBI_CONSOLE 0xaa7
 
-/*#define VIDEO_640x480     1
+#define VIDEO_640x480     1
 #define VIDEO_1024x768    2
 #define VIDEO_1280x720    3
 #define VIDEO_TEXT_ON     4
@@ -41,7 +41,7 @@ int text_width, text_height;
 #define VIDEO_FONT_HEIGHT(X) ((((X)-1)&15) << 4) // allowed range [6, 16]
 #define VIDEO_FONT_WIDTH(X) ((((X)-1)&7) << 8)   // allowed range [6, 8]
 #define VIDEO_RGB565      0
-#define VIDEO_RGAB5515    0x800*/
+#define VIDEO_RGAB5515    0x800
 
 bool read_display_cfg() {
   int dcfg;
@@ -139,6 +139,32 @@ void set_charmap(unsigned i, unsigned value) {
   ioctl(display_fd, IOCTL_SET_CHARMAP, &cd);
 }
 
+void set_wallpaper(const char* arg) {
+  int dcfg;
+  ioctl(display_fd, IOCTL_GET_CFG, &dcfg);
+  if (*arg == 0 || strcmp(arg, "off") == 0) {
+    printf("[textwm] Wallpaper off\n");
+    dcfg &= ~VIDEO_GRAPHIC_ON;
+  } else {
+    printf("[textwm] Wallpaper \"%s\"\n", arg);
+    FILE* f = fopen(arg, "rb");
+    if (!f) {
+      printf("[textwm] Can't open file\n");
+      return;
+    }
+    for (int j = 0; j < 720; ++j) {
+      fseek(f, 70 + (720-j-1) * (1280 * 2), SEEK_SET);
+      char* dst = display_data + 0x100000 + j * (1024*4);
+      fread(dst, 2, 1280, f);
+    }
+    fclose(f);
+    unsigned gaddr = 0x100000;
+    ioctl(display_fd, IOCTL_SET_GRAPHIC_ADDR, &gaddr);
+    dcfg |= VIDEO_GRAPHIC_ON;
+  }
+  ioctl(display_fd, IOCTL_SET_CFG, &dcfg);
+}
+
 #define ACTIVE_WINDOW_BG 0
 #define WINDOW_BG 1
 #define SCREEN_BG 2
@@ -161,6 +187,10 @@ void command(const char* cmd) {
   } else if (strncmp(cmd, "active_window_color", 19) == 0) {
     if (sscanf(cmd, "active_window_color #%x %d", &color, &alpha) != 2) goto err;
     set_charmap(ACTIVE_WINDOW_BG, (color << 8) | alpha);
+  } else if (strncmp(cmd, "wallpaper ", 10) == 0) {
+    const char* arg = cmd + 10;
+    while (*arg == ' ') arg++;
+    set_wallpaper(arg);
   } else goto err;
   return;
 err:
@@ -359,13 +389,17 @@ void tty_handler(int tty_id, char c) {
       case '\n':
         tty->cursor += 512;
         break;
-      case '\t': tty->cursor = (tty->cursor + 7) & ~7; break;
+      case '\t':
+        tty->cursor = (tty->cursor + 15) & ~15;
+        break;
       case '\b':
         if (tty->cursor & 511) {
           tty->cursor -= 2;
-          char* p = tty->frame + tty->frame_start + tty->cursor;
-          p[0] = 0;
-          p[1] = tty->style;
+          //char* p = tty->frame + tty->cursor;
+          //p[0] = 0;
+          //p[1] = tty->style;
+        } else if (tty->cursor != tty->frame_start) {
+          tty->cursor = tty->cursor - 512 + ((tty->width - 1) << 1);
         }
         break;
       default:

@@ -77,7 +77,8 @@ static long display_ioctl(struct file *filp, unsigned int cmd, unsigned long arg
       (void)copy_to_user((void*)arg, &v, sizeof(v));
       break;
     case 0xaa5: // set cfg
-      iowrite32(arg, VIDEO_CFG);
+      (void)copy_from_user(&v, (void*)arg, sizeof(v));
+      iowrite32(v, VIDEO_CFG);
       break;
     case 0xaa6: // set charmap
       (void)copy_from_user(&cd, (void*)arg, sizeof(struct CharmapData));
