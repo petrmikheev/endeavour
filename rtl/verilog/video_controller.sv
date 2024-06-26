@@ -47,7 +47,7 @@ module VideoController(
   reg [31:0] text_addr;
   reg [31:0] graphic_addr;
 
-  reg [9:0] charmap_index;
+  reg [10:0] charmap_index;
 
   // CHARMAP_SIZE = 512: symbols with codes 8-127 (ASCII)
   // CHARMAP_SIZE = 1024: symbols with codes 8-255
@@ -108,7 +108,7 @@ module VideoController(
         end
         if (apb_reg == 3'd1) text_addr <= apb_PWDATA;
         if (apb_reg == 3'd2) graphic_addr <= apb_PWDATA;
-        if (apb_reg == 3'd3) charmap_index <= apb_PWDATA[9:0];
+        if (apb_reg == 3'd3) charmap_index <= apb_PWDATA[10:0];
         if (apb_reg == 3'd4) charmap[charmap_index] <= apb_PWDATA;
       end
     end

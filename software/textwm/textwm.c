@@ -13,6 +13,41 @@ typedef char bool;
 #define false 0
 #define true 1
 
+int utf_extra[] = {
+  0x401, 0x451,
+  0x2500, 0x2502, 0x250C, 0x2510,
+  0x2514, 0x2518, 0x251C, 0x2524,
+  0x252C, 0x2534, 0x253C, 0x2550,
+  0x2551, 0x2552, 0x2553, 0x2554,
+  0x2555, 0x2556, 0x2557, 0x2558,
+  0x2559, 0x255A, 0x255B, 0x255C,
+  0x255D, 0x255E, 0x255F, 0x2560,
+  0x2561, 0x2562, 0x2563, 0x2564,
+  0x2565, 0x2566, 0x2567, 0x2568,
+  0x2569, 0x256A, 0x256B, 0x256C,
+  0x2580, 0x2584, 0x2588, 0x258C,
+  0x2590, 0x2591, 0x2592, 0x2593};
+
+#define UTF_EXTRA_SIZE (sizeof(utf_extra) / sizeof(int))
+
+int from_utf(unsigned u, bool bold) {
+  if (bold && u >= 0x21 && u <= 0x7E) return u - 0x21 + 0x7F;
+  if (u <= 0x7E) return u;
+  if (u >= 0x410 && u <= 0x44F) return u - 0x410 + 0xDD;
+  for (int i = 0; i < UTF_EXTRA_SIZE; ++i) {
+    if (utf_extra[i] == u) return 0x11D + i;
+  }
+  return -1;
+}
+
+int to_utf(unsigned v) {
+  if (v <= 0x7E) return v;
+  if (v >= 0x7F && v <= 0xDC) return v - 0x7F + 0x21;
+  if (v >= 0xDD && v <= 0x11C) return v - 0xDD + 0x410;
+  if (v >= 0x11D && v < 0x11D + UTF_EXTRA_SIZE) return utf_extra[v - 0x11D];
+  return -1;
+}
+
 #define TTY_COUNT 7
 
 int cfg_fd;
@@ -123,7 +158,7 @@ void init_ttys() {
     tty->frame_end = (tty->frame_start + (tty->height << 9)) & 0xffff;
     tty->window_posx = tty->window_posy = 0;
     tty->workspace = -1;
-    tty->style = 0xf;
+    tty->style = 0x7;
     tty->bold = false;
     //tty->in_start = tty->in_end = 0;
     pfds[i + 2].fd = tty->fd;
@@ -165,6 +200,51 @@ void set_wallpaper(const char* arg) {
   ioctl(display_fd, IOCTL_SET_CFG, &dcfg);
 }
 
+void set_font(const char* arg, bool bold) {
+  if (bold)
+    printf("[textwm] Loading font-bold \"%s\"\n", arg);
+  else
+    printf("[textwm] Loading font \"%s\"\n", arg);
+  FILE* f = fopen(arg, "r");
+  if (!f) {
+    printf("[textwm] Can't open file\n");
+    return;
+  }
+  char line[120];
+  int cwidth = 0, cheight = 0;
+  int ucode = 0;
+  char cdata[16];
+  int ci = -1;
+  while (!feof(f)) {
+    fgets(line, 119, f);
+    if (strncmp(line, "ENCODING ", 9) == 0) {
+      sscanf(line, "ENCODING %d", &ucode);
+    } else if (strncmp(line, "BBX ", 4) == 0 && cwidth == 0) {
+      sscanf(line, "BBX %d %d", &cwidth, &cheight);
+      printf("[textwm] font width=%d height=%d\n", cwidth, cheight);
+    } else if (strncmp(line, "BITMAP", 6) == 0) {
+      ci = 0;
+    } else if (strncmp(line, "ENDCHAR", 7) == 0) {
+      if (bold && !(ucode >= 0x21 && ucode <= 0x7E)) continue;
+      int code = from_utf(ucode, bold);
+      if (code < 32) continue;
+      const unsigned* bitmap = (const unsigned*)cdata;
+      //printf("u=%d c=%d bitmap: %08X %08X %08X %08X\n", ucode, code, bitmap[0], bitmap[1], bitmap[2], bitmap[3]);
+      set_charmap(code * 4, bitmap[0]);
+      set_charmap(code * 4 + 1, bitmap[1]);
+      set_charmap(code * 4 + 2, bitmap[2]);
+      set_charmap(code * 4 + 3, bitmap[3]);
+      ci = -1;
+    } else if (ci >= 0) {
+      unsigned v;
+      sscanf(line, "%x", &v);
+      cdata[ci++ & 15] = v;
+    }
+  }
+  fclose(f);
+  // TODO set font size in display cfg
+}
+
 #define ACTIVE_WINDOW_BG 0
 #define WINDOW_BG 1
 #define SCREEN_BG 2
@@ -191,15 +271,19 @@ void command(const char* cmd) {
     const char* arg = cmd + 10;
     while (*arg == ' ') arg++;
     set_wallpaper(arg);
+  } else if (strncmp(cmd, "font ", 5) == 0) {
+    const char* arg = cmd + 5;
+    while (*arg == ' ') arg++;
+    set_font(arg, false);
+  } else if (strncmp(cmd, "font-bold ", 10) == 0) {
+    const char* arg = cmd + 10;
+    while (*arg == ' ') arg++;
+    set_font(arg, true);
   } else goto err;
   return;
 err:
   printf("[textwm] Invalid command: %s\n", cmd);
 }
-
-/*void input_handler(char c) {
-  printf("IN %d '%c'\n", c, c);
-}*/
 
 #define CMD_BUF_SIZE 160
 char cmd_buf[CMD_BUF_SIZE];
@@ -215,15 +299,17 @@ void cfg_handler(char c) {
   }
 }
 
-void tty_print(struct TTY *tty, unsigned code) {
+void tty_print(struct TTY *tty, unsigned ucode) {
   char* cursor = tty->frame + tty->cursor;
-  cursor[0] = code >= 0x80 ? '?' : code;
-  cursor[1] = tty->style | 8;
+  int c = from_utf(ucode, tty->bold);
+  if (c < 0) c = '?';
+  cursor[0] = c & 0xff;
+  cursor[1] = tty->style | (8 & ~(c >> 5));
   tty->cursor += 2;
 }
 
 void tty_sgr(struct TTY *tty) {
-  tty->style = 0xf;
+  tty->style = 0x7;
   tty->bold = false;
   int i = 0;
   const char* s = tty->csi;
@@ -304,12 +390,13 @@ void tty_csi(int tty_id) {
     case 'J':
       n = 0;
       sscanf(tty->csi, "%d", &n);
+      m = (unsigned)(tty->style | 8) << 8;
       if (n == 0) {
-        for (int i = tty->cursor; i != tty->frame_end; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = (unsigned)tty->style << 8;
+        for (int i = tty->cursor; i != tty->frame_end; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
       } else if (n == 1) {
-        for (int i = tty->frame_start; i != tty->cursor; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = (unsigned)tty->style << 8;
+        for (int i = tty->frame_start; i != tty->cursor; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
       } else if (n == 2) {
-        for (int i = tty->frame_start; i != tty->frame_end; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = (unsigned)tty->style << 8;
+        for (int i = tty->frame_start; i != tty->frame_end; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
       }
       break;
     case 'K': {
@@ -324,7 +411,7 @@ void tty_csi(int tty_id) {
         from = tty->cursor & ~0x1ff;
         to = (tty->cursor + 0x200) & ~0x1ff;
       }
-      unsigned v = (unsigned)tty->style << 8;
+      unsigned v = (unsigned)(tty->style | 8) << 8;
       for (char* p = tty->frame + from; p != tty->frame + to; p += 2) *(short*)p = v;
       break;
     }
@@ -423,7 +510,7 @@ void tty_handler(int tty_id, char c) {
   tty->cursor &= 0xffff;
   if ((tty->cursor & ~511) == tty->frame_end) {
     int* line = (int*)(tty->frame + tty->cursor);
-    int v = ((int)tty->style << 8) | ((int)tty->style << 24);
+    int v = ((int)(tty->style|8) << 8) | ((int)(tty->style|8) << 24);
     for (int i = 0; i < 128; ++i) line[i] = v;
     tty->frame_start = (tty->frame_start + 512) & 0xffff;
     tty->frame_end = (tty->frame_end + 512) & 0xffff;
