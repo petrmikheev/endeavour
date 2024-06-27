@@ -13,4 +13,6 @@ cp $SCRIPT_DIR/busybox_config .config
 echo "CONFIG_CROSS_COMPILER_PREFIX=\"$TOOLCHAIN/bin/riscv32-unknown-linux-gnu-\"" >> .config
 echo "CONFIG_SYSROOT=\"$TOOLCHAIN/sysroot\"" >> .config
 
+sed -i 's/"less"/"less -R"/g' miscutils/man.c
+
 make -j$(nproc)

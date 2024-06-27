@@ -14,6 +14,8 @@ typedef char bool;
 #define true 1
 
 int utf_extra[] = {
+  0xC4, 0xD6, 0xDC, 0xDF,
+  0xE4, 0xF6, 0xFC, 0x1EDE,
   0x401, 0x451,
   0x2500, 0x2502, 0x250C, 0x2510,
   0x2514, 0x2518, 0x251C, 0x2524,
@@ -28,6 +30,7 @@ int utf_extra[] = {
   0x2580, 0x2584, 0x2588, 0x258C,
   0x2590, 0x2591, 0x2592, 0x2593};
 
+#define UTF_EXTRA_BOLD_SIZE 8
 #define UTF_EXTRA_SIZE (sizeof(utf_extra) / sizeof(int))
 
 int from_utf(unsigned u, bool bold) {
@@ -35,7 +38,12 @@ int from_utf(unsigned u, bool bold) {
   if (u <= 0x7E) return u;
   if (u >= 0x410 && u <= 0x44F) return u - 0x410 + 0xDD;
   for (int i = 0; i < UTF_EXTRA_SIZE; ++i) {
-    if (utf_extra[i] == u) return 0x11D + i;
+    if (utf_extra[i] == u) {
+      if (bold && i < UTF_EXTRA_BOLD_SIZE)
+        return 0x11D + UTF_EXTRA_SIZE + i;
+      else
+        return 0x11D + i;
+    }
   }
   return -1;
 }
@@ -45,6 +53,8 @@ int to_utf(unsigned v) {
   if (v >= 0x7F && v <= 0xDC) return v - 0x7F + 0x21;
   if (v >= 0xDD && v <= 0x11C) return v - 0xDD + 0x410;
   if (v >= 0x11D && v < 0x11D + UTF_EXTRA_SIZE) return utf_extra[v - 0x11D];
+  if (v >= 0x11D + UTF_EXTRA_SIZE && v < 0x11D + UTF_EXTRA_SIZE + UTF_EXTRA_BOLD_SIZE) return utf_extra[v - 0x11D - UTF_EXTRA_SIZE];
+  // Available: 0x15F - 0x1FF
   return -1;
 }
 
@@ -119,8 +129,11 @@ struct TTY {
   int window_posx, window_posy;
   int workspace;
   char style;
-  bool bold;
+  char style_at_cursor;
   char state;
+  bool cursor_visible;
+  bool cursor_blink;
+  bool bold;
   unsigned ucode, ucount;
   char csi[32];
   int csi_len;
@@ -159,11 +172,33 @@ void init_ttys() {
     tty->window_posx = tty->window_posy = 0;
     tty->workspace = -1;
     tty->style = 0x7;
+    tty->style_at_cursor = 0x7;
     tty->bold = false;
+    tty->cursor_visible = false;
+    tty->cursor_blink = false;
     //tty->in_start = tty->in_end = 0;
     pfds[i + 2].fd = tty->fd;
     pfds[i + 2].events = POLLIN;
   }
+}
+
+char swap_fg_bg(char style) {
+  int bg = 8 | (style & 7);
+  int fg = (style & 0x80) ? ((style >> 4) & 7) : 0;
+  return (style & 8) | fg | (bg << 4);
+}
+
+void hide_cursor(struct TTY *tty) {
+  if (!tty->cursor_visible) return;
+  tty->frame[tty->cursor + 1] = tty->style_at_cursor;
+  tty->cursor_visible = false;
+}
+
+void show_cursor(struct TTY *tty) {
+  if (tty->cursor_visible) return;
+  tty->style_at_cursor = tty->frame[tty->cursor + 1];
+  tty->frame[tty->cursor + 1] = swap_fg_bg(tty->style_at_cursor);
+  tty->cursor_visible = true;
 }
 
 void set_charmap(unsigned i, unsigned value) {
@@ -225,9 +260,9 @@ void set_font(const char* arg, bool bold) {
     } else if (strncmp(line, "BITMAP", 6) == 0) {
       ci = 0;
     } else if (strncmp(line, "ENDCHAR", 7) == 0) {
-      if (bold && !(ucode >= 0x21 && ucode <= 0x7E)) continue;
       int code = from_utf(ucode, bold);
       if (code < 32) continue;
+      if (bold && code == from_utf(ucode, false)) continue;
       const unsigned* bitmap = (const unsigned*)cdata;
       //printf("u=%d c=%d bitmap: %08X %08X %08X %08X\n", ucode, code, bitmap[0], bitmap[1], bitmap[2], bitmap[3]);
       set_charmap(code * 4, bitmap[0]);
@@ -317,9 +352,16 @@ void tty_sgr(struct TTY *tty) {
     int c = 0;
     while (*s >= '0' && *s <= '9') c = c * 10 + *s++ - '0';
     if (*s == ';') s++;
-    if (c == 1 || c == 4) tty->bold = true;
+    if (c == 0 || c == 10) { /* ignore */ }
+    else if (c == 7) tty->style = 0xf0; //((tty->style&15) << 4) || (tty->style >> 4) & 7 | 0x80;
+    else if (c == 1 || c == 4) tty->bold = true;
     else if (c >= 30 && c <= 37) tty->style = (tty->style & 0xf0) | (c - 30);
-    else if (c >= 40 && c <= 47) tty->style |= ((c - 40) << 4) | 0x80;
+    else if (c == 39) tty->style = (tty->style & 0xf0) | 7;
+    else if (c >= 40 && c <= 47) tty->style &= ((c - 40) << 4) | 0x80;
+    else if (c == 49) tty->style &= 0xf;
+    else {
+      printf("[textwm] SGR %d not implemented\n", c);
+    }
   }
 }
 
@@ -363,6 +405,25 @@ void tty_csi(int tty_id) {
       sscanf(tty->csi, "%d", &n);
       line += n;
       break;
+    case 'b': {
+      sscanf(tty->csi, "%d", &n);
+      m = (unsigned)(tty->style | 8) << 8;
+      int to = (tty->cursor + (n<<1)) & 0xffff;
+      for (int i = tty->cursor; i != to; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
+      col += n;
+      break;
+    }
+    case 'P': {
+      sscanf(tty->csi, "%d", &n);
+      //m = (unsigned)(tty->style | 8) << 8;
+      int line_end = (tty->cursor + 512) & ~511;
+      n <<= 1;
+      if (tty->cursor + n > line_end) n = line_end - tty->cursor;
+      for (int i = tty->cursor; i < line_end - n; ++i) tty->frame[i] = tty->frame[i + n];
+      //int to = (tty->cursor + (n<<1)) & 0xffff;
+      //for (int i = tty->cursor; i != to; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
+      break;
+    }
     case 'C':
       sscanf(tty->csi, "%d", &n);
       col += n;
@@ -374,6 +435,10 @@ void tty_csi(int tty_id) {
     case 'G':
       sscanf(tty->csi, "%d", &n);
       col = n - 1;
+      break;
+    case 'd':
+      sscanf(tty->csi, "%d", &n);
+      line = n - 1;
       break;
     case 'f':
     case 'H':
@@ -446,10 +511,24 @@ void tty_handler(int tty_id, char c) {
   //printf("TTY%d %d frame_start=%d cursor=%d frame_end=%d\n", tty_id, c, tty->frame_start, tty->cursor, tty->frame_end);
   if (tty->state == 'e') {
     tty->csi_len = 0;
-    if (c == '[')
-      tty->state = '['; // CSI
-    else
-      tty->state = 0;
+    switch (c) {
+      case '[':
+        tty->state = '[';  // CSI
+        break;
+      case '>':
+      case '=':
+        tty->state = 0;  // keypad mode, ignore
+        break;
+      case '(':
+      case ')':
+        tty->state = '('; // ignore next char
+        break;
+      default:
+        printf("[textwm] Escape sequence \\e%c... (%d) not supported\n", c, c);
+        tty->state = 0;
+    }
+  } else if (tty->state == '(') {
+    tty->state = 0;
   } else if (tty->state == 'u') {
     tty->ucode = (tty->ucode << 6) | (c&0x3f);
     if (--tty->ucount == 1) {
@@ -562,8 +641,13 @@ int main() {
     }
     for (int i = 0; i < TTY_COUNT; ++i) {
       if (pfds[i + 2].revents & POLLIN) {
+        struct TTY *tty = &ttys[i];
+        tty->cursor_blink = false;
+        hide_cursor(tty);
         rsize = read(pfds[i + 2].fd, buf, BUF_SIZE);
         for (int j = 0; j < rsize; ++j) tty_handler(i, buf[j]);
+        show_cursor(tty);
+        tty->cursor_blink = true;
       }
       /*struct TTY *tty = &ttys[i];
       while (tty->in_start != tty->in_end) {
