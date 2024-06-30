@@ -13,10 +13,10 @@ cp busybox/busybox rootfs/bin/busybox
 cp linux_kernel/arch/riscv/boot/Image rootfs/boot/vmlinux
 
 mkdir -p rootfs/sbin
-mkdir -p rootfs/usr/share
+mkdir -p rootfs/usr
 cp -r $TOOLCHAIN/sysroot/lib rootfs/
 cp -r $TOOLCHAIN/sysroot/sbin/* rootfs/sbin/
-cp -r $TOOLCHAIN/sysroot/usr/{bin,include,lib,libexec} rootfs/usr/
+cp -r $TOOLCHAIN/sysroot/usr/{bin,include,lib,libexec,share} rootfs/usr/
 cp -r $TOOLCHAIN/native/include/* rootfs/usr/include/
 cp -r $TOOLCHAIN/native/lib/gcc rootfs/usr/lib/
 #cp -r $TOOLCHAIN/native/lib/gcc/riscv32-unknown-linux-gnu/13.2.0/include/* rootfs/usr/include/
