@@ -36,8 +36,8 @@ module testbench;
   wire USB1_DP, USB1_DN, USB2_DP, USB2_DN;
   pulldown(USB1_DN);
   pullup(USB1_DP);
+  pullup(USB2_DN);
   pulldown(USB2_DP);
-  pulldown(USB2_DN);
 
   EndeavourSoc system(
     .io_clk_in(clk48mhz),

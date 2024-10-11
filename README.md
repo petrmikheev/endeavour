@@ -3,8 +3,8 @@ Endeavour - open-source FPGA board and SoC
 
 | | |
 |:-------------------------:|:-------------------------:|
-| <img height=250 src="images/intro/blueprint.jpg"> | <img height=250 src="images/intro/soldering.jpg"> |
-| <img height=250 src="images/hardware/rev2_front.jpg"> | <img height=250 src="images/intro/display.jpg"> |
+| <img height=270 src="images/intro/blueprint.jpg"> | <img height=270 src="images/intro/soldering.jpg"> |
+| <img height=270 src="images/hardware/rev2_front.jpg"> | <img height=270 src="images/intro/display.jpg"> |
 
 ### Project goal
 

@@ -61,7 +61,8 @@ class EndeavourSoc extends Component {
 
   val peripheral = new ClockingArea(ClockDomain(
       clock = board_ctrl.io.clk_peripheral,
-      reset = board_ctrl.io.reset)) {
+      reset = board_ctrl.io.reset,
+      frequency = FixedFrequency(48 MHz))) {
 
     val uart_ctrl = new UartController()
     uart_ctrl.io.uart <> io.uart
@@ -73,29 +74,27 @@ class EndeavourSoc extends Component {
     val sdcard_ctrl = new SdcardController()
     sdcard_ctrl.io.sdcard <> io.sdcard
 
-    val usb1_ctrl = new USBHostController()
-    val usb2_ctrl = new USBHostController()
-    usb1_ctrl.io.usb <> io.usb1
-    usb2_ctrl.io.usb <> io.usb2
+    val usb_ctrl = new EndeavourUSB()
+    usb_ctrl.io.usb1 <> io.usb1
+    usb_ctrl.io.usb2 <> io.usb2
 
     val apb = Apb3(Apb3Config(
-      addressWidth  = 11,
+      addressWidth  = 19,
       dataWidth     = 32,
       useSlaveError = false
     ))
     val apbDecoder = Apb3Decoder(
       master = apb,
       slaves = List(
-        uart_ctrl.io.apb   -> (0x100, 16),
-        audio_ctrl.io.apb  -> (0x200, 8),
-        sdcard_ctrl.io.apb -> (0x300, 32),
-        usb1_ctrl.io.apb   -> (0x400, 64),
-        usb2_ctrl.io.apb   -> (0x500, 64)
-        // 0x600 reserved for USB_DEVICE
+        uart_ctrl.io.apb     -> (0x10000, 16),
+        audio_ctrl.io.apb    -> (0x20000, 8),
+        sdcard_ctrl.io.apb   -> (0x30000, 32),
+        usb_ctrl.io.apb_ctrl -> (0x40000, 0x1000),
+        usb_ctrl.io.apb_dma  -> (0x41000, 0x1000)
       )
     )
   }
-  val peripheral_apb_bridge = new ApbClockBridge(11)
+  val peripheral_apb_bridge = new ApbClockBridge(19)
   peripheral_apb_bridge.io.clk_output <> board_ctrl.io.clk_peripheral
   peripheral_apb_bridge.io.output <> peripheral.apb
 
@@ -105,12 +104,13 @@ class EndeavourSoc extends Component {
   ram_ctrl.io.clk_shifted <> board_ctrl.io.clk_ram
   ram_ctrl.io.reset <> board_ctrl.io.reset
 
+  val usb_interrupt = RegNext(peripheral.usb_ctrl.io.interrupt) addTag(crossClockDomain)
+
   val plicPriorityWidth = 1
   val plic_gateways = List(
     PlicGatewayActiveHigh(source = peripheral.uart_ctrl.io.interrupt, id = 1, priorityWidth = plicPriorityWidth),
     PlicGatewayActiveHigh(source = peripheral.sdcard_ctrl.io.interrupt, id = 2, priorityWidth = plicPriorityWidth),
-    PlicGatewayActiveHigh(source = peripheral.usb1_ctrl.io.interrupt, id = 3, priorityWidth = plicPriorityWidth),
-    PlicGatewayActiveHigh(source = peripheral.usb2_ctrl.io.interrupt, id = 4, priorityWidth = plicPriorityWidth)
+    PlicGatewayActiveHigh(source = usb_interrupt, id = 3, priorityWidth = plicPriorityWidth)
   )
   val plic_target = PlicTarget(id = 0, gateways = plic_gateways, priorityWidth = plicPriorityWidth)
 
@@ -172,9 +172,9 @@ class EndeavourSoc extends Component {
   val apbDecoder = Apb3Decoder(
     master = apbBridge.io.apb,
     slaves = List(
-      peripheral_apb_bridge.io.input -> (0x000, 2048),
-      board_ctrl.io.apb  -> (0x800, 32),
-      video_ctrl.io.apb  -> (0x900, 32),
+      peripheral_apb_bridge.io.input -> (0x0, 0x80000),
+      board_ctrl.io.apb  -> (0x80000, 32),
+      video_ctrl.io.apb  -> (0x90000, 32),
       plic_apb           -> (plicAddr, plicSize)
     )
   )

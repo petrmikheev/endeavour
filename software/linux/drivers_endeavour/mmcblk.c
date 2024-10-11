@@ -129,6 +129,7 @@ static void mmcblk_submit_bio(struct bio *bio) {
     if (!process_segment(ptr, sector, sector_count, write)) {
       printk("mmcblk error write=%d  ptr=0x%x  sector=%d  count=%d\n", (int)write, (unsigned)ptr, sector, sector_count);
       bio_io_error(bio);
+      return;
     }
   }
 

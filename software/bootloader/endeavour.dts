@@ -46,38 +46,33 @@
     riscv,ndev = <4>;
   };
 
-  uart: serial@100 {
+  uart: serial@10000 {
     compatible = "endeavour,uart";
-    reg = <0x100 12>;
+    reg = <0x10000 12>;
     interrupts-extended = <&plic 1>;
   };
 
-  /*audio: audio@200 {
+  /*audio: audio@20000 {
     compatible = "endeavour,audio";
-    reg = <0x200 8>;
+    reg = <0x20000 8>;
   };*/
 
-  mmcblk: mmcblk@300 {
+  mmcblk: mmcblk@30000 {
     compatible = "endeavour,mmcblk";
-    reg = <0x300 32>;
+    reg = <0x30000 32>;
     interrupts-extended = <&plic 2>;
   };
 
-  /*usb1: usb@400 {
-    compatible = "ue11-hcd";
-    reg = <0x400 0x40>;
+  ohci: ohci@40000 {
+    compatible = "generic-ohci";
+    reg = <0x40000 0x1000>;
+    status = "okay";
     interrupts-extended = <&plic 3>;
   };
 
-  usb2: usb@500 {
-    compatible = "ue11-hcd";
-    reg = <0x500 0x40>;
-    interrupts-extended = <&plic 4>;
-  };*/
-
-  display: display@900 {
+  display: display@90000 {
     compatible = "endeavour,display";
-    reg = <0x900 20>;
+    reg = <0x90000 20>;
   };
 
   memory@80000000 {
@@ -88,7 +83,13 @@
   reserved-memory {
     #address-cells = <1>;
     #size-cells = <1>;
-    ranges; 
+    ranges;
+    ohci_dma: ohci_dma@41000 {
+      compatible = "shared-dma-pool";
+      reusable;
+      reg = <0x41000 0x1000>;
+      linux,cma-default;
+    };
     framebuffer@80000000 {
       no-map;
       reg = <0x80000000 0x400000>;

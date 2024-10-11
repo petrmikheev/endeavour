@@ -134,7 +134,7 @@ class AudioController extends BlackBox {
   mapClockDomain(clock=io.clk, reset=io.reset)
 }
 
-class USBHostController extends BlackBox {
+/*class USBHostController extends BlackBox {
   val io = new Bundle {
     val clk = in Bool()
     val reset = in Bool()
@@ -148,7 +148,7 @@ class USBHostController extends BlackBox {
   }
   noIoPrefix()
   mapClockDomain(clock=io.clk, reset=io.reset)
-}
+}*/
 
 class DDRSdramController(rowBits: Int, colBits: Int) extends BlackBox {
   addGeneric("ROW_BITS", rowBits)
@@ -190,7 +190,7 @@ class DDRSdramController(rowBits: Int, colBits: Int) extends BlackBox {
   addPrePopTask(() => renameIO())
 }
 
-class InternalRam(size: BigInt) extends BlackBox {
+/*class InternalRam(size: BigInt) extends BlackBox {
   val io = new Bundle {
     val clk = in Bool()
     val reset = in Bool()
@@ -209,7 +209,7 @@ class InternalRam(size: BigInt) extends BlackBox {
   }
   noIoPrefix()
   mapClockDomain(clock=io.clk, reset=io.reset)
-}
+}*/
 
 /*class InternalRam extends BlackBox {
   val io = new Bundle {

@@ -81,14 +81,14 @@ derive_clock_uncertainty
 #**************************************************************
 
 set_input_delay -clock {clk48} 0 [get_ports {io_uart_rx io_*_i2c_sda io_plla_clk* io_pllb_clk*}]
-set_input_delay -clock {clk48} 0 [get_ports {io_sdcard_cmd io_sdcard_data* io_sdcard_ndetect io_usb*}]
+#set_input_delay -clock {clk48} 0 [get_ports {io_sdcard_cmd io_sdcard_data* io_sdcard_ndetect io_usb*}]
 
 #**************************************************************
 # Set Output Delay
 #**************************************************************
 
 set_output_delay -clock {clk48} -4.0 [get_ports {io_uart_tx io_audio_* io_pll*i2c*}]
-set_output_delay -clock {clk48} 0 [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data* io_usb*}]
+#set_output_delay -clock {clk48} 0 [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data* io_usb*}]
 
 #**************************************************************
 # Set Clock Groups
@@ -105,9 +105,11 @@ set_false_path -to [get_ports {io_leds*}]
 set_false_path -to [get_ports {io_dvi_*}]
 
 set_false_path -from [get_ports {io_ddr_sdram_dq*}]
+set_false_path -from [get_ports {io_sdcard_* io_usb*}]
 
 #set_false_path -setup -to [get_ports {io_ddr_sdram_*}]
 set_false_path -hold -to [get_ports {io_ddr_sdram_*}]
+set_false_path -hold -to [get_ports {io_sdcard_* io_usb*}]
 
 #**************************************************************
 # Set Multicycle Path
@@ -128,6 +130,9 @@ set_min_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 6
 set_max_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 7
 set_min_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 6
 set_max_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 7
+
+set_min_delay -from [get_clocks clk48] -to [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data* io_usb*}] 10
+set_max_delay -from [get_clocks clk48] -to [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data* io_usb*}] 14
 
 #**************************************************************
 # Set Minimum Delay
