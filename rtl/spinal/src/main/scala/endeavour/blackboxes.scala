@@ -31,10 +31,11 @@ class BoardController extends BlackBox {
     val plla = PLL()
     val pllb = PLL()
 
-    val reset = out Bool()
+    val reset_cpu = out Bool()
     val clk_cpu = out Bool()
     val clk_ram = out Bool()
     //val clk_ram_bus = out Bool()
+    val reset_peripheral = out Bool()
     val clk_peripheral = out Bool()  // uart, audio, usb, sdcard
 
     val utime = out UInt(64 bits)

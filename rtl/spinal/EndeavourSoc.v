@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.10.1    git head : 2527c7c6b0fb0f95e5e1a5722a0be732b364ce43
 // Component : EndeavourSoc
-// Git hash  : 46abafdc907128e7d861c4674130e9ed5e96080e
+// Git hash  : 63f2b75fc6ffaea272fddb2da82caed40099b44d
 
 `timescale 1ns/1ps
 
@@ -92,9 +92,10 @@ module EndeavourSoc (
   wire                apb3Router_3_io_outputs_3_PSLVERROR;
   wire                board_ctrl_plla_i2c_scl;
   wire                board_ctrl_pllb_i2c_scl;
-  wire                board_ctrl_reset;
+  wire                board_ctrl_reset_cpu;
   wire                board_ctrl_clk_cpu;
   wire                board_ctrl_clk_ram;
+  wire                board_ctrl_reset_peripheral;
   wire                board_ctrl_clk_peripheral;
   wire       [63:0]   board_ctrl_utime;
   wire                board_ctrl_timer_interrupt;
@@ -659,40 +660,41 @@ module EndeavourSoc (
 
   assign _zz_dbus_axi_arw_payload_len = ((toplevel_vexRiscv_1_dBus_cmd_m2sPipe_m2sPipe_s2mPipe_payload_size == 3'b101) ? 3'b111 : 3'b000);
   BoardController board_ctrl (
-    .nreset_in       (io_nreset                             ), //i
-    .clk_in          (io_clk_in                             ), //i
-    .plla_i2c_scl    (board_ctrl_plla_i2c_scl               ), //o
-    .plla_i2c_sda    ({io_plla_i2c_sda}),
-    .plla_clk0       (io_plla_clk0                          ), //i
-    .plla_clk1       (io_plla_clk1                          ), //i
-    .plla_clk2       (io_plla_clk2                          ), //i
-    .pllb_i2c_scl    (board_ctrl_pllb_i2c_scl               ), //o
-    .pllb_i2c_sda    ({io_pllb_i2c_sda}),
-    .pllb_clk0       (io_pllb_clk0                          ), //i
-    .pllb_clk1       (io_pllb_clk1                          ), //i
-    .pllb_clk2       (io_pllb_clk2                          ), //i
-    .reset           (board_ctrl_reset                      ), //o
-    .clk_cpu         (board_ctrl_clk_cpu                    ), //o
-    .clk_ram         (board_ctrl_clk_ram                    ), //o
-    .clk_peripheral  (board_ctrl_clk_peripheral             ), //o
-    .utime           (board_ctrl_utime[63:0]                ), //o
-    .timer_interrupt (board_ctrl_timer_interrupt            ), //o
-    .video_mode      (video_ctrl_video_mode_out[1:0]        ), //i
-    .clk_tmds_pixel  (board_ctrl_clk_tmds_pixel             ), //o
-    .clk_tmds_x5     (board_ctrl_clk_tmds_x5                ), //o
-    .leds            (board_ctrl_leds[2:0]                  ), //o
-    .keys            (io_keys[1:0]                          ), //i
-    .apb_PADDR       (board_ctrl_apb_PADDR[4:0]             ), //i
-    .apb_PSEL        (apb3Router_3_io_outputs_1_PSEL        ), //i
-    .apb_PENABLE     (apb3Router_3_io_outputs_1_PENABLE     ), //i
-    .apb_PREADY      (board_ctrl_apb_PREADY                 ), //o
-    .apb_PWRITE      (apb3Router_3_io_outputs_1_PWRITE      ), //i
-    .apb_PWDATA      (apb3Router_3_io_outputs_1_PWDATA[31:0]), //i
-    .apb_PRDATA      (board_ctrl_apb_PRDATA[31:0]           )  //o
+    .nreset_in        (io_nreset                             ), //i
+    .clk_in           (io_clk_in                             ), //i
+    .plla_i2c_scl     (board_ctrl_plla_i2c_scl               ), //o
+    .plla_i2c_sda     ({io_plla_i2c_sda}),
+    .plla_clk0        (io_plla_clk0                          ), //i
+    .plla_clk1        (io_plla_clk1                          ), //i
+    .plla_clk2        (io_plla_clk2                          ), //i
+    .pllb_i2c_scl     (board_ctrl_pllb_i2c_scl               ), //o
+    .pllb_i2c_sda     ({io_pllb_i2c_sda}),
+    .pllb_clk0        (io_pllb_clk0                          ), //i
+    .pllb_clk1        (io_pllb_clk1                          ), //i
+    .pllb_clk2        (io_pllb_clk2                          ), //i
+    .reset_cpu        (board_ctrl_reset_cpu                  ), //o
+    .clk_cpu          (board_ctrl_clk_cpu                    ), //o
+    .clk_ram          (board_ctrl_clk_ram                    ), //o
+    .reset_peripheral (board_ctrl_reset_peripheral           ), //o
+    .clk_peripheral   (board_ctrl_clk_peripheral             ), //o
+    .utime            (board_ctrl_utime[63:0]                ), //o
+    .timer_interrupt  (board_ctrl_timer_interrupt            ), //o
+    .video_mode       (video_ctrl_video_mode_out[1:0]        ), //i
+    .clk_tmds_pixel   (board_ctrl_clk_tmds_pixel             ), //o
+    .clk_tmds_x5      (board_ctrl_clk_tmds_x5                ), //o
+    .leds             (board_ctrl_leds[2:0]                  ), //o
+    .keys             (io_keys[1:0]                          ), //i
+    .apb_PADDR        (board_ctrl_apb_PADDR[4:0]             ), //i
+    .apb_PSEL         (apb3Router_3_io_outputs_1_PSEL        ), //i
+    .apb_PENABLE      (apb3Router_3_io_outputs_1_PENABLE     ), //i
+    .apb_PREADY       (board_ctrl_apb_PREADY                 ), //o
+    .apb_PWRITE       (apb3Router_3_io_outputs_1_PWRITE      ), //i
+    .apb_PWDATA       (apb3Router_3_io_outputs_1_PWDATA[31:0]), //i
+    .apb_PRDATA       (board_ctrl_apb_PRDATA[31:0]           )  //o
   );
   VideoController video_ctrl (
     .clk                  (board_ctrl_clk_cpu                                  ), //i
-    .reset                (board_ctrl_reset                                    ), //i
+    .reset                (board_ctrl_reset_cpu                                ), //i
     .video_mode_out       (video_ctrl_video_mode_out[1:0]                      ), //o
     .tmds_pixel_clk       (board_ctrl_clk_tmds_pixel                           ), //i
     .tmds_x5_clk          (board_ctrl_clk_tmds_x5                              ), //i
@@ -723,7 +725,7 @@ module EndeavourSoc (
   );
   UartController peripheral_uart_ctrl (
     .clk         (board_ctrl_clk_peripheral             ), //i
-    .reset       (board_ctrl_reset                      ), //i
+    .reset       (board_ctrl_reset_peripheral           ), //i
     .uart_rx     (io_uart_rx                            ), //i
     .uart_tx     (peripheral_uart_ctrl_uart_tx          ), //o
     .interrupt   (peripheral_uart_ctrl_interrupt        ), //o
@@ -737,7 +739,7 @@ module EndeavourSoc (
   );
   AudioController peripheral_audio_ctrl (
     .clk         (board_ctrl_clk_peripheral             ), //i
-    .reset       (board_ctrl_reset                      ), //i
+    .reset       (board_ctrl_reset_peripheral           ), //i
     .shdn        (peripheral_audio_ctrl_shdn            ), //o
     .i2c_scl     (peripheral_audio_ctrl_i2c_scl         ), //o
     .i2c_sda     ({io_audio_i2c_sda}),
@@ -751,7 +753,7 @@ module EndeavourSoc (
   );
   SdcardController peripheral_sdcard_ctrl (
     .clk            (board_ctrl_clk_peripheral              ), //i
-    .reset          (board_ctrl_reset                       ), //i
+    .reset          (board_ctrl_reset_peripheral            ), //i
     .sdcard_clk     (peripheral_sdcard_ctrl_sdcard_clk      ), //o
     .sdcard_cmd     ({io_sdcard_cmd}),
     .sdcard_data    ({io_sdcard_data}),
@@ -787,7 +789,7 @@ module EndeavourSoc (
     .io_interrupt        (peripheral_usb_ctrl_io_interrupt            ), //o
     ._zz_io_interrupt    (peripheral_usb_ctrl__zz_io_interrupt        ), //o
     .clk_peripheral      (board_ctrl_clk_peripheral                   ), //i
-    .reset               (board_ctrl_reset                            )  //i
+    .reset_peripheral    (board_ctrl_reset_peripheral                 )  //i
   );
   Apb3Decoder peripheral_apb_decoder (
     .io_input_PADDR    (peripheral_apb_PADDR[18:0]                   ), //i
@@ -849,7 +851,7 @@ module EndeavourSoc (
     .io_outputs_4_PWDATA  (apb3Router_2_io_outputs_4_PWDATA[31:0]       ), //o
     .io_outputs_4_PRDATA  (peripheral_usb_ctrl_io_apb_dma_PRDATA[31:0]  ), //i
     .clk_peripheral       (board_ctrl_clk_peripheral                    ), //i
-    .reset                (board_ctrl_reset                             )  //i
+    .reset_peripheral     (board_ctrl_reset_peripheral                  )  //i
   );
   ApbClockBridge #(
     .AWIDTH(19)
@@ -877,7 +879,7 @@ module EndeavourSoc (
   ) ram_ctrl (
     .clk         (board_ctrl_clk_cpu                                   ), //i
     .clk_shifted (board_ctrl_clk_ram                                   ), //i
-    .reset       (board_ctrl_reset                                     ), //i
+    .reset       (board_ctrl_reset_cpu                                 ), //i
     .arw_valid   (ram_ctrl_axi_arbiter_io_output_arw_valid             ), //i
     .arw_ready   (ram_ctrl_arw_ready                                   ), //o
     .arw_addr    (ram_ctrl_axi_arbiter_io_output_arw_payload_addr[26:0]), //i
@@ -938,7 +940,7 @@ module EndeavourSoc (
     .iBus_rsp_payload_data     (axi4ReadOnlyDecoder_2_io_input_r_payload_data[31:0]), //i
     .iBus_rsp_payload_error    (vexRiscv_1_iBus_rsp_payload_error                  ), //i
     .clk_cpu                   (board_ctrl_clk_cpu                                 ), //i
-    .reset                     (board_ctrl_reset                                   )  //i
+    .reset_cpu                 (board_ctrl_reset_cpu                               )  //i
   );
   Axi4SharedOnChipRam internalRam (
     .io_axi_arw_valid         (internalRam_io_axi_arbiter_io_output_arw_valid             ), //i
@@ -965,7 +967,7 @@ module EndeavourSoc (
     .io_axi_r_payload_resp    (internalRam_io_axi_r_payload_resp[1:0]                     ), //o
     .io_axi_r_payload_last    (internalRam_io_axi_r_payload_last                          ), //o
     .clk_cpu                  (board_ctrl_clk_cpu                                         ), //i
-    .reset                    (board_ctrl_reset                                           )  //i
+    .reset_cpu                (board_ctrl_reset_cpu                                       )  //i
   );
   Axi4SharedToApb3Bridge apbBridge (
     .io_axi_arw_valid         (apbBridge_io_axi_arbiter_io_output_arw_valid             ), //i
@@ -1000,7 +1002,7 @@ module EndeavourSoc (
     .io_apb_PRDATA            (io_apb_decoder_io_input_PRDATA[31:0]                     ), //i
     .io_apb_PSLVERROR         (io_apb_decoder_io_input_PSLVERROR                        ), //i
     .clk_cpu                  (board_ctrl_clk_cpu                                       ), //i
-    .reset                    (board_ctrl_reset                                         )  //i
+    .reset_cpu                (board_ctrl_reset_cpu                                     )  //i
   );
   Axi4ReadOnlyDecoder axi4ReadOnlyDecoder_2 (
     .io_input_ar_valid             (vexRiscv_1_iBus_cmd_valid                                      ), //i
@@ -1040,7 +1042,7 @@ module EndeavourSoc (
     .io_outputs_1_r_payload_resp   (axi4ReadOnlyDecoder_2_io_outputs_1_r_payload_resp[1:0]         ), //i
     .io_outputs_1_r_payload_last   (ram_ctrl_axi_arbiter_io_readInputs_0_r_payload_last            ), //i
     .clk_cpu                       (board_ctrl_clk_cpu                                             ), //i
-    .reset                         (board_ctrl_reset                                               )  //i
+    .reset_cpu                     (board_ctrl_reset_cpu                                           )  //i
   );
   Axi4SharedDecoder dbus_axi_decoder (
     .io_input_arw_valid                   (dbus_axi_arw_valid                                               ), //i
@@ -1128,7 +1130,7 @@ module EndeavourSoc (
     .io_sharedOutputs_2_r_payload_resp    (dbus_axi_decoder_io_sharedOutputs_2_r_payload_resp[1:0]          ), //i
     .io_sharedOutputs_2_r_payload_last    (ram_ctrl_axi_arbiter_io_sharedInputs_0_r_payload_last            ), //i
     .clk_cpu                              (board_ctrl_clk_cpu                                               ), //i
-    .reset                                (board_ctrl_reset                                                 )  //i
+    .reset_cpu                            (board_ctrl_reset_cpu                                             )  //i
   );
   Axi4ReadOnlyDecoder_1 video_ctrl_axi_decoder (
     .io_input_ar_valid             (video_ctrl_axi_ar_valid                                       ), //i
@@ -1150,7 +1152,7 @@ module EndeavourSoc (
     .io_outputs_0_r_payload_data   (ram_ctrl_axi_arbiter_io_readInputs_1_r_payload_data[31:0]     ), //i
     .io_outputs_0_r_payload_last   (ram_ctrl_axi_arbiter_io_readInputs_1_r_payload_last           ), //i
     .clk_cpu                       (board_ctrl_clk_cpu                                            ), //i
-    .reset                         (board_ctrl_reset                                              )  //i
+    .reset_cpu                     (board_ctrl_reset_cpu                                          )  //i
   );
   Axi4SharedArbiter ram_ctrl_axi_arbiter (
     .io_readInputs_0_ar_valid            (toplevel_axi4ReadOnlyDecoder_2_io_outputs_1_ar_validPipe_valid              ), //i
@@ -1213,7 +1215,7 @@ module EndeavourSoc (
     .io_output_r_payload_id              (ram_ctrl_rid[1:0]                                                           ), //i
     .io_output_r_payload_last            (ram_ctrl_rlast                                                              ), //i
     .clk_cpu                             (board_ctrl_clk_cpu                                                          ), //i
-    .reset                               (board_ctrl_reset                                                            )  //i
+    .reset_cpu                           (board_ctrl_reset_cpu                                                        )  //i
   );
   Axi4SharedArbiter_1 internalRam_io_axi_arbiter (
     .io_readInputs_0_ar_valid            (toplevel_axi4ReadOnlyDecoder_2_io_outputs_0_ar_validPipe_valid              ), //i
@@ -1276,7 +1278,7 @@ module EndeavourSoc (
     .io_output_r_payload_resp            (internalRam_io_axi_r_payload_resp[1:0]                                      ), //i
     .io_output_r_payload_last            (internalRam_io_axi_r_payload_last                                           ), //i
     .clk_cpu                             (board_ctrl_clk_cpu                                                          ), //i
-    .reset                               (board_ctrl_reset                                                            )  //i
+    .reset_cpu                           (board_ctrl_reset_cpu                                                        )  //i
   );
   Axi4SharedArbiter_2 apbBridge_io_axi_arbiter (
     .io_sharedInputs_0_arw_valid         (toplevel_dbus_axi_decoder_io_sharedOutputs_0_arw_validPipe_valid            ), //i
@@ -1326,7 +1328,7 @@ module EndeavourSoc (
     .io_output_r_payload_resp            (apbBridge_io_axi_r_payload_resp[1:0]                                        ), //i
     .io_output_r_payload_last            (apbBridge_io_axi_r_payload_last                                             ), //i
     .clk_cpu                             (board_ctrl_clk_cpu                                                          ), //i
-    .reset                               (board_ctrl_reset                                                            )  //i
+    .reset_cpu                           (board_ctrl_reset_cpu                                                        )  //i
   );
   Apb3Decoder_1 io_apb_decoder (
     .io_input_PADDR      (apbBridge_io_apb_PADDR[26:0]         ), //i
@@ -1388,7 +1390,7 @@ module EndeavourSoc (
     .io_outputs_3_PRDATA    (plic_apb_PRDATA[31:0]                   ), //i
     .io_outputs_3_PSLVERROR (apb3Router_3_io_outputs_3_PSLVERROR     ), //i
     .clk_cpu                (board_ctrl_clk_cpu                      ), //i
-    .reset                  (board_ctrl_reset                        )  //i
+    .reset_cpu              (board_ctrl_reset_cpu                    )  //i
   );
   assign io_plla_i2c_scl = board_ctrl_plla_i2c_scl;
   assign io_pllb_i2c_scl = board_ctrl_pllb_i2c_scl;
@@ -1845,8 +1847,8 @@ module EndeavourSoc (
     end
   end
 
-  always @(posedge board_ctrl_clk_cpu or posedge board_ctrl_reset) begin
-    if(board_ctrl_reset) begin
+  always @(posedge board_ctrl_clk_cpu or posedge board_ctrl_reset_cpu) begin
+    if(board_ctrl_reset_cpu) begin
       plic_gateways_0_ip <= 1'b0;
       plic_gateways_0_waitCompletion <= 1'b0;
       plic_gateways_1_ip <= 1'b0;
@@ -2059,7 +2061,7 @@ module Apb3Router_1 (
   input  wire [31:0]   io_outputs_3_PRDATA,
   input  wire          io_outputs_3_PSLVERROR,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   reg                 _zz_io_input_PREADY;
@@ -2227,7 +2229,7 @@ module Axi4SharedArbiter_2 (
   input  wire [1:0]    io_output_r_payload_resp,
   input  wire          io_output_r_payload_last,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   reg                 cmdArbiter_io_output_ready;
@@ -2315,7 +2317,7 @@ module Axi4SharedArbiter_2 (
     .io_output_payload_write   (cmdArbiter_io_output_payload_write     ), //o
     .io_chosenOH               (cmdArbiter_io_chosenOH                 ), //o
     .clk_cpu                   (clk_cpu                                ), //i
-    .reset                     (reset                                  )  //i
+    .reset_cpu                 (reset_cpu                              )  //i
   );
   StreamFifoLowLatency_2 cmdRouteFork_thrown_translated_fifo (
     .io_push_valid   (cmdRouteFork_thrown_translated_valid                    ), //i
@@ -2326,7 +2328,7 @@ module Axi4SharedArbiter_2 (
     .io_occupancy    (cmdRouteFork_thrown_translated_fifo_io_occupancy[2:0]   ), //o
     .io_availability (cmdRouteFork_thrown_translated_fifo_io_availability[2:0]), //o
     .clk_cpu         (clk_cpu                                                 ), //i
-    .reset           (reset                                                   )  //i
+    .reset_cpu       (reset_cpu                                               )  //i
   );
   assign inputsCmd_0_valid = io_sharedInputs_0_arw_valid;
   assign io_sharedInputs_0_arw_ready = inputsCmd_0_ready;
@@ -2422,8 +2424,8 @@ module Axi4SharedArbiter_2 (
   assign io_sharedInputs_0_r_payload_id = io_output_r_payload_id;
   assign io_output_r_ready = io_sharedInputs_0_r_ready;
   assign cmdRouteFork_thrown_translated_fifo_io_flush = 1'b0;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       apbBridge_io_axi_arbiter_cmdArbiter_io_output_fork2_logic_linkEnable_0 <= 1'b1;
       apbBridge_io_axi_arbiter_cmdArbiter_io_output_fork2_logic_linkEnable_1 <= 1'b1;
     end else begin
@@ -2504,7 +2506,7 @@ module Axi4SharedArbiter_1 (
   input  wire [1:0]    io_output_r_payload_resp,
   input  wire          io_output_r_payload_last,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   reg                 cmdArbiter_io_output_ready;
@@ -2621,7 +2623,7 @@ module Axi4SharedArbiter_1 (
     .io_chosen                 (cmdArbiter_io_chosen                   ), //o
     .io_chosenOH               (cmdArbiter_io_chosenOH[1:0]            ), //o
     .clk_cpu                   (clk_cpu                                ), //i
-    .reset                     (reset                                  )  //i
+    .reset_cpu                 (reset_cpu                              )  //i
   );
   StreamFifoLowLatency_2 cmdRouteFork_thrown_translated_fifo (
     .io_push_valid   (cmdRouteFork_thrown_translated_valid                    ), //i
@@ -2632,7 +2634,7 @@ module Axi4SharedArbiter_1 (
     .io_occupancy    (cmdRouteFork_thrown_translated_fifo_io_occupancy[2:0]   ), //o
     .io_availability (cmdRouteFork_thrown_translated_fifo_io_availability[2:0]), //o
     .clk_cpu         (clk_cpu                                                 ), //i
-    .reset           (reset                                                   )  //i
+    .reset_cpu       (reset_cpu                                               )  //i
   );
   always @(*) begin
     case(readRspIndex)
@@ -2752,8 +2754,8 @@ module Axi4SharedArbiter_1 (
   assign io_sharedInputs_0_r_payload_id = io_output_r_payload_id[0:0];
   assign io_output_r_ready = _zz_io_output_r_ready;
   assign cmdRouteFork_thrown_translated_fifo_io_flush = 1'b0;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       internalRam_io_axi_arbiter_cmdArbiter_io_output_fork2_logic_linkEnable_0 <= 1'b1;
       internalRam_io_axi_arbiter_cmdArbiter_io_output_fork2_logic_linkEnable_1 <= 1'b1;
     end else begin
@@ -2834,7 +2836,7 @@ module Axi4SharedArbiter (
   input  wire [1:0]    io_output_r_payload_id,
   input  wire          io_output_r_payload_last,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   reg                 cmdArbiter_io_output_ready;
@@ -2954,7 +2956,7 @@ module Axi4SharedArbiter (
     .io_chosen                 (cmdArbiter_io_chosen[1:0]              ), //o
     .io_chosenOH               (cmdArbiter_io_chosenOH[2:0]            ), //o
     .clk_cpu                   (clk_cpu                                ), //i
-    .reset                     (reset                                  )  //i
+    .reset_cpu                 (reset_cpu                              )  //i
   );
   StreamFifoLowLatency_2 cmdRouteFork_thrown_translated_fifo (
     .io_push_valid   (cmdRouteFork_thrown_translated_valid                    ), //i
@@ -2965,7 +2967,7 @@ module Axi4SharedArbiter (
     .io_occupancy    (cmdRouteFork_thrown_translated_fifo_io_occupancy[2:0]   ), //o
     .io_availability (cmdRouteFork_thrown_translated_fifo_io_availability[2:0]), //o
     .clk_cpu         (clk_cpu                                                 ), //i
-    .reset           (reset                                                   )  //i
+    .reset_cpu       (reset_cpu                                               )  //i
   );
   always @(*) begin
     case(readRspIndex)
@@ -3089,8 +3091,8 @@ module Axi4SharedArbiter (
   assign io_sharedInputs_0_r_payload_last = io_output_r_payload_last;
   assign io_output_r_ready = _zz_io_output_r_ready;
   assign cmdRouteFork_thrown_translated_fifo_io_flush = 1'b0;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       ram_ctrl_axi_arbiter_cmdArbiter_io_output_fork2_logic_linkEnable_0 <= 1'b1;
       ram_ctrl_axi_arbiter_cmdArbiter_io_output_fork2_logic_linkEnable_1 <= 1'b1;
     end else begin
@@ -3130,7 +3132,7 @@ module Axi4ReadOnlyDecoder_1 (
   input  wire [31:0]   io_outputs_0_r_payload_data,
   input  wire          io_outputs_0_r_payload_last,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   wire                errorSlave_io_axi_ar_valid;
@@ -3168,7 +3170,7 @@ module Axi4ReadOnlyDecoder_1 (
     .io_axi_r_payload_data   (errorSlave_io_axi_r_payload_data[31:0]), //o
     .io_axi_r_payload_last   (errorSlave_io_axi_r_payload_last      ), //o
     .clk_cpu                 (clk_cpu                               ), //i
-    .reset                   (reset                                 )  //i
+    .reset_cpu               (reset_cpu                             )  //i
   );
   assign io_input_ar_fire = (io_input_ar_valid && io_input_ar_ready);
   assign io_input_r_fire = (io_input_r_valid && io_input_r_ready);
@@ -3230,8 +3232,8 @@ module Axi4ReadOnlyDecoder_1 (
   end
 
   assign io_outputs_0_r_ready = io_input_r_ready;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       pendingCmdCounter_value <= 3'b000;
       pendingSels <= 1'b0;
       pendingError <= 1'b0;
@@ -3335,7 +3337,7 @@ module Axi4SharedDecoder (
   input  wire [1:0]    io_sharedOutputs_2_r_payload_resp,
   input  wire          io_sharedOutputs_2_r_payload_last,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   wire                errorSlave_io_axi_arw_valid;
@@ -3416,7 +3418,7 @@ module Axi4SharedDecoder (
     .io_axi_r_payload_resp    (errorSlave_io_axi_r_payload_resp[1:0] ), //o
     .io_axi_r_payload_last    (errorSlave_io_axi_r_payload_last      ), //o
     .clk_cpu                  (clk_cpu                               ), //i
-    .reset                    (reset                                 )  //i
+    .reset_cpu                (reset_cpu                             )  //i
   );
   always @(*) begin
     case(writeRspIndex)
@@ -3589,8 +3591,8 @@ module Axi4SharedDecoder (
   assign io_sharedOutputs_0_r_ready = io_input_r_ready;
   assign io_sharedOutputs_1_r_ready = io_input_r_ready;
   assign io_sharedOutputs_2_r_ready = io_input_r_ready;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       pendingCmdCounter <= 3'b000;
       pendingDataCounter_value <= 3'b000;
       pendingSels <= 3'b000;
@@ -3655,7 +3657,7 @@ module Axi4ReadOnlyDecoder (
   input  wire [1:0]    io_outputs_1_r_payload_resp,
   input  wire          io_outputs_1_r_payload_last,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   wire                errorSlave_io_axi_ar_valid;
@@ -3700,7 +3702,7 @@ module Axi4ReadOnlyDecoder (
     .io_axi_r_payload_resp   (errorSlave_io_axi_r_payload_resp[1:0] ), //o
     .io_axi_r_payload_last   (errorSlave_io_axi_r_payload_last      ), //o
     .clk_cpu                 (clk_cpu                               ), //i
-    .reset                   (reset                                 )  //i
+    .reset_cpu               (reset_cpu                             )  //i
   );
   assign io_input_ar_fire = (io_input_ar_valid && io_input_ar_ready);
   assign io_input_r_fire = (io_input_r_valid && io_input_r_ready);
@@ -3781,8 +3783,8 @@ module Axi4ReadOnlyDecoder (
 
   assign io_outputs_0_r_ready = io_input_r_ready;
   assign io_outputs_1_r_ready = io_input_r_ready;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       pendingCmdCounter_value <= 3'b000;
       pendingSels <= 2'b00;
       pendingError <= 1'b0;
@@ -3833,7 +3835,7 @@ module Axi4SharedToApb3Bridge (
   input  wire [31:0]   io_apb_PRDATA,
   input  wire          io_apb_PSLVERROR,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
   localparam Axi4ToApb3BridgePhase_SETUP = 2'd0;
   localparam Axi4ToApb3BridgePhase_ACCESS_1 = 2'd1;
@@ -3974,8 +3976,8 @@ module Axi4SharedToApb3Bridge (
   assign io_axi_b_payload_id = id;
   assign io_axi_r_payload_data = readedData;
   assign io_axi_r_payload_last = 1'b1;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       phase <= Axi4ToApb3BridgePhase_SETUP;
     end else begin
       case(phase)
@@ -4051,7 +4053,7 @@ module Axi4SharedOnChipRam (
   output wire [1:0]    io_axi_r_payload_resp,
   output wire          io_axi_r_payload_last,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   wire                ram_en;
@@ -4316,8 +4318,8 @@ module Axi4SharedOnChipRam (
   assign io_axi_b_payload_id = stage1_payload_fragment_id;
   assign ram_addr = stage0_payload_fragment_addr[13 : 2];
   assign ram_en = (stage0_fire && 1'b1);
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       unburstify_buffer_valid <= 1'b0;
       stage0_rValid <= 1'b0;
     end else begin
@@ -4397,7 +4399,7 @@ module VexRiscv (
   input  wire [31:0]   iBus_rsp_payload_data,
   input  wire          iBus_rsp_payload_error,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
   localparam ShiftCtrlEnum_DISABLE_1 = 2'd0;
   localparam ShiftCtrlEnum_SLL_1 = 2'd1;
@@ -6625,7 +6627,7 @@ module VexRiscv (
     .io_mem_rsp_payload_data               (iBus_rsp_payload_data[31:0]                               ), //i
     .io_mem_rsp_payload_error              (iBus_rsp_payload_error                                    ), //i
     .clk_cpu                               (clk_cpu                                                   ), //i
-    .reset                                 (reset                                                     )  //i
+    .reset_cpu                             (reset_cpu                                                 )  //i
   );
   DataCache dataCache_1 (
     .io_cpu_execute_isValid                 (dataCache_1_io_cpu_execute_isValid               ), //i
@@ -6703,7 +6705,7 @@ module VexRiscv (
     .io_mem_rsp_payload_data                (dBus_rsp_regNext_payload_data[31:0]              ), //i
     .io_mem_rsp_payload_error               (dBus_rsp_regNext_payload_error                   ), //i
     .clk_cpu                                (clk_cpu                                          ), //i
-    .reset                                  (reset                                            )  //i
+    .reset_cpu                              (reset_cpu                                        )  //i
   );
   always @(*) begin
     case(_zz_IBusCachedPlugin_jump_pcLoad_payload_7)
@@ -10742,8 +10744,8 @@ module VexRiscv (
 
   assign when_CsrPlugin_l1717 = (CsrPlugin_privilege < execute_CsrPlugin_csrAddress[9 : 8]);
   assign when_CsrPlugin_l1725 = ((! execute_arbitration_isValid) || (! execute_IS_CSR));
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       _zz_5 <= 1'b1;
       HazardSimplePlugin_writeBackBuffer_valid <= 1'b0;
       memory_MulDivIterativePlugin_div_counter_value <= 5'h00;
@@ -12038,7 +12040,7 @@ module Apb3Router (
   output wire [31:0]   io_outputs_4_PWDATA,
   input  wire [31:0]   io_outputs_4_PRDATA,
   input  wire          clk_peripheral,
-  input  wire          reset
+  input  wire          reset_peripheral
 );
 
   reg                 _zz_io_input_PREADY;
@@ -12177,7 +12179,7 @@ module EndeavourUSB (
   output wire          io_interrupt,
   output wire          _zz_io_interrupt,
   input  wire          clk_peripheral,
-  input  wire          reset
+  input  wire          reset_peripheral
 );
 
   wire                ohci_io_ctrl_cmd_valid;
@@ -12371,7 +12373,7 @@ module EndeavourUSB (
     .io_interrupt                         (ohci_io_interrupt                             ), //o
     .io_interruptBios                     (ohci_io_interruptBios                         ), //o
     .clk_peripheral                       (clk_peripheral                                ), //i
-    .reset                                (reset                                         )  //i
+    .reset_peripheral                     (reset_peripheral                              )  //i
   );
   UsbLsFsPhyModified phy (
     .io_ctrl_lowSpeed                      (ohci_io_phy_lowSpeed                     ), //i
@@ -12433,7 +12435,7 @@ module EndeavourUSB (
     .io_management_1_overcurrent           (phy_io_management_1_overcurrent          ), //i
     .io_management_1_power                 (phy_io_management_1_power                ), //o
     .clk_peripheral                        (clk_peripheral                           ), //i
-    .reset                                 (reset                                    )  //i
+    .reset_peripheral                      (reset_peripheral                         )  //i
   );
   BmbOnChipRamMultiPort ram (
     .io_buses_0_cmd_valid                    (ohci_io_dma_cmd_valid                            ), //i
@@ -12463,7 +12465,7 @@ module EndeavourUSB (
     .io_buses_1_rsp_payload_fragment_opcode  (ram_io_buses_1_rsp_payload_fragment_opcode       ), //o
     .io_buses_1_rsp_payload_fragment_data    (ram_io_buses_1_rsp_payload_fragment_data[31:0]   ), //o
     .clk_peripheral                          (clk_peripheral                                   ), //i
-    .reset                                   (reset                                            )  //i
+    .reset_peripheral                        (reset_peripheral                                 )  //i
   );
   assign io_usb1_dp = _zz_io_usb1_dp ? usb1_tri_dp_write : 1'bz;
   assign io_usb1_dn = _zz_io_usb1_dn ? usb1_tri_dm_write : 1'bz;
@@ -12536,8 +12538,8 @@ module EndeavourUSB (
   assign when_usb_l96_2 = (ram_io_buses_1_cmd_valid && ram_io_buses_1_cmd_ready);
   assign when_usb_l96_3 = (_zz_when_usb_l96_3 && (! _zz_when_usb_l96_2));
   assign ram_io_buses_1_cmd_valid = (_zz_when_usb_l96_2 && (! _zz_when_usb_l96_3));
-  always @(posedge clk_peripheral or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_peripheral or posedge reset_peripheral) begin
+    if(reset_peripheral) begin
       _zz_when_usb_l96_1 <= 1'b0;
       _zz_when_usb_l96_3 <= 1'b0;
     end else begin
@@ -12580,7 +12582,7 @@ module StreamArbiter (
   output wire          io_output_payload_write,
   output wire [0:0]    io_chosenOH,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   wire       [1:0]    _zz__zz_maskProposal_0_2;
@@ -12615,8 +12617,8 @@ module StreamArbiter (
   assign io_output_payload_write = io_inputs_0_payload_write;
   assign io_inputs_0_ready = (maskRouted_0 && io_output_ready);
   assign io_chosenOH = maskRouted_0;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       locked <= 1'b0;
       maskLocked_0 <= 1'b1;
     end else begin
@@ -12665,7 +12667,7 @@ module StreamArbiter_1 (
   output wire [0:0]    io_chosen,
   output wire [1:0]    io_chosenOH,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   wire       [3:0]    _zz__zz_maskProposal_0_2;
@@ -12709,8 +12711,8 @@ module StreamArbiter_1 (
   assign io_chosenOH = {maskRouted_1,maskRouted_0};
   assign _zz_io_chosen = io_chosenOH[1];
   assign io_chosen = _zz_io_chosen;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       locked <= 1'b0;
       maskLocked_0 <= 1'b0;
       maskLocked_1 <= 1'b1;
@@ -12740,7 +12742,7 @@ module StreamFifoLowLatency_2 (
   output wire [2:0]    io_occupancy,
   output wire [2:0]    io_availability,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   wire                fifo_io_push_ready;
@@ -12757,7 +12759,7 @@ module StreamFifoLowLatency_2 (
     .io_occupancy    (fifo_io_occupancy[2:0]   ), //o
     .io_availability (fifo_io_availability[2:0]), //o
     .clk_cpu         (clk_cpu                  ), //i
-    .reset           (reset                    )  //i
+    .reset_cpu       (reset_cpu                )  //i
   );
   assign io_push_ready = fifo_io_push_ready;
   assign io_pop_valid = fifo_io_pop_valid;
@@ -12798,7 +12800,7 @@ module StreamArbiter_2 (
   output wire [1:0]    io_chosen,
   output wire [2:0]    io_chosenOH,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   wire       [5:0]    _zz__zz_maskProposal_0_2;
@@ -12882,8 +12884,8 @@ module StreamArbiter_2 (
   assign _zz_io_chosen = io_chosenOH[1];
   assign _zz_io_chosen_1 = io_chosenOH[2];
   assign io_chosen = {_zz_io_chosen_1,_zz_io_chosen};
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       locked <= 1'b0;
       maskLocked_0 <= 1'b0;
       maskLocked_1 <= 1'b0;
@@ -12917,7 +12919,7 @@ module Axi4ReadOnlyErrorSlave (
   output wire [31:0]   io_axi_r_payload_data,
   output wire          io_axi_r_payload_last,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   reg                 sendRsp;
@@ -12930,8 +12932,8 @@ module Axi4ReadOnlyErrorSlave (
   assign io_axi_ar_fire = (io_axi_ar_valid && io_axi_ar_ready);
   assign io_axi_r_valid = sendRsp;
   assign io_axi_r_payload_last = remainingZero;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       sendRsp <= 1'b0;
     end else begin
       if(io_axi_ar_fire) begin
@@ -12984,7 +12986,7 @@ module Axi4SharedErrorSlave (
   output wire [1:0]    io_axi_r_payload_resp,
   output wire          io_axi_r_payload_last,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   reg                 consumeData;
@@ -13009,8 +13011,8 @@ module Axi4SharedErrorSlave (
   assign io_axi_r_valid = sendReadRsp;
   assign io_axi_r_payload_resp = 2'b11;
   assign io_axi_r_payload_last = remainingZero;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       consumeData <= 1'b0;
       sendReadRsp <= 1'b0;
       sendWriteRsp <= 1'b0;
@@ -13064,7 +13066,7 @@ module Axi4ReadOnlyErrorSlave_1 (
   output wire [1:0]    io_axi_r_payload_resp,
   output wire          io_axi_r_payload_last,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   reg                 sendRsp;
@@ -13078,8 +13080,8 @@ module Axi4ReadOnlyErrorSlave_1 (
   assign io_axi_r_valid = sendRsp;
   assign io_axi_r_payload_resp = 2'b11;
   assign io_axi_r_payload_last = remainingZero;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       sendRsp <= 1'b0;
     end else begin
       if(io_axi_ar_fire) begin
@@ -13185,7 +13187,7 @@ module DataCache (
   input  wire [31:0]   io_mem_rsp_payload_data,
   input  wire          io_mem_rsp_payload_error,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   wire       [21:0]   _zz_ways_0_tags_port0;
@@ -14032,8 +14034,8 @@ module DataCache (
     loader_valid_regNext <= loader_valid;
   end
 
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       memCmdSent <= 1'b0;
       stageB_flusher_waitDone <= 1'b0;
       stageB_flusher_counter <= 8'h00;
@@ -14164,7 +14166,7 @@ module InstructionCache (
   input  wire [31:0]   io_mem_rsp_payload_data,
   input  wire          io_mem_rsp_payload_error,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   reg        [31:0]   _zz_banks_0_port1;
@@ -14349,8 +14351,8 @@ module InstructionCache (
   assign io_cpu_decode_mmuRefilling = decodeStage_mmuRsp_refilling;
   assign io_cpu_decode_mmuException = (((! decodeStage_mmuRsp_refilling) && decodeStage_mmuRsp_isPaging) && (decodeStage_mmuRsp_exception || (! decodeStage_mmuRsp_allowExecute)));
   assign io_cpu_decode_physicalAddress = decodeStage_mmuRsp_physicalAddress;
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       lineLoader_valid <= 1'b0;
       lineLoader_hadError <= 1'b0;
       lineLoader_flushPending <= 1'b1;
@@ -14459,7 +14461,7 @@ module BmbOnChipRamMultiPort (
   output wire [0:0]    io_buses_1_rsp_payload_fragment_opcode,
   output wire [31:0]   io_buses_1_rsp_payload_fragment_data,
   input  wire          clk_peripheral,
-  input  wire          reset
+  input  wire          reset_peripheral
 );
 
   reg        [31:0]   _zz_ram_port0;
@@ -14592,8 +14594,8 @@ module BmbOnChipRamMultiPort (
     end
   end
 
-  always @(posedge clk_peripheral or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_peripheral or posedge reset_peripheral) begin
+    if(reset_peripheral) begin
       io_buses_0_cmd_valid_regNextWhen <= 1'b0;
       io_buses_1_cmd_valid_regNextWhen <= 1'b0;
     end else begin
@@ -14669,7 +14671,7 @@ module UsbLsFsPhyModified (
   input  wire          io_management_1_overcurrent,
   output wire          io_management_1_power,
   input  wire          clk_peripheral,
-  input  wire          reset
+  input  wire          reset_peripheral
 );
   localparam txShared_frame_enumDef_BOOT = 4'd0;
   localparam txShared_frame_enumDef_IDLE = 4'd1;
@@ -15086,7 +15088,7 @@ module UsbLsFsPhyModified (
     .io_filtred_se0    (ports_0_filter_io_filtred_se0   ), //o
     .io_filtred_sample (ports_0_filter_io_filtred_sample), //o
     .clk_peripheral    (clk_peripheral                  ), //i
-    .reset             (reset                           )  //i
+    .reset_peripheral  (reset_peripheral                )  //i
   );
   UsbLsFsPhyFilter ports_1_filter (
     .io_lowSpeed       (io_ctrl_lowSpeed                ), //i
@@ -15098,7 +15100,7 @@ module UsbLsFsPhyModified (
     .io_filtred_se0    (ports_1_filter_io_filtred_se0   ), //o
     .io_filtred_sample (ports_1_filter_io_filtred_sample), //o
     .clk_peripheral    (clk_peripheral                  ), //i
-    .reset             (reset                           )  //i
+    .reset_peripheral  (reset_peripheral                )  //i
   );
   `ifndef SYNTHESIS
   always @(*) begin
@@ -17532,8 +17534,8 @@ module UsbLsFsPhyModified (
   assign when_usb_phy_l512_1 = ((! io_ctrl_ports_1_power) || io_ctrl_usbReset);
   assign when_usb_phy_l519_1 = (! ports_1_fsm_resetInProgress);
   assign when_usb_phy_l520_1 = (ports_1_filter_io_filtred_dm != ports_1_filter_io_filtred_dp);
-  always @(posedge clk_peripheral or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_peripheral or posedge reset_peripheral) begin
+    if(reset_peripheral) begin
       tickTimer_counter_value <= 2'b00;
       txShared_rxToTxDelay_active <= 1'b0;
       txShared_lowSpeedSof_state <= 2'b00;
@@ -17995,8 +17997,8 @@ module UsbLsFsPhyModified (
     endcase
   end
 
-  always @(posedge clk_peripheral or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_peripheral or posedge reset_peripheral) begin
+    if(reset_peripheral) begin
       io_ctrl_tx_payload_first <= 1'b1;
     end else begin
       if(io_ctrl_tx_fire) begin
@@ -18082,7 +18084,7 @@ module UsbOhci (
   output wire          io_interrupt,
   output wire          io_interruptBios,
   input  wire          clk_peripheral,
-  input  wire          reset
+  input  wire          reset_peripheral
 );
   localparam MainState_RESET = 2'd0;
   localparam MainState_RESUME = 2'd1;
@@ -19190,17 +19192,17 @@ module UsbOhci (
   assign _zz_ioDma_cmd_payload_fragment_address_1 = ({2'd0,reg_hcFmNumber_FN[4 : 0]} <<< 2'd2);
   assign _zz_ioDma_cmd_payload_fragment_address = {25'd0, _zz_ioDma_cmd_payload_fragment_address_1};
   StreamFifo_3 fifo (
-    .io_push_valid   (fifo_io_push_valid        ), //i
-    .io_push_ready   (fifo_io_push_ready        ), //o
-    .io_push_payload (fifo_io_push_payload[31:0]), //i
-    .io_pop_valid    (fifo_io_pop_valid         ), //o
-    .io_pop_ready    (fifo_io_pop_ready         ), //i
-    .io_pop_payload  (fifo_io_pop_payload[31:0] ), //o
-    .io_flush        (fifo_io_flush             ), //i
-    .io_occupancy    (fifo_io_occupancy[9:0]    ), //o
-    .io_availability (fifo_io_availability[9:0] ), //o
-    .clk_peripheral  (clk_peripheral            ), //i
-    .reset           (reset                     )  //i
+    .io_push_valid    (fifo_io_push_valid        ), //i
+    .io_push_ready    (fifo_io_push_ready        ), //o
+    .io_push_payload  (fifo_io_push_payload[31:0]), //i
+    .io_pop_valid     (fifo_io_pop_valid         ), //o
+    .io_pop_ready     (fifo_io_pop_ready         ), //i
+    .io_pop_payload   (fifo_io_pop_payload[31:0] ), //o
+    .io_flush         (fifo_io_flush             ), //i
+    .io_occupancy     (fifo_io_occupancy[9:0]    ), //o
+    .io_availability  (fifo_io_availability[9:0] ), //o
+    .clk_peripheral   (clk_peripheral            ), //i
+    .reset_peripheral (reset_peripheral          )  //i
   );
   Crc token_crc5 (
     .io_flush         (token_crc5_io_flush          ), //i
@@ -19209,7 +19211,7 @@ module UsbOhci (
     .io_result        (token_crc5_io_result[4:0]    ), //o
     .io_resultNext    (token_crc5_io_resultNext[4:0]), //o
     .clk_peripheral   (clk_peripheral               ), //i
-    .reset            (reset                        )  //i
+    .reset_peripheral (reset_peripheral             )  //i
   );
   Crc_1 dataTx_crc16 (
     .io_flush         (dataTx_crc16_io_flush            ), //i
@@ -19218,7 +19220,7 @@ module UsbOhci (
     .io_result        (dataTx_crc16_io_result[15:0]     ), //o
     .io_resultNext    (dataTx_crc16_io_resultNext[15:0] ), //o
     .clk_peripheral   (clk_peripheral                   ), //i
-    .reset            (reset                            )  //i
+    .reset_peripheral (reset_peripheral                 )  //i
   );
   Crc_2 dataRx_crc16 (
     .io_flush         (dataRx_crc16_io_flush           ), //i
@@ -19227,7 +19229,7 @@ module UsbOhci (
     .io_result        (dataRx_crc16_io_result[15:0]    ), //o
     .io_resultNext    (dataRx_crc16_io_resultNext[15:0]), //o
     .clk_peripheral   (clk_peripheral                  ), //i
-    .reset            (reset                           )  //i
+    .reset_peripheral (reset_peripheral                )  //i
   );
   always @(*) begin
     case(endpoint_dmaLogic_byteCtx_sel)
@@ -24457,8 +24459,8 @@ module UsbOhci (
   assign when_StateMachine_l253_8 = ((! (hc_stateReg == hc_enumDef_ANY_TO_RESET)) && (hc_stateNext == hc_enumDef_ANY_TO_RESET));
   assign when_StateMachine_l253_9 = ((! (hc_stateReg == hc_enumDef_ANY_TO_SUSPEND)) && (hc_stateNext == hc_enumDef_ANY_TO_SUSPEND));
   assign when_UsbOhci_l1659 = (reg_hcControl_HCFSWrite_valid && (reg_hcControl_HCFSWrite_payload == MainState_RESET));
-  always @(posedge clk_peripheral or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_peripheral or posedge reset_peripheral) begin
+    if(reset_peripheral) begin
       dmaCtx_pendingCounter <= 4'b0000;
       dmaCtx_beatCounter <= 6'h00;
       io_dma_cmd_payload_first <= 1'b1;
@@ -25875,8 +25877,8 @@ module UsbOhci (
     endcase
   end
 
-  always @(posedge clk_peripheral or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_peripheral or posedge reset_peripheral) begin
+    if(reset_peripheral) begin
       ioDma_cmd_payload_first <= 1'b1;
     end else begin
       if(ioDma_cmd_fire) begin
@@ -25901,7 +25903,7 @@ module StreamFifo_2 (
   output wire [2:0]    io_occupancy,
   output wire [2:0]    io_availability,
   input  wire          clk_cpu,
-  input  wire          reset
+  input  wire          reset_cpu
 );
 
   reg                 logic_ptr_doPush;
@@ -25958,8 +25960,8 @@ module StreamFifo_2 (
   assign logic_ptr_popOnIo = logic_ptr_pop;
   assign io_occupancy = logic_ptr_occupancy;
   assign io_availability = (3'b100 - logic_ptr_occupancy);
-  always @(posedge clk_cpu or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_cpu or posedge reset_cpu) begin
+    if(reset_cpu) begin
       logic_ptr_push <= 3'b000;
       logic_ptr_pop <= 3'b000;
       logic_ptr_wentUp <= 1'b0;
@@ -25998,7 +26000,7 @@ module UsbLsFsPhyFilter (
   output wire          io_filtred_se0,
   output wire          io_filtred_sample,
   input  wire          clk_peripheral,
-  input  wire          reset
+  input  wire          reset_peripheral
 );
 
   wire       [4:0]    _zz_timer_sampleDo;
@@ -26049,7 +26051,7 @@ module Crc_2 (
   output wire [15:0]   io_result,
   output wire [15:0]   io_resultNext,
   input  wire          clk_peripheral,
-  input  wire          reset
+  input  wire          reset_peripheral
 );
 
   wire       [15:0]   _zz_acc_1;
@@ -26126,8 +26128,8 @@ module Crc_2 (
   assign accXor = (acc_8 ^ 16'h0000);
   assign io_result = stateXor;
   assign io_resultNext = accXor;
-  always @(posedge clk_peripheral or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_peripheral or posedge reset_peripheral) begin
+    if(reset_peripheral) begin
       state <= 16'hffff;
     end else begin
       if(io_input_valid) begin
@@ -26149,7 +26151,7 @@ module Crc_1 (
   output wire [15:0]   io_result,
   output wire [15:0]   io_resultNext,
   input  wire          clk_peripheral,
-  input  wire          reset
+  input  wire          reset_peripheral
 );
 
   wire       [15:0]   _zz_acc_1;
@@ -26238,8 +26240,8 @@ module Crc_1 (
   assign accXor = (acc_8 ^ 16'hffff);
   assign io_result = {stateXor[0],{stateXor[1],{stateXor[2],{stateXor[3],{stateXor[4],{stateXor[5],{stateXor[6],{_zz_io_result,{_zz_io_result_1,_zz_io_result_2}}}}}}}}};
   assign io_resultNext = {accXor[0],{accXor[1],{accXor[2],{accXor[3],{accXor[4],{accXor[5],{accXor[6],{_zz_io_resultNext,{_zz_io_resultNext_1,_zz_io_resultNext_2}}}}}}}}};
-  always @(posedge clk_peripheral or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_peripheral or posedge reset_peripheral) begin
+    if(reset_peripheral) begin
       state <= 16'hffff;
     end else begin
       if(io_input_valid) begin
@@ -26261,7 +26263,7 @@ module Crc (
   output wire [4:0]    io_result,
   output wire [4:0]    io_resultNext,
   input  wire          clk_peripheral,
-  input  wire          reset
+  input  wire          reset_peripheral
 );
 
   wire       [4:0]    _zz_acc_1;
@@ -26362,8 +26364,8 @@ module Crc (
   assign accXor = (acc_11 ^ 5'h1f);
   assign io_result = {stateXor[0],{stateXor[1],{stateXor[2],{stateXor[3],stateXor[4]}}}};
   assign io_resultNext = {accXor[0],{accXor[1],{accXor[2],{accXor[3],accXor[4]}}}};
-  always @(posedge clk_peripheral or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_peripheral or posedge reset_peripheral) begin
+    if(reset_peripheral) begin
       state <= 5'h1f;
     end else begin
       if(io_input_valid) begin
@@ -26389,7 +26391,7 @@ module StreamFifo_3 (
   output wire [9:0]    io_occupancy,
   output wire [9:0]    io_availability,
   input  wire          clk_peripheral,
-  input  wire          reset
+  input  wire          reset_peripheral
 );
 
   reg        [31:0]   _zz_logic_ram_port1;
@@ -26484,8 +26486,8 @@ module StreamFifo_3 (
   assign io_occupancy = logic_ptr_occupancy;
   assign io_availability = (10'h200 - logic_ptr_occupancy);
   assign logic_ptr_full = 1'b0;
-  always @(posedge clk_peripheral or posedge reset) begin
-    if(reset) begin
+  always @(posedge clk_peripheral or posedge reset_peripheral) begin
+    if(reset_peripheral) begin
       logic_ptr_push <= 10'h000;
       logic_ptr_pop <= 10'h000;
       logic_ptr_wentUp <= 1'b0;

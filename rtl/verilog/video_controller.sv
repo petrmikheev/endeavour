@@ -387,8 +387,9 @@ module TMDS_encoder(
   wire [9:0] TMDS_code = CD[1] ? (CD[0] ? 10'b1010101011 : 10'b0101010100) : (CD[0] ? 10'b0010101011 : 10'b1101010100);
 
   reg [9:0] TMDS_buf = 0;
-  always @(posedge clk) TMDS_buf <= VDE ? TMDS_data : TMDS_code;
-  always @(posedge clk) TMDS <= TMDS_buf;
-  always @(posedge clk) balance_acc <= VDE ? balance_acc_new : 4'h0;
+  always @(posedge clk) begin
+    TMDS_buf <= VDE ? TMDS_data : TMDS_code;
+    TMDS <= TMDS_buf;
+    balance_acc <= VDE ? balance_acc_new : 4'h0;
+  end
 endmodule
-

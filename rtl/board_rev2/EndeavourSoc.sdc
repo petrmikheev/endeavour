@@ -40,8 +40,8 @@ set_time_format -unit ns -decimal_places 3
 #**************************************************************
 
 create_clock -name {clk48} -period 20.833 -waveform { 0.000 10.416 } [get_ports {io_clk_in}]
-#create_clock -name {io_plla_clk0} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_plla_clk0}]
-#create_clock -name {io_plla_clk1} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_plla_clk1}]
+create_clock -name {clk_cpu} -period 11.7 -waveform { 0.00 5.85 } [get_ports {io_plla_clk0}]
+create_clock -name {clk_ram} -period 11.7 -waveform { 2.42 8.27 } [get_ports {io_plla_clk1}]
 #create_clock -name {io_plla_clk2} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_plla_clk2}]
 #create_clock -name {io_pllb_clk0} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk0}]
 #create_clock -name {io_pllb_clk1} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk1}]
@@ -61,8 +61,8 @@ create_clock -name {clk48} -period 20.833 -waveform { 0.000 10.416 } [get_ports 
 
 create_generated_clock -multiply_by 116 -divide_by 75 -source [get_ports io_clk_in] -name clk_tmds_pixel [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[0]]
 create_generated_clock -multiply_by 116 -divide_by 15 -source [get_ports io_clk_in] -name clk_tmds_x5 [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[1]]
-create_generated_clock -multiply_by 116 -divide_by 65 -source [get_ports io_clk_in] -name clk_cpu [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[2]]
-create_generated_clock -multiply_by 116 -divide_by 65 -phase 90 -source [get_ports io_clk_in] -name clk_ram [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[3]]
+#create_generated_clock -multiply_by 116 -divide_by 65 -source [get_ports io_clk_in] -name clk_cpu [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[2]]
+#create_generated_clock -multiply_by 116 -divide_by 65 -phase 90 -source [get_ports io_clk_in] -name clk_ram [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[3]]
 
 #**************************************************************
 # Set Clock Latency
@@ -126,10 +126,10 @@ set_max_delay -from clk48 -to clk_cpu 10.000
 set_max_delay -from clk_cpu -to clk_tmds_pixel 30.000
 set_max_delay -from clk_tmds_pixel -to clk_cpu 30.000
 
-set_min_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 6
-set_max_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 7
-set_min_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 6
-set_max_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 7
+set_min_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 10
+set_max_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 11
+set_min_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 10
+set_max_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 11
 
 set_min_delay -from [get_clocks clk48] -to [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data* io_usb*}] 10
 set_max_delay -from [get_clocks clk48] -to [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data* io_usb*}] 14

@@ -39,6 +39,10 @@ module testbench;
   pullup(USB2_DN);
   pulldown(USB2_DP);
 
+  wire PLLA_SCL, PLLA_SDA;
+  pullup(PLLA_SCL);
+  pullup(PLLA_SDA);
+
   EndeavourSoc system(
     .io_clk_in(clk48mhz),
     .io_nreset(1'b1),
@@ -64,7 +68,9 @@ module testbench;
     .io_usb1_dp(USB1_DP),
     .io_usb1_dn(USB1_DN),
     .io_usb2_dp(USB2_DP),
-    .io_usb2_dn(USB2_DN)
+    .io_usb2_dn(USB2_DN),
+    .io_plla_i2c_scl(PLLA_SCL),
+    .io_plla_i2c_sda(PLLA_SDA)
   );
 
   mdl_sdio #(.OPT_HIGH_CAPACITY(1'b1), .LGMEMSZ(27)) sdcard(

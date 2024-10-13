@@ -46,9 +46,11 @@ module AudioController (
   assign shdn = state == STATE_HALT && counter == 0;
 `endif
 
-  wire i2c_ready;
+  /*wire i2c_ready;
+  wire i2c_halted;
   I2C i2c(
     .halt(shdn),
+    .halted(i2c_halted),
     .clk(clk),
     .hs(1'b0),
     .wr(1'b1),
@@ -90,7 +92,7 @@ module AudioController (
         counter <= divisor;
         outa <= outa + 1'b1;
         value <= fifo[outa];
-        if (state == STATE_HALT) state <= STATE_ADDR;
+        if (state == STATE_HALT && i2c_halted) state <= STATE_ADDR;
         if (state == STATE_IDLE) state <= STATE_DHI;
       end else if (state == STATE_IDLE) state <= STATE_HALT;
       if (state == STATE_ADDR && i2c_ready) state <= STATE_CFG;
@@ -98,98 +100,6 @@ module AudioController (
       if (state == STATE_DHI && i2c_ready) state <= STATE_DLO;
       if (state == STATE_DLO && i2c_ready) state <= STATE_IDLE;
     end
-  end
-
-endmodule
-
-module I2C (
-  input halt, input clk,
-  input hs,
-  input [7:0] addr,
-  input wr,
-  input enable, output reg ready,
-  input [7:0] din,
-  output reg [7:0] dout,
-  output reg ac,
-
-  output i2c_scl,
-  inout i2c_sda
-);
-
-  localparam HALT = 2'd0;
-  localparam IDLE = 2'd1;
-  localparam WORK = 2'd2;
-  localparam SWITCH_TO_HS = 2'd3;
-
-  reg [1:0] state = HALT;
-
-  parameter CLK_FREQ = 48_000_000;
-  localparam DIVISOR_400K = CLK_FREQ / (400_000 * 4) - 1;  // 29
-  localparam DIVISOR_HS = CLK_FREQ / (3_000_000 * 4) - 1;  // 2
-
-  reg [5:0] clk_counter = 0;
-  reg [1:0] q = 0;
-  reg [3:0] bit_counter = 0;
-  reg [7:0] data;
-  reg hs_state = 0;
-  initial ready = 0;
-
-  reg sda = 1;
-  assign i2c_scl = (~state[1] | q[1]) ? 1'bz : 1'b0;
-  assign i2c_sda = sda ? 1'bz : 1'b0;
-
-  always @(posedge clk) begin
-    if (clk_counter != 0) begin
-      clk_counter <= clk_counter - 1'b1;
-      ready <= 0;
-    end else begin
-      clk_counter <= hs_state ? DIVISOR_HS : DIVISOR_400K;
-      q <= q + 1'b1;
-      if (state == HALT) begin
-        if (~halt && q == 2'd3) begin
-          sda <= 0;
-          data <= 8'h08;
-          if (~sda) state <= hs ? SWITCH_TO_HS : IDLE;
-          bit_counter <= 4'd8;
-        end else if (halt)
-          sda <= 1;
-      end else if (state == IDLE && q == 2'd3) begin
-        if (halt) begin
-          state <= HALT;
-          hs_state <= 0;
-        end
-        if (enable) begin
-          data <= din;
-          state <= WORK;
-          bit_counter <= 4'd8;
-        end
-      end else if (state[1] & (state[0] | wr)) begin  // write (WORK or SWITCH_TO_HS)
-        if (q == 2'd0) begin
-          {sda, data} <= {data, 1'b1};
-        end else if (q == 2'd3) begin
-          if (bit_counter == 0) begin
-            ac <= i2c_sda;
-            if (state == SWITCH_TO_HS)
-              hs_state <= 1;
-            else
-              ready <= 1;
-            state <= IDLE;
-            sda <= 0;
-          end else
-            bit_counter <= bit_counter - 1'b1;
-        end
-      end else if (state[1]) begin  // read (WORK)
-        sda <= |bit_counter;
-        if (q == 2'd3) begin
-          data <= {data[6:0], i2c_sda};
-          if (bit_counter == 0) begin
-            ready <= 1;
-            state <= IDLE;
-            dout <= data;
-          end
-        end
-      end
-    end
-  end
+  end*/
 
 endmodule

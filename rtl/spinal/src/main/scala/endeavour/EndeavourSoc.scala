@@ -51,7 +51,7 @@ class EndeavourSoc extends Component {
   board_ctrl.io.leds <> io.leds
   board_ctrl.io.keys <> io.keys
 
-  ClockDomainStack.set(ClockDomain(clock=board_ctrl.io.clk_cpu, reset=board_ctrl.io.reset))
+  ClockDomainStack.set(ClockDomain(clock=board_ctrl.io.clk_cpu, reset=board_ctrl.io.reset_cpu))
 
   val video_ctrl = new VideoController()
   video_ctrl.io.video_mode_out <> board_ctrl.io.video_mode
@@ -61,7 +61,7 @@ class EndeavourSoc extends Component {
 
   val peripheral = new ClockingArea(ClockDomain(
       clock = board_ctrl.io.clk_peripheral,
-      reset = board_ctrl.io.reset,
+      reset = board_ctrl.io.reset_peripheral,
       frequency = FixedFrequency(48 MHz))) {
 
     val uart_ctrl = new UartController()
@@ -102,7 +102,7 @@ class EndeavourSoc extends Component {
   ram_ctrl.io.ddr <> io.ddr_sdram
   ram_ctrl.io.clk <> board_ctrl.io.clk_cpu
   ram_ctrl.io.clk_shifted <> board_ctrl.io.clk_ram
-  ram_ctrl.io.reset <> board_ctrl.io.reset
+  ram_ctrl.io.reset <> board_ctrl.io.reset_cpu
 
   val usb_interrupt = RegNext(peripheral.usb_ctrl.io.interrupt) addTag(crossClockDomain)
 
