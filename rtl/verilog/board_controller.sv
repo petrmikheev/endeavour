@@ -88,8 +88,6 @@ module BoardController(
   end
 
   reg tih, tihe, til;
-  reg [17:0] cpu_freq_counter = 0;
-  reg [17:0] cpu_freq;
 
   always @(posedge clk_cpu) begin
     reset_cpu <= reset_peripheral;
@@ -98,12 +96,10 @@ module BoardController(
     tihe <= utime[63:32] == utime_cmp[63:32];
     til <= utime[31:0] >= utime_cmp[31:0];
     timer_interrupt <= tih | (tihe & til);
-    if (utime[9:0] == 10'd0 && |cpu_freq_counter[17:9]) begin
-      cpu_freq_counter <= 10'd0;
-      cpu_freq <= cpu_freq_counter;
-    end else
-      cpu_freq_counter <= cpu_freq_counter + 1'd1;
   end
+
+  reg [17:0] cpu_freq;
+  FrequencyCounter cpu_freq_counter(.clk(clk_cpu), .utime(utime[9:0]), .freq_khz(cpu_freq));
 
 `ifdef IVERILOG
 
@@ -153,13 +149,84 @@ module BoardController(
   assign clk_tmds_pixel = clk_peripheral;
 `endif
 `ifdef ENDEAVOUR_BOARD_VER2
+  wire pll_areset;
+  wire pll_configupdate;
+  wire pll_scanclk;
+  wire pll_scanclkena;
+  wire pll_scandata;
+  wire pll_reconfig_busy;
+  wire pll_scandataout;
+  wire pll_scandone;
+  wire vrom_en;
+  wire vrom_data;
+  wire [7:0] vrom_addr;
+
   PLL1280 pll(
     .inclk0(clk_in),
+
+    .areset(pll_areset),
+    .configupdate(pll_configupdate),
+    .scanclk(pll_scanclk),
+    .scanclkena(pll_scanclkena),
+    .scandata(pll_scandata),
+    .scandataout(pll_scandataout),
+    .scandone(pll_scandone),
+
     .c0(clk_tmds_pixel),
     .c1(clk_tmds_x5)
     //.c2(clk_cpu),
     //.c3(clk_ram)
   );
+
+  reg [1:0] video_mode_buf1 = 0;
+  reg [1:0] video_mode_buf2 = 0;
+  wire video_mode_changed = video_mode_buf1 != video_mode_buf2;
+  reg video_mode_changing = 0;
+
+  always @(posedge clk_in) begin
+    if (~pll_reconfig_busy) begin
+      if (video_mode_changing)
+        video_mode_changing <= 0;
+      else begin
+        if (~video_mode_changed) video_mode_buf1 <= video_mode;
+        video_mode_buf2 <= video_mode_buf1;
+        video_mode_changing <= video_mode_changed;
+      end
+    end
+  end
+
+  PLL_RECONFIG pll_reconfig(
+    .clock(clk_in),
+
+    .pll_areset_in(1'b0),
+    .read_param(1'b0),
+    .reset(1'b0),
+    .write_param(1'b0),
+
+    .reconfig(video_mode_changing & ~pll_reconfig_busy),
+    .busy(pll_reconfig_busy),
+    .write_from_rom(video_mode_changed),
+    .reset_rom_address(1'b0),
+    .rom_data_in(vrom_data),
+    .rom_address_out(vrom_addr),
+    .write_rom_ena(vrom_en),
+
+    .pll_areset(pll_areset),
+    .pll_configupdate(pll_configupdate),
+    .pll_scanclk(pll_scanclk),
+    .pll_scanclkena(pll_scanclkena),
+    .pll_scandata(pll_scandata),
+    .pll_scandataout(pll_scandataout),
+    .pll_scandone(pll_scandone)
+  );
+
+  PLL_VIDEO_CONF_ROM pll_vrom(
+    .clock(clk_in),
+    .address({video_mode_buf1, vrom_addr}),
+    .rden(vrom_en),
+    .q(vrom_data)
+  );
+
   assign clk_peripheral = clk_in;
   assign clk_cpu = plla_clk0;
   assign clk_ram = plla_clk1;
@@ -250,4 +317,16 @@ module BoardController(
     .i2c_sda(plla_i2c_sda)
   );
 
+endmodule
+
+module FrequencyCounter(input clk, input [9:0] utime, output reg [17:0] freq_khz);
+  reg [17:0] freq_counter = 0;
+
+  always @(posedge clk) begin
+    if (utime[9:0] == 10'd0 && |freq_counter[17:9])
+      freq_counter <= 10'd0;
+    else
+      freq_counter <= freq_counter + 1'd1;
+    if (utime[9:0] == 10'd976) freq_khz <= freq_counter;
+  end
 endmodule

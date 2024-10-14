@@ -34,24 +34,39 @@
 
 module PLL1280 (
 	areset,
+	configupdate,
 	inclk0,
+	scanclk,
+	scanclkena,
+	scandata,
 	c0,
 	c1,
 	c2,
 	c3,
-	locked);
+	locked,
+	scandataout,
+	scandone);
 
 	input	  areset;
+	input	  configupdate;
 	input	  inclk0;
+	input	  scanclk;
+	input	  scanclkena;
+	input	  scandata;
 	output	  c0;
 	output	  c1;
 	output	  c2;
 	output	  c3;
 	output	  locked;
+	output	  scandataout;
+	output	  scandone;
 `ifndef ALTERA_RESERVED_QIS
 // synopsys translate_off
 `endif
 	tri0	  areset;
+	tri0	  configupdate;
+	tri0	  scanclkena;
+	tri0	  scandata;
 `ifndef ALTERA_RESERVED_QIS
 // synopsys translate_on
 `endif
@@ -156,7 +171,7 @@ endmodule
 // Retrieval info: PRIVATE: PLL_TARGET_HARCOPY_CHECK NUMERIC "0"
 // Retrieval info: PRIVATE: PRIMARY_CLK_COMBO STRING "inclk0"
 // Retrieval info: PRIVATE: RECONFIG_FILE STRING "PLL1280.mif"
-// Retrieval info: PRIVATE: SACN_INPUTS_CHECK STRING "0"
+// Retrieval info: PRIVATE: SACN_INPUTS_CHECK STRING "1"
 // Retrieval info: PRIVATE: SCAN_FEATURE_ENABLED STRING "1"
 // Retrieval info: PRIVATE: SELF_RESET_LOCK_LOSS STRING "0"
 // Retrieval info: PRIVATE: SHORT_SCAN_RADIO STRING "0"
@@ -214,7 +229,7 @@ endmodule
 // Retrieval info: CONSTANT: PORT_CLKBAD1 STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: PORT_CLKLOSS STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: PORT_CLKSWITCH STRING "PORT_UNUSED"
-// Retrieval info: CONSTANT: PORT_CONFIGUPDATE STRING "PORT_UNUSED"
+// Retrieval info: CONSTANT: PORT_CONFIGUPDATE STRING "PORT_USED"
 // Retrieval info: CONSTANT: PORT_FBIN STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: PORT_INCLK0 STRING "PORT_USED"
 // Retrieval info: CONSTANT: PORT_INCLK1 STRING "PORT_UNUSED"
@@ -226,11 +241,11 @@ endmodule
 // Retrieval info: CONSTANT: PORT_PHASEUPDOWN STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: PORT_PLLENA STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: PORT_SCANACLR STRING "PORT_UNUSED"
-// Retrieval info: CONSTANT: PORT_SCANCLK STRING "PORT_UNUSED"
-// Retrieval info: CONSTANT: PORT_SCANCLKENA STRING "PORT_UNUSED"
-// Retrieval info: CONSTANT: PORT_SCANDATA STRING "PORT_UNUSED"
-// Retrieval info: CONSTANT: PORT_SCANDATAOUT STRING "PORT_UNUSED"
-// Retrieval info: CONSTANT: PORT_SCANDONE STRING "PORT_UNUSED"
+// Retrieval info: CONSTANT: PORT_SCANCLK STRING "PORT_USED"
+// Retrieval info: CONSTANT: PORT_SCANCLKENA STRING "PORT_USED"
+// Retrieval info: CONSTANT: PORT_SCANDATA STRING "PORT_USED"
+// Retrieval info: CONSTANT: PORT_SCANDATAOUT STRING "PORT_USED"
+// Retrieval info: CONSTANT: PORT_SCANDONE STRING "PORT_USED"
 // Retrieval info: CONSTANT: PORT_SCANREAD STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: PORT_SCANWRITE STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: PORT_clk0 STRING "PORT_USED"
@@ -251,22 +266,35 @@ endmodule
 // Retrieval info: CONSTANT: PORT_extclk3 STRING "PORT_UNUSED"
 // Retrieval info: CONSTANT: SELF_RESET_ON_LOSS_LOCK STRING "OFF"
 // Retrieval info: CONSTANT: WIDTH_CLOCK NUMERIC "5"
+// Retrieval info: CONSTANT: scan_chain_mif_file STRING "PLL1280.mif"
 // Retrieval info: USED_PORT: @clk 0 0 5 0 OUTPUT_CLK_EXT VCC "@clk[4..0]"
 // Retrieval info: USED_PORT: areset 0 0 0 0 INPUT GND "areset"
 // Retrieval info: USED_PORT: c0 0 0 0 0 OUTPUT_CLK_EXT VCC "c0"
 // Retrieval info: USED_PORT: c1 0 0 0 0 OUTPUT_CLK_EXT VCC "c1"
 // Retrieval info: USED_PORT: c2 0 0 0 0 OUTPUT_CLK_EXT VCC "c2"
 // Retrieval info: USED_PORT: c3 0 0 0 0 OUTPUT_CLK_EXT VCC "c3"
+// Retrieval info: USED_PORT: configupdate 0 0 0 0 INPUT GND "configupdate"
 // Retrieval info: USED_PORT: inclk0 0 0 0 0 INPUT_CLK_EXT GND "inclk0"
 // Retrieval info: USED_PORT: locked 0 0 0 0 OUTPUT GND "locked"
+// Retrieval info: USED_PORT: scanclk 0 0 0 0 INPUT_CLK_EXT VCC "scanclk"
+// Retrieval info: USED_PORT: scanclkena 0 0 0 0 INPUT GND "scanclkena"
+// Retrieval info: USED_PORT: scandata 0 0 0 0 INPUT GND "scandata"
+// Retrieval info: USED_PORT: scandataout 0 0 0 0 OUTPUT VCC "scandataout"
+// Retrieval info: USED_PORT: scandone 0 0 0 0 OUTPUT VCC "scandone"
 // Retrieval info: CONNECT: @areset 0 0 0 0 areset 0 0 0 0
+// Retrieval info: CONNECT: @configupdate 0 0 0 0 configupdate 0 0 0 0
 // Retrieval info: CONNECT: @inclk 0 0 1 1 GND 0 0 0 0
 // Retrieval info: CONNECT: @inclk 0 0 1 0 inclk0 0 0 0 0
+// Retrieval info: CONNECT: @scanclk 0 0 0 0 scanclk 0 0 0 0
+// Retrieval info: CONNECT: @scanclkena 0 0 0 0 scanclkena 0 0 0 0
+// Retrieval info: CONNECT: @scandata 0 0 0 0 scandata 0 0 0 0
 // Retrieval info: CONNECT: c0 0 0 0 0 @clk 0 0 1 0
 // Retrieval info: CONNECT: c1 0 0 0 0 @clk 0 0 1 1
 // Retrieval info: CONNECT: c2 0 0 0 0 @clk 0 0 1 2
 // Retrieval info: CONNECT: c3 0 0 0 0 @clk 0 0 1 3
 // Retrieval info: CONNECT: locked 0 0 0 0 @locked 0 0 0 0
+// Retrieval info: CONNECT: scandataout 0 0 0 0 @scandataout 0 0 0 0
+// Retrieval info: CONNECT: scandone 0 0 0 0 @scandone 0 0 0 0
 // Retrieval info: GEN_FILE: TYPE_NORMAL PLL1280.v TRUE
 // Retrieval info: GEN_FILE: TYPE_NORMAL PLL1280.ppf TRUE
 // Retrieval info: GEN_FILE: TYPE_NORMAL PLL1280.inc FALSE
@@ -274,5 +302,7 @@ endmodule
 // Retrieval info: GEN_FILE: TYPE_NORMAL PLL1280.bsf FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL PLL1280_inst.v FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL PLL1280_bb.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL PLL1280.mif TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL PLL1280.hex TRUE
 // Retrieval info: LIB_FILE: altera_mf
 // Retrieval info: CBX_MODULE_PREFIX: ON

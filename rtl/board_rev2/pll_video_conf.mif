@@ -1,0 +1,610 @@
+-- Copyright (C) 2021  Intel Corporation. All rights reserved.
+-- Your use of Intel Corporation's design tools, logic functions 
+-- and other software and tools, and any partner logic 
+-- functions, and any output files from any of the foregoing 
+-- (including device programming or simulation files), and any 
+-- associated documentation or information are expressly subject 
+-- to the terms and conditions of the Intel Program License 
+-- Subscription Agreement, the Intel Quartus Prime License Agreement,
+-- the Intel FPGA IP License Agreement, or other applicable license
+-- agreement, including, without limitation, that your use is for
+-- the sole purpose of programming logic devices manufactured by
+-- Intel and sold by Intel or its authorized distributors.  Please
+-- refer to the applicable agreement for further details, at
+-- https://fpgasoftware.intel.com/eula.
+
+-- MIF file representing initial state of PLL Scan Chain
+--    Device Family: MAX 10
+--    Device Part: -
+--    Device Speed Grade: -
+--    PLL Scan Chain: Fast PLL (144 bits)
+--    File Name: /home/petya/endeavour/rtl/board_rev2/PLL1280.mif
+--    Generated: Sun Oct 13 18:26:37 2024
+
+WIDTH=1;
+DEPTH=1024;
+
+ADDRESS_RADIX=UNS;
+DATA_RADIX=UNS;
+
+CONTENT BEGIN
+	0    :   0; -- Reserved Bits = 0 (1 bit(s))
+	1    :   0; -- Reserved Bits = 0 (1 bit(s))
+	2    :   0; -- Loop Filter Capacitance = 0 (2 bit(s)) (Setting 0)
+	3    :   0;
+	4    :   0; -- Loop Filter Resistance = 8 (5 bit(s)) (Setting 8)
+	5    :   1;
+	6    :   0;
+	7    :   0;
+	8    :   0;
+	9    :   0; -- VCO Post Scale = 0 (1 bit(s)) (VCO post-scale divider counter value = 2)
+	10   :   0; -- Reserved Bits = 0 (5 bit(s))
+	11   :   0;
+	12   :   0;
+	13   :   0;
+	14   :   0;
+	15   :   0; -- Charge Pump Current = 1 (3 bit(s)) (Setting 1)
+	16   :   0;
+	17   :   1;
+	18   :   0; -- N counter: Bypass = 0 (1 bit(s))
+	19   :   0; -- N counter: High Count = 5 (8 bit(s))
+	20   :   0;
+	21   :   0;
+	22   :   0;
+	23   :   0;
+	24   :   1;
+	25   :   0;
+	26   :   1;
+	27   :   1; -- N counter: Odd Division = 1 (1 bit(s))
+	28   :   0; -- N counter: Low Count = 4 (8 bit(s))
+	29   :   0;
+	30   :   0;
+	31   :   0;
+	32   :   0;
+	33   :   1;
+	34   :   0;
+	35   :   0;
+	36   :   0; -- M counter: Bypass = 0 (1 bit(s))
+	37   :   0; -- M counter: High Count = 59 (8 bit(s))
+	38   :   0;
+	39   :   1;
+	40   :   1;
+	41   :   1;
+	42   :   0;
+	43   :   1;
+	44   :   1;
+	45   :   0; -- M counter: Odd Division = 0 (1 bit(s))
+	46   :   0; -- M counter: Low Count = 59 (8 bit(s))
+	47   :   0;
+	48   :   1;
+	49   :   1;
+	50   :   1;
+	51   :   0;
+	52   :   1;
+	53   :   1;
+	54   :   0; -- clk0 counter: Bypass = 0 (1 bit(s))
+	55   :   0; -- clk0 counter: High Count = 13 (8 bit(s))
+	56   :   0;
+	57   :   0;
+	58   :   0;
+	59   :   1;
+	60   :   1;
+	61   :   0;
+	62   :   1;
+	63   :   1; -- clk0 counter: Odd Division = 1 (1 bit(s))
+	64   :   0; -- clk0 counter: Low Count = 12 (8 bit(s))
+	65   :   0;
+	66   :   0;
+	67   :   0;
+	68   :   1;
+	69   :   1;
+	70   :   0;
+	71   :   0;
+	72   :   0; -- clk1 counter: Bypass = 0 (1 bit(s))
+	73   :   0; -- clk1 counter: High Count = 3 (8 bit(s))
+	74   :   0;
+	75   :   0;
+	76   :   0;
+	77   :   0;
+	78   :   0;
+	79   :   1;
+	80   :   1;
+	81   :   1; -- clk1 counter: Odd Division = 1 (1 bit(s))
+	82   :   0; -- clk1 counter: Low Count = 2 (8 bit(s))
+	83   :   0;
+	84   :   0;
+	85   :   0;
+	86   :   0;
+	87   :   0;
+	88   :   1;
+	89   :   0;
+	90   :   1; -- clk2 counter: Bypass = 1 (1 bit(s))
+	91   :   0; -- clk2 counter: High Count = 0 (8 bit(s))
+	92   :   0;
+	93   :   0;
+	94   :   0;
+	95   :   0;
+	96   :   0;
+	97   :   0;
+	98   :   0;
+	99   :   0; -- clk2 counter: Odd Division = 0 (1 bit(s))
+	100  :   0; -- clk2 counter: Low Count = 0 (8 bit(s))
+	101  :   0;
+	102  :   0;
+	103  :   0;
+	104  :   0;
+	105  :   0;
+	106  :   0;
+	107  :   0;
+	108  :   1; -- clk3 counter: Bypass = 1 (1 bit(s))
+	109  :   0; -- clk3 counter: High Count = 0 (8 bit(s))
+	110  :   0;
+	111  :   0;
+	112  :   0;
+	113  :   0;
+	114  :   0;
+	115  :   0;
+	116  :   0;
+	117  :   0; -- clk3 counter: Odd Division = 0 (1 bit(s))
+	118  :   0; -- clk3 counter: Low Count = 0 (8 bit(s))
+	119  :   0;
+	120  :   0;
+	121  :   0;
+	122  :   0;
+	123  :   0;
+	124  :   0;
+	125  :   0;
+	126  :   1; -- clk4 counter: Bypass = 1 (1 bit(s))
+	127  :   0; -- clk4 counter: High Count = 0 (8 bit(s))
+	128  :   0;
+	129  :   0;
+	130  :   0;
+	131  :   0;
+	132  :   0;
+	133  :   0;
+	134  :   0;
+	135  :   0; -- clk4 counter: Odd Division = 0 (1 bit(s))
+	136  :   0; -- clk4 counter: Low Count = 0 (8 bit(s))
+	137  :   0;
+	138  :   0;
+	139  :   0;
+	140  :   0;
+	141  :   0;
+	142  :   0;
+	143  :   0;
+
+	256  :   0; -- Reserved Bits = 0 (1 bit(s))
+	257  :   0; -- Reserved Bits = 0 (1 bit(s))
+	258  :   0; -- Loop Filter Capacitance = 0 (2 bit(s)) (Setting 0)
+	259  :   0;
+	260  :   0; -- Loop Filter Resistance = 8 (5 bit(s)) (Setting 8)
+	261  :   1;
+	262  :   0;
+	263  :   0;
+	264  :   0;
+	265  :   0; -- VCO Post Scale = 0 (1 bit(s)) (VCO post-scale divider counter value = 2)
+	266  :   0; -- Reserved Bits = 0 (5 bit(s))
+	267  :   0;
+	268  :   0;
+	269  :   0;
+	270  :   0;
+	271  :   0; -- Charge Pump Current = 1 (3 bit(s)) (Setting 1)
+	272  :   0;
+	273  :   1;
+	274  :   0; -- N counter: Bypass = 0 (1 bit(s))
+	275  :   0; -- N counter: High Count = 5 (8 bit(s))
+	276  :   0;
+	277  :   0;
+	278  :   0;
+	279  :   0;
+	280  :   1;
+	281  :   0;
+	282  :   1;
+	283  :   1; -- N counter: Odd Division = 1 (1 bit(s))
+	284  :   0; -- N counter: Low Count = 4 (8 bit(s))
+	285  :   0;
+	286  :   0;
+	287  :   0;
+	288  :   0;
+	289  :   1;
+	290  :   0;
+	291  :   0;
+	292  :   0; -- M counter: Bypass = 0 (1 bit(s))
+	293  :   0; -- M counter: High Count = 59 (8 bit(s))
+	294  :   0;
+	295  :   1;
+	296  :   1;
+	297  :   1;
+	298  :   0;
+	299  :   1;
+	300  :   1;
+	301  :   0; -- M counter: Odd Division = 0 (1 bit(s))
+	302  :   0; -- M counter: Low Count = 59 (8 bit(s))
+	303  :   0;
+	304  :   1;
+	305  :   1;
+	306  :   1;
+	307  :   0;
+	308  :   1;
+	309  :   1;
+	310  :   0; -- clk0 counter: Bypass = 0 (1 bit(s))
+	311  :   0; -- clk0 counter: High Count = 13 (8 bit(s))
+	312  :   0;
+	313  :   0;
+	314  :   0;
+	315  :   1;
+	316  :   1;
+	317  :   0;
+	318  :   1;
+	319  :   1; -- clk0 counter: Odd Division = 1 (1 bit(s))
+	320  :   0; -- clk0 counter: Low Count = 12 (8 bit(s))
+	321  :   0;
+	322  :   0;
+	323  :   0;
+	324  :   1;
+	325  :   1;
+	326  :   0;
+	327  :   0;
+	328  :   0; -- clk1 counter: Bypass = 0 (1 bit(s))
+	329  :   0; -- clk1 counter: High Count = 3 (8 bit(s))
+	330  :   0;
+	331  :   0;
+	332  :   0;
+	333  :   0;
+	334  :   0;
+	335  :   1;
+	336  :   1;
+	337  :   1; -- clk1 counter: Odd Division = 1 (1 bit(s))
+	338  :   0; -- clk1 counter: Low Count = 2 (8 bit(s))
+	339  :   0;
+	340  :   0;
+	341  :   0;
+	342  :   0;
+	343  :   0;
+	344  :   1;
+	345  :   0;
+	346  :   1; -- clk2 counter: Bypass = 1 (1 bit(s))
+	347  :   0; -- clk2 counter: High Count = 0 (8 bit(s))
+	348  :   0;
+	349  :   0;
+	350  :   0;
+	351  :   0;
+	352  :   0;
+	353  :   0;
+	354  :   0;
+	355  :   0; -- clk2 counter: Odd Division = 0 (1 bit(s))
+	356  :   0; -- clk2 counter: Low Count = 0 (8 bit(s))
+	357  :   0;
+	358  :   0;
+	359  :   0;
+	360  :   0;
+	361  :   0;
+	362  :   0;
+	363  :   0;
+	364  :   1; -- clk3 counter: Bypass = 1 (1 bit(s))
+	365  :   0; -- clk3 counter: High Count = 0 (8 bit(s))
+	366  :   0;
+	367  :   0;
+	368  :   0;
+	369  :   0;
+	370  :   0;
+	371  :   0;
+	372  :   0;
+	373  :   0; -- clk3 counter: Odd Division = 0 (1 bit(s))
+	374  :   0; -- clk3 counter: Low Count = 0 (8 bit(s))
+	375  :   0;
+	376  :   0;
+	377  :   0;
+	378  :   0;
+	379  :   0;
+	380  :   0;
+	381  :   0;
+	382  :   1; -- clk4 counter: Bypass = 1 (1 bit(s))
+	383  :   0; -- clk4 counter: High Count = 0 (8 bit(s))
+	384  :   0;
+	385  :   0;
+	386  :   0;
+	387  :   0;
+	388  :   0;
+	389  :   0;
+	390  :   0;
+	391  :   0; -- clk4 counter: Odd Division = 0 (1 bit(s))
+	392  :   0; -- clk4 counter: Low Count = 0 (8 bit(s))
+	393  :   0;
+	394  :   0;
+	395  :   0;
+	396  :   0;
+	397  :   0;
+	398  :   0;
+	399  :   0;
+
+	512  :   0; -- Reserved Bits = 0 (1 bit(s))
+	513  :   0; -- Reserved Bits = 0 (1 bit(s))
+	514  :   0; -- Loop Filter Capacitance = 0 (2 bit(s)) (Setting 0)
+	515  :   0;
+	516  :   1; -- Loop Filter Resistance = 24 (5 bit(s)) (Setting 24)
+	517  :   1;
+	518  :   0;
+	519  :   0;
+	520  :   0;
+	521  :   1; -- VCO Post Scale = 1 (1 bit(s)) (VCO post-scale divider counter value = 1)
+	522  :   0; -- Reserved Bits = 0 (5 bit(s))
+	523  :   0;
+	524  :   0;
+	525  :   0;
+	526  :   0;
+	527  :   0; -- Charge Pump Current = 1 (3 bit(s)) (Setting 1)
+	528  :   0;
+	529  :   1;
+	530  :   0; -- N counter: Bypass = 0 (1 bit(s))
+	531  :   0; -- N counter: High Count = 2 (8 bit(s))
+	532  :   0;
+	533  :   0;
+	534  :   0;
+	535  :   0;
+	536  :   0;
+	537  :   1;
+	538  :   0;
+	539  :   1; -- N counter: Odd Division = 1 (1 bit(s))
+	540  :   0; -- N counter: Low Count = 1 (8 bit(s))
+	541  :   0;
+	542  :   0;
+	543  :   0;
+	544  :   0;
+	545  :   0;
+	546  :   0;
+	547  :   1;
+	548  :   0; -- M counter: Bypass = 0 (1 bit(s))
+	549  :   0; -- M counter: High Count = 31 (8 bit(s))
+	550  :   0;
+	551  :   0;
+	552  :   1;
+	553  :   1;
+	554  :   1;
+	555  :   1;
+	556  :   1;
+	557  :   1; -- M counter: Odd Division = 1 (1 bit(s))
+	558  :   0; -- M counter: Low Count = 30 (8 bit(s))
+	559  :   0;
+	560  :   0;
+	561  :   1;
+	562  :   1;
+	563  :   1;
+	564  :   1;
+	565  :   0;
+	566  :   0; -- clk0 counter: Bypass = 0 (1 bit(s))
+	567  :   0; -- clk0 counter: High Count = 8 (8 bit(s))
+	568  :   0;
+	569  :   0;
+	570  :   0;
+	571  :   1;
+	572  :   0;
+	573  :   0;
+	574  :   0;
+	575  :   1; -- clk0 counter: Odd Division = 1 (1 bit(s))
+	576  :   0; -- clk0 counter: Low Count = 7 (8 bit(s))
+	577  :   0;
+	578  :   0;
+	579  :   0;
+	580  :   0;
+	581  :   1;
+	582  :   1;
+	583  :   1;
+	584  :   0; -- clk1 counter: Bypass = 0 (1 bit(s))
+	585  :   0; -- clk1 counter: High Count = 2 (8 bit(s))
+	586  :   0;
+	587  :   0;
+	588  :   0;
+	589  :   0;
+	590  :   0;
+	591  :   1;
+	592  :   0;
+	593  :   1; -- clk1 counter: Odd Division = 1 (1 bit(s))
+	594  :   0; -- clk1 counter: Low Count = 1 (8 bit(s))
+	595  :   0;
+	596  :   0;
+	597  :   0;
+	598  :   0;
+	599  :   0;
+	600  :   0;
+	601  :   1;
+	602  :   1; -- clk2 counter: Bypass = 1 (1 bit(s))
+	603  :   0; -- clk2 counter: High Count = 0 (8 bit(s))
+	604  :   0;
+	605  :   0;
+	606  :   0;
+	607  :   0;
+	608  :   0;
+	609  :   0;
+	610  :   0;
+	611  :   0; -- clk2 counter: Odd Division = 0 (1 bit(s))
+	612  :   0; -- clk2 counter: Low Count = 0 (8 bit(s))
+	613  :   0;
+	614  :   0;
+	615  :   0;
+	616  :   0;
+	617  :   0;
+	618  :   0;
+	619  :   0;
+	620  :   1; -- clk3 counter: Bypass = 1 (1 bit(s))
+	621  :   0; -- clk3 counter: High Count = 0 (8 bit(s))
+	622  :   0;
+	623  :   0;
+	624  :   0;
+	625  :   0;
+	626  :   0;
+	627  :   0;
+	628  :   0;
+	629  :   0; -- clk3 counter: Odd Division = 0 (1 bit(s))
+	630  :   0; -- clk3 counter: Low Count = 0 (8 bit(s))
+	631  :   0;
+	632  :   0;
+	633  :   0;
+	634  :   0;
+	635  :   0;
+	636  :   0;
+	637  :   0;
+	638  :   1; -- clk4 counter: Bypass = 1 (1 bit(s))
+	639  :   0; -- clk4 counter: High Count = 0 (8 bit(s))
+	640  :   0;
+	641  :   0;
+	642  :   0;
+	643  :   0;
+	644  :   0;
+	645  :   0;
+	646  :   0;
+	647  :   0; -- clk4 counter: Odd Division = 0 (1 bit(s))
+	648  :   0; -- clk4 counter: Low Count = 0 (8 bit(s))
+	649  :   0;
+	650  :   0;
+	651  :   0;
+	652  :   0;
+	653  :   0;
+	654  :   0;
+	655  :   0;
+
+	768  :   0; -- Reserved Bits = 0 (1 bit(s))
+	769  :   0; -- Reserved Bits = 0 (1 bit(s))
+	770  :   0; -- Loop Filter Capacitance = 0 (2 bit(s)) (Setting 0)
+	771  :   0;
+	772  :   1; -- Loop Filter Resistance = 19 (5 bit(s)) (Setting 19)
+	773  :   0;
+	774  :   0;
+	775  :   1;
+	776  :   1;
+	777  :   1; -- VCO Post Scale = 1 (1 bit(s)) (VCO post-scale divider counter value = 1)
+	778  :   0; -- Reserved Bits = 0 (5 bit(s))
+	779  :   0;
+	780  :   0;
+	781  :   0;
+	782  :   0;
+	783  :   0; -- Charge Pump Current = 1 (3 bit(s)) (Setting 1)
+	784  :   0;
+	785  :   1;
+	786  :   0; -- N counter: Bypass = 0 (1 bit(s))
+	787  :   0; -- N counter: High Count = 3 (8 bit(s))
+	788  :   0;
+	789  :   0;
+	790  :   0;
+	791  :   0;
+	792  :   0;
+	793  :   1;
+	794  :   1;
+	795  :   1; -- N counter: Odd Division = 1 (1 bit(s))
+	796  :   0; -- N counter: Low Count = 2 (8 bit(s))
+	797  :   0;
+	798  :   0;
+	799  :   0;
+	800  :   0;
+	801  :   0;
+	802  :   1;
+	803  :   0;
+	804  :   0; -- M counter: Bypass = 0 (1 bit(s))
+	805  :   0; -- M counter: High Count = 58 (8 bit(s))
+	806  :   0;
+	807  :   1;
+	808  :   1;
+	809  :   1;
+	810  :   0;
+	811  :   1;
+	812  :   0;
+	813  :   0; -- M counter: Odd Division = 0 (1 bit(s))
+	814  :   0; -- M counter: Low Count = 58 (8 bit(s))
+	815  :   0;
+	816  :   1;
+	817  :   1;
+	818  :   1;
+	819  :   0;
+	820  :   1;
+	821  :   0;
+	822  :   0; -- clk0 counter: Bypass = 0 (1 bit(s))
+	823  :   0; -- clk0 counter: High Count = 8 (8 bit(s))
+	824  :   0;
+	825  :   0;
+	826  :   0;
+	827  :   1;
+	828  :   0;
+	829  :   0;
+	830  :   0;
+	831  :   1; -- clk0 counter: Odd Division = 1 (1 bit(s))
+	832  :   0; -- clk0 counter: Low Count = 7 (8 bit(s))
+	833  :   0;
+	834  :   0;
+	835  :   0;
+	836  :   0;
+	837  :   1;
+	838  :   1;
+	839  :   1;
+	840  :   0; -- clk1 counter: Bypass = 0 (1 bit(s))
+	841  :   0; -- clk1 counter: High Count = 2 (8 bit(s))
+	842  :   0;
+	843  :   0;
+	844  :   0;
+	845  :   0;
+	846  :   0;
+	847  :   1;
+	848  :   0;
+	849  :   1; -- clk1 counter: Odd Division = 1 (1 bit(s))
+	850  :   0; -- clk1 counter: Low Count = 1 (8 bit(s))
+	851  :   0;
+	852  :   0;
+	853  :   0;
+	854  :   0;
+	855  :   0;
+	856  :   0;
+	857  :   1;
+	858  :   0; -- clk2 counter: Bypass = 0 (1 bit(s))
+	859  :   0; -- clk2 counter: High Count = 7 (8 bit(s))
+	860  :   0;
+	861  :   0;
+	862  :   0;
+	863  :   0;
+	864  :   1;
+	865  :   1;
+	866  :   1;
+	867  :   1; -- clk2 counter: Odd Division = 1 (1 bit(s))
+	868  :   0; -- clk2 counter: Low Count = 6 (8 bit(s))
+	869  :   0;
+	870  :   0;
+	871  :   0;
+	872  :   0;
+	873  :   1;
+	874  :   1;
+	875  :   0;
+	876  :   0; -- clk3 counter: Bypass = 0 (1 bit(s))
+	877  :   0; -- clk3 counter: High Count = 7 (8 bit(s))
+	878  :   0;
+	879  :   0;
+	880  :   0;
+	881  :   0;
+	882  :   1;
+	883  :   1;
+	884  :   1;
+	885  :   1; -- clk3 counter: Odd Division = 1 (1 bit(s))
+	886  :   0; -- clk3 counter: Low Count = 6 (8 bit(s))
+	887  :   0;
+	888  :   0;
+	889  :   0;
+	890  :   0;
+	891  :   1;
+	892  :   1;
+	893  :   0;
+	894  :   1; -- clk4 counter: Bypass = 1 (1 bit(s))
+	895  :   0; -- clk4 counter: High Count = 0 (8 bit(s))
+	896  :   0;
+	897  :   0;
+	898  :   0;
+	899  :   0;
+	900  :   0;
+	901  :   0;
+	902  :   0;
+	903  :   0; -- clk4 counter: Odd Division = 0 (1 bit(s))
+	904  :   0; -- clk4 counter: Low Count = 0 (8 bit(s))
+	905  :   0;
+	906  :   0;
+	907  :   0;
+	908  :   0;
+	909  :   0;
+	910  :   0;
+	911  :   0;
+END;

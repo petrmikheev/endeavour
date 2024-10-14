@@ -258,14 +258,6 @@ set_location_assignment PIN_99 -to io_usb2_dp
 set_location_assignment PIN_98 -to io_usb2_dn
 set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/i2c.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/usb_host_controller.sv
-set_global_assignment -name VERILOG_FILE ../../extern/core_usb_fs_phy/src_v/usb_transceiver.v
-set_global_assignment -name VERILOG_FILE ../../extern/core_usb_fs_phy/src_v/usb_fs_phy.v
-set_global_assignment -name VERILOG_FILE ../../extern/core_usb_host/src_v/usbh_sie.v
-set_global_assignment -name VERILOG_FILE ../../extern/core_usb_host/src_v/usbh_host_defs.v
-set_global_assignment -name VERILOG_FILE ../../extern/core_usb_host/src_v/usbh_host.v
-set_global_assignment -name VERILOG_FILE ../../extern/core_usb_host/src_v/usbh_fifo.v
-set_global_assignment -name VERILOG_FILE ../../extern/core_usb_host/src_v/usbh_crc5.v
-set_global_assignment -name VERILOG_FILE ../../extern/core_usb_host/src_v/usbh_crc16.v
 set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/apb_clock_bridge.sv
 set_global_assignment -name QIP_FILE DDR_O1.qip
 set_global_assignment -name QIP_FILE DDR_IO1.qip
@@ -294,4 +286,6 @@ set_global_assignment -name SIP_FILE DDR_O4.sip
 set_global_assignment -name QIP_FILE PLL1280.qip
 set_global_assignment -name QIP_FILE SDR_O1.qip
 set_global_assignment -name SIP_FILE SDR_O1.sip
+set_global_assignment -name QIP_FILE PLL_RECONFIG.qip
+set_global_assignment -name QIP_FILE PLL_VIDEO_CONF_ROM.qip
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
