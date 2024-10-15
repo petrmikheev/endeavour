@@ -90,7 +90,7 @@ void printf_impl(const char* fmt, unsigned a1, unsigned a2, unsigned a3, unsigne
       continue;
     }
     int width = 1;
-    if (f >= '0' && f <= '9') {
+    while (f >= '0' && f <= '9') {
       width = f - '0';
       f = *fmt++;
     }

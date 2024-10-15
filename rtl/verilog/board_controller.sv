@@ -98,8 +98,12 @@ module BoardController(
     timer_interrupt <= tih | (tihe & til);
   end
 
+`ifdef IVERILOG
+  reg [17:0] cpu_freq = CPU_FREQ / 1024;
+`else
   reg [17:0] cpu_freq;
   FrequencyCounter cpu_freq_counter(.clk(clk_cpu), .utime(utime[9:0]), .freq_khz(cpu_freq));
+`endif
 
 `ifdef IVERILOG
 
@@ -107,7 +111,6 @@ module BoardController(
   localparam CPU_PERIOD = 1_000_000_000.0 / CPU_FREQ;
 
   initial begin
-    cpu_freq = CPU_FREQ / 1024;
     clk_cpu = 0;
     clk_ram = 0;
     clk_peripheral = 0;
