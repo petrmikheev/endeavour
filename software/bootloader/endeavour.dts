@@ -9,8 +9,8 @@
   chosen {
     //bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi debug root=/dev/ram";
     //bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi debug root=/dev/mmcblk0p1";
-    //bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi root=/dev/mmcblk0p1";
-    bootargs = "console=ttyS0,sbi:115200e root=/dev/ram";
+    bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi root=/dev/mmcblk0p1";
+    //bootargs = "console=ttyS0,sbi:115200e root=/dev/ram";
     linux,initrd-start = <0x87000000>;
     linux,initrd-end   = <0x87400000>;
   };

@@ -131,7 +131,7 @@ set_max_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 11
 set_min_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 10
 set_max_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 11
 
-set_min_delay -from [get_clocks clk48] -to [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data* io_usb*}] 10
+set_min_delay -from [get_clocks clk48] -to [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data* io_usb*}] 13
 set_max_delay -from [get_clocks clk48] -to [get_ports {io_sdcard_clk io_sdcard_cmd io_sdcard_data* io_usb*}] 14
 
 #**************************************************************

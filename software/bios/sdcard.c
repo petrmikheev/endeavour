@@ -109,7 +109,7 @@ unsigned init_sdcard() {
   command(SDIO_R1 | 55, rca);
   command(SDIO_R1 | 6, 0x2);
   unsigned phy = IO_PORT(SDCARD_PHY) | SDIO_W4;
-
+/*
   // CMD6 - check if HS mode (50MHz) is available
   phy = (phy & 0xf0ffffff) | (6<<24);  // 64 byte response
   IO_PORT(SDCARD_PHY) = phy;
@@ -129,7 +129,7 @@ unsigned init_sdcard() {
   // Simulation model doesn't implement CMD6
   phy = (phy & ~0xff) | SDIOCK_HS;
 #endif
-
+*/
   phy = (phy & 0xf0ffffff) | SECTOR_512B;
 
   IO_PORT(SDCARD_PHY) = phy;

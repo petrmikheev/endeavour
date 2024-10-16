@@ -342,7 +342,7 @@ void set_resolution(int w, int h) {
   int mode;
   if (w == 640 && h == 480) mode = 1;
   else if (w == 1024 && h == 768) mode = 2;
-  else if (w == 1280 && h == 1024) mode = 3;
+  else if (w == 1280 && h == 720) mode = 3;
   else {
     printf("[textwm] Invalid resolution %dx%d. Supported: 640x480 / 1024x768 / 1280x720\n", w, h);
     return;

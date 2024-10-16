@@ -30,7 +30,7 @@ sed -i 's/#!\/bin\/bash/#!\/bin\/sh/g' rootfs/usr/bin/*
 cp groff-1.22.4/{groff,grotty,nroff,tbl,troff} rootfs/usr/bin/
 $TOOLCHAIN/bin/riscv32-unknown-linux-gnu-strip rootfs/usr/bin/{groff,grotty,tbl,troff}
 mkdir -p rootfs/usr/share/groff/1.22.4/font
-cp -r groff-1.22.4/font/devascii rootfs/usr/share/groff/1.22.4/font/devascii
+cp -r groff-1.22.4/font/{devascii,devutf8} rootfs/usr/share/groff/1.22.4/font/
 cp -r groff-1.22.4/tmac rootfs/usr/share/groff/1.22.4/tmac
 sed -i 's/.mso man.local/.\\"msi man.local/g' rootfs/usr/share/groff/1.22.4/tmac/an-old.tmac
 
@@ -60,3 +60,6 @@ fi
 
 mkdir -p rootfs/usr/share/fonts
 cp terminus-font-4.49.1/ter-u{12,14,16}*.bdf rootfs/usr/share/fonts
+
+mkdir -p rootfs/usr/lib/locale
+cp -r /usr/lib/locale/C.UTF-8 rootfs/usr/lib/locale/
