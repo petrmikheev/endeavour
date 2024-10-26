@@ -4,3 +4,6 @@
 [submodule "extern/core_usb_fs_phy"]
 	path = extern/core_usb_fs_phy
 	url = https://github.com/ultraembedded/core_usb_fs_phy.git
+[submodule "rtl/spinal/ext/VexiiRiscv"]
+	path = rtl/spinal/VexiiRiscv
+	url = https://github.com/SpinalHDL/VexiiRiscv.git

@@ -39,10 +39,23 @@ set_time_format -unit ns -decimal_places 3
 # Create Clock
 #**************************************************************
 
-create_clock -name {clk48} -period 20.833 -waveform { 0.000 10.416 } [get_ports {io_clk_in}]
-create_clock -name {clk_cpu} -period 11.7 -waveform { 0.00 5.85 } [get_ports {io_plla_clk0}]
-create_clock -name {clk_ram} -period 11.7 -waveform { 2.42 8.27 } [get_ports {io_plla_clk1}]
-#create_clock -name {io_plla_clk2} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_plla_clk2}]
+create_clock -name {clk48}       -period 20.833 -waveform { 0.0  10.416 } [get_ports {io_clk_in}]
+
+# RAM 100 Mhz
+#create_clock -name {clk_ram_bus} -period 10.000 -waveform { 0.0  5.000 }  [get_ports {io_plla_clk0}]
+#create_clock -name {clk_ram}     -period 10.000 -waveform { 2.5  7.5 }    [get_ports {io_plla_clk1}]
+
+# RAM 110 MHz
+#create_clock -name {clk_ram_bus} -period 9.09   -waveform { 0.0   4.545 } [get_ports {io_plla_clk0}]
+#create_clock -name {clk_ram}     -period 9.09   -waveform { 2.273 6.818 } [get_ports {io_plla_clk1}]
+
+# RAM 120 MHz
+create_clock -name {clk_ram_bus} -period 8.333  -waveform { 0.0   4.167 } [get_ports {io_plla_clk0}]
+create_clock -name {clk_ram}     -period 8.333  -waveform { 2.083 6.250 } [get_ports {io_plla_clk1}]
+
+# CPU 60 Mhz
+create_clock -name {clk_cpu}     -period 16.667 -waveform { 0.0   8.333 } [get_ports {io_plla_clk2}]
+
 #create_clock -name {io_pllb_clk0} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk0}]
 #create_clock -name {io_pllb_clk1} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk1}]
 #create_clock -name {io_pllb_clk2} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk2}]
@@ -123,11 +136,12 @@ set_false_path -hold -to [get_ports {io_sdcard_* io_usb*}]
 
 set_max_delay -from clk_cpu -to clk48 10.000
 set_max_delay -from clk48 -to clk_cpu 10.000
+set_max_delay -from clk48 -to clk_ram_bus 10.000
 set_max_delay -from clk_cpu -to clk_tmds_pixel 30.000
 set_max_delay -from clk_tmds_pixel -to clk_cpu 30.000
 
-set_min_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 10
-set_max_delay -from [get_clocks clk_cpu] -to [get_ports {io_ddr_sdram_*}] 11
+set_min_delay -from [get_clocks clk_ram_bus] -to [get_ports {io_ddr_sdram_*}] 10
+set_max_delay -from [get_clocks clk_ram_bus] -to [get_ports {io_ddr_sdram_*}] 11
 set_min_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 10
 set_max_delay -from [get_clocks clk_ram] -to [get_ports {io_ddr_sdram_*}] 11
 
@@ -140,8 +154,8 @@ set_max_delay -from [get_clocks clk48] -to [get_ports {io_sdcard_clk io_sdcard_c
 
 set_min_delay -from clk_cpu -to clk48 -5.000
 set_min_delay -from clk48 -to clk_cpu -5.000
+set_min_delay -from clk48 -to clk_ram_bus -5.000
 
 #**************************************************************
 # Set Input Transition
 #**************************************************************
-

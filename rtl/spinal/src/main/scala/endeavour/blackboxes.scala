@@ -32,10 +32,11 @@ class BoardController extends BlackBox {
     val pllb = PLL()
 
     val reset_cpu = out Bool()
+    val reset_ram = out Bool()
+    val reset_peripheral = out Bool()
     val clk_cpu = out Bool()
     val clk_ram = out Bool()
-    //val clk_ram_bus = out Bool()
-    val reset_peripheral = out Bool()
+    val clk_ram_bus = out Bool()
     val clk_peripheral = out Bool()  // uart, audio, usb, sdcard
 
     val utime = out UInt(64 bits)
@@ -151,9 +152,10 @@ class AudioController extends BlackBox {
   mapClockDomain(clock=io.clk, reset=io.reset)
 }*/
 
-class DDRSdramController(rowBits: Int, colBits: Int) extends BlackBox {
+class DDRSdramController(rowBits: Int, colBits: Int, idWidth: Int) extends BlackBox {
   addGeneric("ROW_BITS", rowBits)
   addGeneric("COL_BITS", colBits)
+  addGeneric("ID_WIDTH", idWidth)
   val io = new Bundle {
     val clk = in Bool()
     val clk_shifted = in Bool()
@@ -161,7 +163,7 @@ class DDRSdramController(rowBits: Int, colBits: Int) extends BlackBox {
     val axi = slave(Axi4Shared(Axi4Config(
       addressWidth = rowBits + colBits + 3,
       dataWidth = 32,
-      idWidth = 2,
+      idWidth = idWidth,
       useResp = false,
       useLock = false,
       useRegion = false,

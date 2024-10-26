@@ -4,6 +4,7 @@
 module DDRSdramController #(
     parameter       ROW_BITS  = 13,
     parameter       COL_BITS  = 11,
+    parameter       ID_WIDTH  = 1,
     parameter [9:0] tREFC     = 10'd600,
     parameter [7:0] tW2I      = 8'd2,
     parameter [7:0] tR2I      = 8'd2
@@ -29,11 +30,11 @@ module DDRSdramController #(
     output wire                          rlast,
     output wire                   [31:0] rdata,
     //
-    input wire   [1:0] arw_id,
+    input wire   [ID_WIDTH-1:0] arw_id,
     input wire   [2:0] arw_size,  // ignored, expected 4 byte (0x2)
     input wire   [1:0] arw_burst, // ignored, expected INCR
-    output reg   [1:0] bid,
-    output wire  [1:0] rid,
+    output reg   [ID_WIDTH-1:0] bid,
+    output wire  [ID_WIDTH-1:0] rid,
     // DDR-SDRAM interface
     output wire                                ddr_ck_p, ddr_ck_n,
     output reg                                 ddr_cke,

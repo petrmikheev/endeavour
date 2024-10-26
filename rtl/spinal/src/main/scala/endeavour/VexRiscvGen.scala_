@@ -10,7 +10,32 @@ import vexriscv.ip.{DataCacheConfig, InstructionCacheConfig}
 import vexriscv.ip.fpu.FpuParameter
 
 class VexRiscvGen(useCache: Boolean, compressedGen: Boolean, resetVector: BigInt) {
-  val plugins = ArrayBuffer(
+  var vexiiParam = new ParamSimple()
+  val vexiis = for (hartId <- 0 until cpuCount) yield new TilelinkVexiiRiscvFiber(vexiiParam.plugins(hartId))
+  for (vexii <- vexiis) {
+    if (vexiiParam.fetchL1Enable) vexii.iBus.setDownConnection { (down, up) =>
+      down.a << up.a.halfPipe().halfPipe()
+      up.d << down.d.m2sPipe()
+    }
+    if (vexiiParam.lsuL1Enable) {
+      vexii.lsuL1Bus.setDownConnection(a = withCoherency.mux(StreamPipe.HALF, StreamPipe.FULL), b = StreamPipe.HALF_KEEP, c = StreamPipe.FULL, d = StreamPipe.M2S_KEEP, e = StreamPipe.HALF)
+      vexii.dBus.setDownConnection(a = StreamPipe.HALF, d = StreamPipe.M2S_KEEP)
+    }
+  }
+
+  val ioBus = fabric.Node()
+
+  val mem = new Area {
+    val toAxi4 = new fabric.Axi4Bridge()
+    toAxi4.up.forceDataWidth(32)
+    toAxi4.down.addTag(PMA.MAIN)
+    toAxi4.down.addTag(PMA.EXECUTABLE)
+    /*for (region <- memRegions) {
+      toAxi4.down.addTag(new MemoryEndpointTag(region.mapping))
+    }*/
+  }
+
+  /*val plugins = ArrayBuffer(
     new DecoderSimplePlugin(
       catchIllegalInstruction = true
     ),
@@ -55,9 +80,9 @@ class VexRiscvGen(useCache: Boolean, compressedGen: Boolean, resetVector: BigInt
       marchid        = null,
       mimpid         = null,
       mhartid        = null,
-      mtvecInit      = resetVector,
-      misaExtensionsInit = (1<<8 /*I*/) | (1<<12 /*M*/) | (1<<0 /*A*/) | (if (compressedGen) 1<<2 /*C*/ else 0) | (1<<18 /*S*/) | (1<<20 /*U*/),
-      misaAccess     = CsrAccess.READ_ONLY,
+      mtvecInit      = resetVector,*/
+      //misaExtensionsInit = (1<<8 /*I*/) | (1<<12 /*M*/) | (1<<0 /*A*/) | (if (compressedGen) 1<<2 /*C*/ else 0) | (1<<18 /*S*/) | (1<<20 /*U*/),
+      /*misaAccess     = CsrAccess.READ_ONLY,
       medelegAccess  = CsrAccess.READ_WRITE,
       midelegAccess  = CsrAccess.READ_WRITE,
       mtvecAccess    = CsrAccess.READ_WRITE,
@@ -145,6 +170,6 @@ class VexRiscvGen(useCache: Boolean, compressedGen: Boolean, resetVector: BigInt
     plugins += new DBusSimplePlugin
   }
 
-  new VexRiscv(VexRiscvConfig(plugins))
+  new VexRiscv(VexRiscvConfig(plugins))*/
 }
 

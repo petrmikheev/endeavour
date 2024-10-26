@@ -20,7 +20,7 @@ void print_cpu_info() {
 }
 
 int memtest() {
-  bios_printf("RAM: %uMB\tmemtest", RAM_SIZE >> 20);
+  bios_printf("RAM: %uMB\tfreq=%uMHz\tmemtest", RAM_SIZE >> 20, IO_PORT(BOARD_RAM_FREQ) / 1000000);
   char* ram = (char*)RAM_ADDR;
 #ifndef SIMULATION
   const int batch_size = RAM_SIZE >> 4;
@@ -79,7 +79,7 @@ int main() {
 #ifndef SIMULATION
   int memtest_ok = memtest();
 #else
-  int memtest_ok = 1;
+  int memtest_ok = (IO_PORT(BOARD_KEYS) & 1) || memtest();
 #endif
   SDCARD_SECTOR_COUNT = init_sdcard();
 

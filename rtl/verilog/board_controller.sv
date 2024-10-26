@@ -20,10 +20,11 @@ module BoardController(
   input   [1:0] keys,
 
   output reg reset_cpu,
+  output reg reset_ram,
   output reg reset_peripheral,
   output reg clk_cpu,
   output reg clk_ram,
-  // output reg clk_ram_bus,
+  output reg clk_ram_bus,
   output reg clk_peripheral,
   output reg clk_tmds_pixel,
   output reg clk_tmds_x5,
@@ -58,6 +59,7 @@ module BoardController(
 
   initial reset_peripheral = 1'b1;
   initial reset_cpu = 1'b1;
+  initial reset_ram = 1'b1;
 
   parameter RESET_DELAY = PERIPHERAL_FREQ / 10; // 100ms
 
@@ -98,29 +100,37 @@ module BoardController(
     timer_interrupt <= tih | (tihe & til);
   end
 
+  always @(posedge clk_ram_bus) reset_ram <= reset_peripheral;
+
 `ifdef IVERILOG
   reg [17:0] cpu_freq = CPU_FREQ / 1024;
+  reg [17:0] ram_freq = RAM_FREQ / 1024;
 `else
-  reg [17:0] cpu_freq;
+  reg [17:0] cpu_freq, ram_freq;
   FrequencyCounter cpu_freq_counter(.clk(clk_cpu), .utime(utime[9:0]), .freq_khz(cpu_freq));
+  FrequencyCounter ram_freq_counter(.clk(clk_ram_bus), .utime(utime[9:0]), .freq_khz(ram_freq));
 `endif
 
 `ifdef IVERILOG
-
-  parameter CPU_FREQ = 85_000_000;
+  parameter CPU_FREQ = 60_000_000;
   localparam CPU_PERIOD = 1_000_000_000.0 / CPU_FREQ;
+
+  parameter RAM_FREQ = 120_000_000;
+  localparam RAM_PERIOD = 1_000_000_000.0 / RAM_FREQ;
 
   initial begin
     clk_cpu = 0;
     clk_ram = 0;
+    clk_ram_bus = 0;
     clk_peripheral = 0;
     clk_tmds_pixel = 0;
     clk_tmds_x5 = 0;
 
-    #(CPU_PERIOD/4);
-    while (1) #(CPU_PERIOD/2) clk_ram = ~clk_ram;
+    #(RAM_PERIOD/4);
+    while (1) #(RAM_PERIOD/2) clk_ram = ~clk_ram;
   end
 
+  always #(RAM_PERIOD/2) clk_ram_bus = ~clk_ram_bus;
   always #(CPU_PERIOD/2) clk_cpu = ~clk_cpu;
   always #(PERIPHERAL_PERIOD/2) clk_peripheral = ~clk_peripheral;
 
@@ -150,6 +160,7 @@ module BoardController(
     .c3(clk_tmds_x5)
   );
   assign clk_tmds_pixel = clk_peripheral;
+  assign clk_ram_bus = clk_cpu;
 `endif
 `ifdef ENDEAVOUR_BOARD_VER2
   wire pll_areset;
@@ -177,8 +188,6 @@ module BoardController(
 
     .c0(clk_tmds_pixel),
     .c1(clk_tmds_x5)
-    //.c2(clk_cpu),
-    //.c3(clk_ram)
   );
 
   reg [1:0] video_mode_buf1 = 0;
@@ -231,8 +240,9 @@ module BoardController(
   );
 
   assign clk_peripheral = clk_in;
-  assign clk_cpu = plla_clk0;
+  assign clk_ram_bus = plla_clk0;
   assign clk_ram = plla_clk1;
+  assign clk_cpu = plla_clk2;
 `endif
 
   reg [2:0] leds_normalized;
@@ -255,7 +265,8 @@ module BoardController(
   assign apb_PRDATA = addr == 3'd0 ? {29'b0, leds_normalized}  :
                       addr == 3'd1 ? {30'b0, keys_normalized}  :
                       addr == 3'd2 ? {4'h0, cpu_freq, 10'h3ff} :
-                      addr == 3'd3 ? utime_cmp[31:0] : utime_cmp[63:32];
+                      addr == 3'd3 ? {4'h0, ram_freq, 10'h3ff} :
+                      addr == 3'd4 ? utime_cmp[31:0] : utime_cmp[63:32];
   assign apb_PREADY = 1'b1;
 
   always @(posedge clk_cpu) begin
@@ -265,8 +276,8 @@ module BoardController(
       utime_cmp <= '1;
     end else if (apb_PSEL & apb_PENABLE & apb_PWRITE) begin
       if (addr == 3'd0) leds_normalized <= apb_PWDATA[2:0];
-      if (addr == 3'd3) utime_cmp[31:0] <= apb_PWDATA;
-      if (addr == 3'd4) utime_cmp[63:32] <= apb_PWDATA;
+      if (addr == 3'd4) utime_cmp[31:0] <= apb_PWDATA;
+      if (addr == 3'd5) utime_cmp[63:32] <= apb_PWDATA;
     end
   end
 
