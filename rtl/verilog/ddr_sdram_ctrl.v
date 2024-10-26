@@ -19,7 +19,7 @@ module DDRSdramController #(
     input  wire                    [7:0] arw_len,
     input  wire                          arw_write,
     input  wire                          wvalid,
-    output wire                          wready,
+    output reg                           wready,
     input  wire                          wlast,
     input  wire                   [31:0] wdata,
     input wire                     [3:0] wstrb,
@@ -104,7 +104,6 @@ end
 // -------------------------------------------------------------------------------------
 //  assignment for user interface (AXI4)
 // -------------------------------------------------------------------------------------
-assign wready  = stat==WRITE;
 assign bvalid  = stat==WRESP;
 assign arw_ready = stat==IDLE && ref_real==ref_idle;
 assign rid = bid;
@@ -121,6 +120,7 @@ always @ (posedge clk)
         ref_real <= 3'd0;
         cnt <= 8'd0;
         stat <= RESET;
+        wready <= 0;
     end else begin
         case (stat)
             RESET: begin
@@ -190,6 +190,7 @@ always @ (posedge clk)
                 {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // controlled in new_rcw_n assignment
                 cnt <= 8'd0;
                 stat <= WRITE;
+                wready <= 1;
             end
             RPRE: begin
                 {next_ras_n, next_cas_n, next_we_n} <= 3'b101; // READ    Note: if clk>110mhz then second NOP is needed
@@ -202,6 +203,7 @@ always @ (posedge clk)
                     if(burst_last | wlast) begin
                         cnt <= 8'd0;
                         stat <= WRESP;
+                        wready <= 0;
                         {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // NOP
                     end else begin
                         cnt <= cnt + 8'd1;
@@ -262,7 +264,7 @@ end
 
 wire [31:0] ddr_in;
 reg [31:0] ddr_out;
-reg [31:0] ddr_out_buf;
+reg [15:0] ddr_out_buf;
 reg ddr_out_valid = 0;
 reg ddr_out_valid_buf = 0;
 reg [3:0] wstrb1, wstrb2;
@@ -345,8 +347,8 @@ always @(posedge clk) begin
         ddr_out_buf <= 32'b0;
     end else begin
         ddr_out_valid_buf <= (stat==WRITE && wvalid);
-        ddr_out_buf <= wdata;
-        ddr_out <= ddr_out_buf;
+        ddr_out_buf <= wdata[15:0];
+        ddr_out <= {wdata[31:16], ddr_out_buf};
         wstrb1 <= wstrb;
         wstrb2 <= wstrb1;
     end

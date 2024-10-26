@@ -125,46 +125,50 @@ module testbench;
   wire [31:0]  apb_wdata  = testbench.system.toApb_logic_bridge.io_down_PWDATA;
 
   wire [31:0] cpu_aligner_pc = testbench.system.vexiiRiscv_1.AlignerPlugin_logic_buffer_pc;
-  wire [31:0] cpu_aligner_instr = testbench.system.vexiiRiscv_1.AlignerPlugin_logic_buffer_data;
+  wire [63:0] cpu_aligner_instr = testbench.system.vexiiRiscv_1.AlignerPlugin_logic_buffer_data;
 
   wire cpu_clk = testbench.system.board_ctrl.clk_cpu;
   wire [31:0] cpu_pc = testbench.system.vexiiRiscv_1.PcPlugin_logic_harts_0_output_payload_pc;
   wire cpu_pc_ready = testbench.system.vexiiRiscv_1.PcPlugin_logic_harts_0_output_ready;
   wire cpu_pc_valid = testbench.system.vexiiRiscv_1.PcPlugin_logic_harts_0_output_valid;
   wire cpu_pc_fire = testbench.system.vexiiRiscv_1.PcPlugin_logic_harts_0_output_fire;
-/*
-`define REGFILE testbench.system.vexiiRiscv_1.integer_RegFilePlugin_logic_regfile_fpga.asMem_ram
-  wire [31:0] reg01_ra = `REGFILE[1];
-  wire [31:0] reg02_sp = `REGFILE[2];
-  wire [31:0] reg03_gp = `REGFILE[3];
-  wire [31:0] reg04_tp = `REGFILE[4];
-  wire [31:0] reg05_t0 = `REGFILE[5];
-  wire [31:0] reg06_t1 = `REGFILE[6];
-  wire [31:0] reg07_t2 = `REGFILE[7];
-  wire [31:0] reg08_s0 = `REGFILE[8];
-  wire [31:0] reg09_s1 = `REGFILE[9];
-  wire [31:0] reg10_a0 = `REGFILE[10];
-  wire [31:0] reg11_a1 = `REGFILE[11];
-  wire [31:0] reg12_a2 = `REGFILE[12];
-  wire [31:0] reg13_a3 = `REGFILE[13];
-  wire [31:0] reg14_a4 = `REGFILE[14];
-  wire [31:0] reg15_a5 = `REGFILE[15];
-  wire [31:0] reg16_a6 = `REGFILE[16];
-  wire [31:0] reg17_a7 = `REGFILE[17];
-  wire [31:0] reg18_s2 = `REGFILE[18];
-  wire [31:0] reg19_s3 = `REGFILE[19];
-  wire [31:0] reg20_s4 = `REGFILE[20];
-  wire [31:0] reg21_s5 = `REGFILE[21];
-  wire [31:0] reg22_s6 = `REGFILE[22];
-  wire [31:0] reg23_s7 = `REGFILE[23];
-  wire [31:0] reg24_s8 = `REGFILE[24];
-  wire [31:0] reg25_s9 = `REGFILE[25];
-  wire [31:0] reg26_s10 = `REGFILE[26];
-  wire [31:0] reg27_s11 = `REGFILE[27];
-  wire [31:0] reg28_t3 = `REGFILE[28];
-  wire [31:0] reg29_t4 = `REGFILE[29];
-  wire [31:0] reg30_t5 = `REGFILE[30];
-  wire [31:0] reg31_t6 = `REGFILE[31];*/
+
+`define REGFILE0 testbench.system.vexiiRiscv_1.integer_RegFilePlugin_logic_regfile_fpga.ramSyncMwMux_1.ram_0
+`define REGFILE1 testbench.system.vexiiRiscv_1.integer_RegFilePlugin_logic_regfile_fpga.ramSyncMwMux_1.ram_1
+`define REGFILE(i) testbench.system.vexiiRiscv_1.integer_RegFilePlugin_logic_regfile_fpga.ramSyncMwMux_1.location.ram_``i ? `REGFILE1[i] : `REGFILE0[i]
+`define REGFILE_FLOAT(i) testbench.system.vexiiRiscv_1.float_RegFilePlugin_logic_regfile_fpga.asMem_ram[i]
+
+  wire [31:0] reg01_ra = `REGFILE(1);
+  wire [31:0] reg02_sp = `REGFILE(2);
+  wire [31:0] reg03_gp = `REGFILE(3);
+  wire [31:0] reg04_tp = `REGFILE(4);
+  wire [31:0] reg05_t0 = `REGFILE(5);
+  wire [31:0] reg06_t1 = `REGFILE(6);
+  wire [31:0] reg07_t2 = `REGFILE(7);
+  wire [31:0] reg08_s0 = `REGFILE(8);
+  wire [31:0] reg09_s1 = `REGFILE(9);
+  wire [31:0] reg10_a0 = `REGFILE(10);
+  wire [31:0] reg11_a1 = `REGFILE(11);
+  wire [31:0] reg12_a2 = `REGFILE(12);
+  wire [31:0] reg13_a3 = `REGFILE(13);
+  wire [31:0] reg14_a4 = `REGFILE(14);
+  wire [31:0] reg15_a5 = `REGFILE(15);
+  wire [31:0] reg16_a6 = `REGFILE(16);
+  wire [31:0] reg17_a7 = `REGFILE(17);
+  wire [31:0] reg18_s2 = `REGFILE(18);
+  wire [31:0] reg19_s3 = `REGFILE(19);
+  wire [31:0] reg20_s4 = `REGFILE(20);
+  wire [31:0] reg21_s5 = `REGFILE(21);
+  wire [31:0] reg22_s6 = `REGFILE(22);
+  wire [31:0] reg23_s7 = `REGFILE(23);
+  wire [31:0] reg24_s8 = `REGFILE(24);
+  wire [31:0] reg25_s9 = `REGFILE(25);
+  wire [31:0] reg26_s10 = `REGFILE(26);
+  wire [31:0] reg27_s11 = `REGFILE(27);
+  wire [31:0] reg28_t3 = `REGFILE(28);
+  wire [31:0] reg29_t4 = `REGFILE(29);
+  wire [31:0] reg30_t5 = `REGFILE(30);
+  wire [31:0] reg31_t6 = `REGFILE(31);
 
   initial begin
     $dumpfile("dump.vcd");
