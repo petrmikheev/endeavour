@@ -25,7 +25,6 @@ class VexiiCore(resetVector: Long) {
 
   param.withMul = true
   param.withDiv = true
-  //param.divRadix = 4
   param.withRva = true
   param.withRvZb = false
 
@@ -66,28 +65,30 @@ class VexiiCore(resetVector: Long) {
   //fetchL1Ways
   //lsuL1Ways
 
+  val utime = UInt(64 bits)
+
+  val interrupts = new Bundle {
+    val timer = Bool()
+    val software = Bool()
+    val external = Bool()
+  }
+
   val core = new TilelinkVexiiRiscvFiber(param.plugins())
   core.priv match {
     case Some(priv) => new Area {
       val mti, msi, mei, sei = misc.InterruptNode.master()
-      mti.flag := False
-      msi.flag := False
-      mei.flag := False
-      sei.flag := False
+      mti.flag := interrupts.timer
+      msi.flag := interrupts.software
+      mei.flag := interrupts.external
+      sei.flag := interrupts.external
       priv.mti << mti
       priv.msi << msi
       priv.mei << mei
       priv.sei << sei
+      priv.rdtime := utime
     }
+    case None =>
   }
-
-  val bus = tilelink.fabric.Node()
-  bus << core.buses
-
-  val bus32 = tilelink.fabric.Node().forceDataWidth(32)
-  bus32 << bus
-
-  // plic and clint
 
   core.iBus.setDownConnection { (down, up) =>
     down.a << up.a.halfPipe().halfPipe()
@@ -96,4 +97,7 @@ class VexiiCore(resetVector: Long) {
   //core.lsuL1Bus.setDownConnection(a = withCoherency.mux(StreamPipe.HALF, StreamPipe.FULL), b = StreamPipe.HALF_KEEP, c = StreamPipe.FULL, d = StreamPipe.M2S_KEEP, e = StreamPipe.HALF)
   core.lsuL1Bus.setDownConnection(a = StreamPipe.HALF, b = StreamPipe.HALF_KEEP, c = StreamPipe.FULL, d = StreamPipe.M2S_KEEP, e = StreamPipe.HALF)
   core.dBus.setDownConnection(a = StreamPipe.HALF, d = StreamPipe.M2S_KEEP)
+
+  val bus = tilelink.fabric.Node()
+  bus << core.buses
 }

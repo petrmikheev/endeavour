@@ -1,6 +1,6 @@
 // Generator : SpinalHDL dev    git head : c796d9fc761d68c4391d98f72d852457e34aeb32
 // Component : EndeavourSoc
-// Git hash  : 7bccf9e9ef87ac7526360a482416657e6df0b62b
+// Git hash  : e57fc267d7e23ccfa1a76e090a28bfed2a860d93
 
 `timescale 1ns/1ps
 
@@ -396,35 +396,35 @@ module EndeavourSoc (
   wire       [31:0]   widthAdapter_3_io_down_a_payload_data;
   wire                widthAdapter_3_io_down_a_payload_corrupt;
   wire                widthAdapter_3_io_down_d_ready;
-  wire                decoder_3_io_up_a_ready;
-  wire                decoder_3_io_up_d_valid;
-  wire       [2:0]    decoder_3_io_up_d_payload_opcode;
-  wire       [2:0]    decoder_3_io_up_d_payload_param;
-  wire       [2:0]    decoder_3_io_up_d_payload_source;
-  wire       [2:0]    decoder_3_io_up_d_payload_size;
-  wire                decoder_3_io_up_d_payload_denied;
-  wire       [31:0]   decoder_3_io_up_d_payload_data;
-  wire                decoder_3_io_up_d_payload_corrupt;
-  wire                decoder_3_io_downs_0_a_valid;
-  wire       [2:0]    decoder_3_io_downs_0_a_payload_opcode;
-  wire       [2:0]    decoder_3_io_downs_0_a_payload_param;
-  wire       [2:0]    decoder_3_io_downs_0_a_payload_source;
-  wire       [26:0]   decoder_3_io_downs_0_a_payload_address;
-  wire       [2:0]    decoder_3_io_downs_0_a_payload_size;
-  wire       [3:0]    decoder_3_io_downs_0_a_payload_mask;
-  wire       [31:0]   decoder_3_io_downs_0_a_payload_data;
-  wire                decoder_3_io_downs_0_a_payload_corrupt;
-  wire                decoder_3_io_downs_0_d_ready;
-  wire                decoder_3_io_downs_1_a_valid;
-  wire       [2:0]    decoder_3_io_downs_1_a_payload_opcode;
-  wire       [2:0]    decoder_3_io_downs_1_a_payload_param;
-  wire       [2:0]    decoder_3_io_downs_1_a_payload_source;
-  wire       [13:0]   decoder_3_io_downs_1_a_payload_address;
-  wire       [2:0]    decoder_3_io_downs_1_a_payload_size;
-  wire       [3:0]    decoder_3_io_downs_1_a_payload_mask;
-  wire       [31:0]   decoder_3_io_downs_1_a_payload_data;
-  wire                decoder_3_io_downs_1_a_payload_corrupt;
-  wire                decoder_3_io_downs_1_d_ready;
+  wire                bus32_decoder_core_io_up_a_ready;
+  wire                bus32_decoder_core_io_up_d_valid;
+  wire       [2:0]    bus32_decoder_core_io_up_d_payload_opcode;
+  wire       [2:0]    bus32_decoder_core_io_up_d_payload_param;
+  wire       [2:0]    bus32_decoder_core_io_up_d_payload_source;
+  wire       [2:0]    bus32_decoder_core_io_up_d_payload_size;
+  wire                bus32_decoder_core_io_up_d_payload_denied;
+  wire       [31:0]   bus32_decoder_core_io_up_d_payload_data;
+  wire                bus32_decoder_core_io_up_d_payload_corrupt;
+  wire                bus32_decoder_core_io_downs_0_a_valid;
+  wire       [2:0]    bus32_decoder_core_io_downs_0_a_payload_opcode;
+  wire       [2:0]    bus32_decoder_core_io_downs_0_a_payload_param;
+  wire       [2:0]    bus32_decoder_core_io_downs_0_a_payload_source;
+  wire       [26:0]   bus32_decoder_core_io_downs_0_a_payload_address;
+  wire       [2:0]    bus32_decoder_core_io_downs_0_a_payload_size;
+  wire       [3:0]    bus32_decoder_core_io_downs_0_a_payload_mask;
+  wire       [31:0]   bus32_decoder_core_io_downs_0_a_payload_data;
+  wire                bus32_decoder_core_io_downs_0_a_payload_corrupt;
+  wire                bus32_decoder_core_io_downs_0_d_ready;
+  wire                bus32_decoder_core_io_downs_1_a_valid;
+  wire       [2:0]    bus32_decoder_core_io_downs_1_a_payload_opcode;
+  wire       [2:0]    bus32_decoder_core_io_downs_1_a_payload_param;
+  wire       [2:0]    bus32_decoder_core_io_downs_1_a_payload_source;
+  wire       [13:0]   bus32_decoder_core_io_downs_1_a_payload_address;
+  wire       [2:0]    bus32_decoder_core_io_downs_1_a_payload_size;
+  wire       [3:0]    bus32_decoder_core_io_downs_1_a_payload_mask;
+  wire       [31:0]   bus32_decoder_core_io_downs_1_a_payload_data;
+  wire                bus32_decoder_core_io_downs_1_a_payload_corrupt;
+  wire                bus32_decoder_core_io_downs_1_d_ready;
   wire                toApb_down_decoder_io_input_PREADY;
   wire       [31:0]   toApb_down_decoder_io_input_PRDATA;
   wire                toApb_down_decoder_io_input_PSLVERROR;
@@ -535,6 +535,7 @@ module EndeavourSoc (
   reg                 _zz_plic_target_ie_0;
   reg                 _zz_plic_target_ie_1;
   reg                 _zz_plic_target_ie_2;
+  wire                _zz_PrivilegedPlugin_logic_harts_0_int_m_external;
   wire                when_Apb3SlaveFactory_l81;
   wire                _zz_FetchL1TileLinkPlugin_logic_down_a_ready;
   wire       [2:0]    _zz_io_ups_0_a_payload_opcode;
@@ -629,10 +630,27 @@ module EndeavourSoc (
   wire       [2:0]    _zz_io_down_d_payload_opcode_1;
   wire       [2:0]    _zz_io_ups_2_a_payload_opcode_4;
   wire       [2:0]    _zz_LsuL1TileLinkPlugin_logic_down_d_payload_opcode_4;
-  wire       [2:0]    _zz_io_up_a_payload_opcode_5;
+  wire                bus32_bus_a_valid;
+  wire                bus32_bus_a_ready;
+  wire       [2:0]    bus32_bus_a_payload_opcode;
+  wire       [2:0]    bus32_bus_a_payload_param;
+  wire       [2:0]    bus32_bus_a_payload_source;
+  wire       [30:0]   bus32_bus_a_payload_address;
+  wire       [2:0]    bus32_bus_a_payload_size;
+  wire       [3:0]    bus32_bus_a_payload_mask;
+  wire       [31:0]   bus32_bus_a_payload_data;
+  wire                bus32_bus_a_payload_corrupt;
+  wire                bus32_bus_d_valid;
+  wire                bus32_bus_d_ready;
+  wire       [2:0]    bus32_bus_d_payload_opcode;
+  wire       [2:0]    bus32_bus_d_payload_param;
+  wire       [2:0]    bus32_bus_d_payload_source;
+  wire       [2:0]    bus32_bus_d_payload_size;
+  wire                bus32_bus_d_payload_denied;
+  wire       [31:0]   bus32_bus_d_payload_data;
+  wire                bus32_bus_d_payload_corrupt;
+  wire       [2:0]    _zz_bus32_bus_a_payload_opcode;
   wire       [2:0]    _zz_io_down_d_payload_opcode_2;
-  wire       [2:0]    _zz_io_up_a_payload_opcode_6;
-  wire       [2:0]    _zz_io_down_d_payload_opcode_3;
   wire                ramBridge_up_bus_a_valid;
   wire                ramBridge_up_bus_a_ready;
   wire       [2:0]    ramBridge_up_bus_a_payload_opcode;
@@ -656,7 +674,7 @@ module EndeavourSoc (
   wire       [2:0]    _zz_io_downs_1_d_payload_opcode;
   wire       [2:0]    _zz_io_ups_0_a_payload_opcode_7;
   wire       [2:0]    _zz_FetchL1TileLinkPlugin_logic_down_d_payload_opcode_5;
-  wire       [2:0]    _zz_io_up_a_payload_opcode_7;
+  wire       [2:0]    _zz_io_up_a_payload_opcode_5;
   wire       [2:0]    _zz_LsuTileLinkPlugin_logic_bridge_down_d_payload_opcode_4;
   wire       [2:0]    _zz_io_ups_2_a_payload_opcode_5;
   wire       [2:0]    _zz_LsuL1TileLinkPlugin_logic_down_d_payload_opcode_5;
@@ -709,8 +727,25 @@ module EndeavourSoc (
   wire                toApb_up_bus_d_payload_denied;
   wire       [31:0]   toApb_up_bus_d_payload_data;
   wire                toApb_up_bus_d_payload_corrupt;
-  wire       [2:0]    _zz_toApb_up_bus_a_payload_opcode;
-  wire       [2:0]    _zz_io_downs_0_d_payload_opcode;
+  wire                bus32_to_toApb_up_down_bus_a_valid;
+  wire                bus32_to_toApb_up_down_bus_a_ready;
+  wire       [2:0]    bus32_to_toApb_up_down_bus_a_payload_opcode;
+  wire       [2:0]    bus32_to_toApb_up_down_bus_a_payload_param;
+  wire       [2:0]    bus32_to_toApb_up_down_bus_a_payload_source;
+  wire       [26:0]   bus32_to_toApb_up_down_bus_a_payload_address;
+  wire       [2:0]    bus32_to_toApb_up_down_bus_a_payload_size;
+  wire       [3:0]    bus32_to_toApb_up_down_bus_a_payload_mask;
+  wire       [31:0]   bus32_to_toApb_up_down_bus_a_payload_data;
+  wire                bus32_to_toApb_up_down_bus_a_payload_corrupt;
+  wire                bus32_to_toApb_up_down_bus_d_valid;
+  wire                bus32_to_toApb_up_down_bus_d_ready;
+  wire       [2:0]    bus32_to_toApb_up_down_bus_d_payload_opcode;
+  wire       [2:0]    bus32_to_toApb_up_down_bus_d_payload_param;
+  wire       [2:0]    bus32_to_toApb_up_down_bus_d_payload_source;
+  wire       [2:0]    bus32_to_toApb_up_down_bus_d_payload_size;
+  wire                bus32_to_toApb_up_down_bus_d_payload_denied;
+  wire       [31:0]   bus32_to_toApb_up_down_bus_d_payload_data;
+  wire                bus32_to_toApb_up_down_bus_d_payload_corrupt;
   wire                internalRam_up_bus_a_valid;
   wire                internalRam_up_bus_a_ready;
   wire       [2:0]    internalRam_up_bus_a_payload_opcode;
@@ -730,8 +765,25 @@ module EndeavourSoc (
   wire                internalRam_up_bus_d_payload_denied;
   wire       [31:0]   internalRam_up_bus_d_payload_data;
   wire                internalRam_up_bus_d_payload_corrupt;
-  wire       [2:0]    _zz_internalRam_up_bus_a_payload_opcode;
-  wire       [2:0]    _zz_io_downs_1_d_payload_opcode_1;
+  wire                bus32_to_internalRam_up_down_bus_a_valid;
+  wire                bus32_to_internalRam_up_down_bus_a_ready;
+  wire       [2:0]    bus32_to_internalRam_up_down_bus_a_payload_opcode;
+  wire       [2:0]    bus32_to_internalRam_up_down_bus_a_payload_param;
+  wire       [2:0]    bus32_to_internalRam_up_down_bus_a_payload_source;
+  wire       [13:0]   bus32_to_internalRam_up_down_bus_a_payload_address;
+  wire       [2:0]    bus32_to_internalRam_up_down_bus_a_payload_size;
+  wire       [3:0]    bus32_to_internalRam_up_down_bus_a_payload_mask;
+  wire       [31:0]   bus32_to_internalRam_up_down_bus_a_payload_data;
+  wire                bus32_to_internalRam_up_down_bus_a_payload_corrupt;
+  wire                bus32_to_internalRam_up_down_bus_d_valid;
+  wire                bus32_to_internalRam_up_down_bus_d_ready;
+  wire       [2:0]    bus32_to_internalRam_up_down_bus_d_payload_opcode;
+  wire       [2:0]    bus32_to_internalRam_up_down_bus_d_payload_param;
+  wire       [2:0]    bus32_to_internalRam_up_down_bus_d_payload_source;
+  wire       [2:0]    bus32_to_internalRam_up_down_bus_d_payload_size;
+  wire                bus32_to_internalRam_up_down_bus_d_payload_denied;
+  wire       [31:0]   bus32_to_internalRam_up_down_bus_d_payload_data;
+  wire                bus32_to_internalRam_up_down_bus_d_payload_corrupt;
   wire                ram_axi_arw_valid;
   wire                ram_axi_arw_ready;
   wire       [26:0]   ram_axi_arw_payload_addr;
@@ -756,10 +808,10 @@ module EndeavourSoc (
   wire       [2:0]    ram_axi_r_payload_id;
   wire       [1:0]    ram_axi_r_payload_resp;
   wire                ram_axi_r_payload_last;
-  wire       [2:0]    _zz_io_up_a_payload_opcode_8;
-  wire       [2:0]    _zz_io_downs_0_d_payload_opcode_1;
+  wire       [2:0]    _zz_io_up_a_payload_opcode_6;
+  wire       [2:0]    _zz_io_downs_0_d_payload_opcode;
   wire       [2:0]    _zz_ramBridge_up_bus_a_payload_opcode_1;
-  wire       [2:0]    _zz_io_downs_1_d_payload_opcode_2;
+  wire       [2:0]    _zz_io_downs_1_d_payload_opcode_1;
   wire       [26:0]   toApb_down_PADDR;
   wire       [0:0]    toApb_down_PSEL;
   wire                toApb_down_PENABLE;
@@ -768,10 +820,44 @@ module EndeavourSoc (
   wire       [31:0]   toApb_down_PWDATA;
   wire       [31:0]   toApb_down_PRDATA;
   wire                toApb_down_PSLVERROR;
-  wire       [2:0]    _zz_toApb_up_bus_a_payload_opcode_1;
-  wire       [2:0]    _zz_io_downs_0_d_payload_opcode_2;
-  wire       [2:0]    _zz_internalRam_up_bus_a_payload_opcode_1;
-  wire       [2:0]    _zz_io_downs_1_d_payload_opcode_3;
+  wire                bus32_to_toApb_up_up_bus_a_valid;
+  wire                bus32_to_toApb_up_up_bus_a_ready;
+  wire       [2:0]    bus32_to_toApb_up_up_bus_a_payload_opcode;
+  wire       [2:0]    bus32_to_toApb_up_up_bus_a_payload_param;
+  wire       [2:0]    bus32_to_toApb_up_up_bus_a_payload_source;
+  wire       [26:0]   bus32_to_toApb_up_up_bus_a_payload_address;
+  wire       [2:0]    bus32_to_toApb_up_up_bus_a_payload_size;
+  wire       [3:0]    bus32_to_toApb_up_up_bus_a_payload_mask;
+  wire       [31:0]   bus32_to_toApb_up_up_bus_a_payload_data;
+  wire                bus32_to_toApb_up_up_bus_a_payload_corrupt;
+  wire                bus32_to_toApb_up_up_bus_d_valid;
+  wire                bus32_to_toApb_up_up_bus_d_ready;
+  wire       [2:0]    bus32_to_toApb_up_up_bus_d_payload_opcode;
+  wire       [2:0]    bus32_to_toApb_up_up_bus_d_payload_param;
+  wire       [2:0]    bus32_to_toApb_up_up_bus_d_payload_source;
+  wire       [2:0]    bus32_to_toApb_up_up_bus_d_payload_size;
+  wire                bus32_to_toApb_up_up_bus_d_payload_denied;
+  wire       [31:0]   bus32_to_toApb_up_up_bus_d_payload_data;
+  wire                bus32_to_toApb_up_up_bus_d_payload_corrupt;
+  wire                bus32_to_internalRam_up_up_bus_a_valid;
+  wire                bus32_to_internalRam_up_up_bus_a_ready;
+  wire       [2:0]    bus32_to_internalRam_up_up_bus_a_payload_opcode;
+  wire       [2:0]    bus32_to_internalRam_up_up_bus_a_payload_param;
+  wire       [2:0]    bus32_to_internalRam_up_up_bus_a_payload_source;
+  wire       [13:0]   bus32_to_internalRam_up_up_bus_a_payload_address;
+  wire       [2:0]    bus32_to_internalRam_up_up_bus_a_payload_size;
+  wire       [3:0]    bus32_to_internalRam_up_up_bus_a_payload_mask;
+  wire       [31:0]   bus32_to_internalRam_up_up_bus_a_payload_data;
+  wire                bus32_to_internalRam_up_up_bus_a_payload_corrupt;
+  wire                bus32_to_internalRam_up_up_bus_d_valid;
+  wire                bus32_to_internalRam_up_up_bus_d_ready;
+  wire       [2:0]    bus32_to_internalRam_up_up_bus_d_payload_opcode;
+  wire       [2:0]    bus32_to_internalRam_up_up_bus_d_payload_param;
+  wire       [2:0]    bus32_to_internalRam_up_up_bus_d_payload_source;
+  wire       [2:0]    bus32_to_internalRam_up_up_bus_d_payload_size;
+  wire                bus32_to_internalRam_up_up_bus_d_payload_denied;
+  wire       [31:0]   bus32_to_internalRam_up_up_bus_d_payload_data;
+  wire                bus32_to_internalRam_up_up_bus_d_payload_corrupt;
   `ifndef SYNTHESIS
   reg [127:0] _zz_io_ups_0_a_payload_opcode_string;
   reg [119:0] _zz_FetchL1TileLinkPlugin_logic_down_d_payload_opcode_string;
@@ -807,36 +893,36 @@ module EndeavourSoc (
   reg [119:0] _zz_io_down_d_payload_opcode_1_string;
   reg [127:0] _zz_io_ups_2_a_payload_opcode_4_string;
   reg [119:0] _zz_LsuL1TileLinkPlugin_logic_down_d_payload_opcode_4_string;
-  reg [127:0] _zz_io_up_a_payload_opcode_5_string;
+  reg [127:0] bus32_bus_a_payload_opcode_string;
+  reg [119:0] bus32_bus_d_payload_opcode_string;
+  reg [127:0] _zz_bus32_bus_a_payload_opcode_string;
   reg [119:0] _zz_io_down_d_payload_opcode_2_string;
-  reg [127:0] _zz_io_up_a_payload_opcode_6_string;
-  reg [119:0] _zz_io_down_d_payload_opcode_3_string;
   reg [127:0] ramBridge_up_bus_a_payload_opcode_string;
   reg [119:0] ramBridge_up_bus_d_payload_opcode_string;
   reg [127:0] _zz_ramBridge_up_bus_a_payload_opcode_string;
   reg [119:0] _zz_io_downs_1_d_payload_opcode_string;
   reg [127:0] _zz_io_ups_0_a_payload_opcode_7_string;
   reg [119:0] _zz_FetchL1TileLinkPlugin_logic_down_d_payload_opcode_5_string;
-  reg [127:0] _zz_io_up_a_payload_opcode_7_string;
+  reg [127:0] _zz_io_up_a_payload_opcode_5_string;
   reg [119:0] _zz_LsuTileLinkPlugin_logic_bridge_down_d_payload_opcode_4_string;
   reg [127:0] _zz_io_ups_2_a_payload_opcode_5_string;
   reg [119:0] _zz_LsuL1TileLinkPlugin_logic_down_d_payload_opcode_5_string;
   reg [127:0] toApb_up_bus_a_payload_opcode_string;
   reg [119:0] toApb_up_bus_d_payload_opcode_string;
-  reg [127:0] _zz_toApb_up_bus_a_payload_opcode_string;
-  reg [119:0] _zz_io_downs_0_d_payload_opcode_string;
+  reg [127:0] bus32_to_toApb_up_down_bus_a_payload_opcode_string;
+  reg [119:0] bus32_to_toApb_up_down_bus_d_payload_opcode_string;
   reg [127:0] internalRam_up_bus_a_payload_opcode_string;
   reg [119:0] internalRam_up_bus_d_payload_opcode_string;
-  reg [127:0] _zz_internalRam_up_bus_a_payload_opcode_string;
-  reg [119:0] _zz_io_downs_1_d_payload_opcode_1_string;
-  reg [127:0] _zz_io_up_a_payload_opcode_8_string;
-  reg [119:0] _zz_io_downs_0_d_payload_opcode_1_string;
+  reg [127:0] bus32_to_internalRam_up_down_bus_a_payload_opcode_string;
+  reg [119:0] bus32_to_internalRam_up_down_bus_d_payload_opcode_string;
+  reg [127:0] _zz_io_up_a_payload_opcode_6_string;
+  reg [119:0] _zz_io_downs_0_d_payload_opcode_string;
   reg [127:0] _zz_ramBridge_up_bus_a_payload_opcode_1_string;
-  reg [119:0] _zz_io_downs_1_d_payload_opcode_2_string;
-  reg [127:0] _zz_toApb_up_bus_a_payload_opcode_1_string;
-  reg [119:0] _zz_io_downs_0_d_payload_opcode_2_string;
-  reg [127:0] _zz_internalRam_up_bus_a_payload_opcode_1_string;
-  reg [119:0] _zz_io_downs_1_d_payload_opcode_3_string;
+  reg [119:0] _zz_io_downs_1_d_payload_opcode_1_string;
+  reg [127:0] bus32_to_toApb_up_up_bus_a_payload_opcode_string;
+  reg [119:0] bus32_to_toApb_up_up_bus_d_payload_opcode_string;
+  reg [127:0] bus32_to_internalRam_up_up_bus_a_payload_opcode_string;
+  reg [119:0] bus32_to_internalRam_up_up_bus_d_payload_opcode_string;
   `endif
 
 
@@ -1244,7 +1330,7 @@ module EndeavourSoc (
   WidthAdapter widthAdapter_2 (
     .io_up_a_valid             (_zz_io_up_a_valid                             ), //i
     .io_up_a_ready             (widthAdapter_2_io_up_a_ready                  ), //o
-    .io_up_a_payload_opcode    (_zz_io_up_a_payload_opcode_7[2:0]             ), //i
+    .io_up_a_payload_opcode    (_zz_io_up_a_payload_opcode_5[2:0]             ), //i
     .io_up_a_payload_param     (_zz_io_up_a_payload_param[2:0]                ), //i
     .io_up_a_payload_address   (_zz_io_up_a_payload_address[31:0]             ), //i
     .io_up_a_payload_size      (_zz_io_up_a_payload_size[1:0]                 ), //i
@@ -1439,7 +1525,7 @@ module EndeavourSoc (
     .io_downs_0_a_payload_corrupt (decoder_2_io_downs_0_a_payload_corrupt      ), //o
     .io_downs_0_d_valid           (widthAdapter_3_io_up_d_valid                ), //i
     .io_downs_0_d_ready           (decoder_2_io_downs_0_d_ready                ), //o
-    .io_downs_0_d_payload_opcode  (_zz_io_downs_0_d_payload_opcode_1[2:0]      ), //i
+    .io_downs_0_d_payload_opcode  (_zz_io_downs_0_d_payload_opcode[2:0]        ), //i
     .io_downs_0_d_payload_param   (widthAdapter_3_io_up_d_payload_param[2:0]   ), //i
     .io_downs_0_d_payload_source  (widthAdapter_3_io_up_d_payload_source[2:0]  ), //i
     .io_downs_0_d_payload_size    (widthAdapter_3_io_up_d_payload_size[2:0]    ), //i
@@ -1458,7 +1544,7 @@ module EndeavourSoc (
     .io_downs_1_a_payload_corrupt (decoder_2_io_downs_1_a_payload_corrupt      ), //o
     .io_downs_1_d_valid           (ramBridge_up_bus_d_valid                    ), //i
     .io_downs_1_d_ready           (decoder_2_io_downs_1_d_ready                ), //o
-    .io_downs_1_d_payload_opcode  (_zz_io_downs_1_d_payload_opcode_2[2:0]      ), //i
+    .io_downs_1_d_payload_opcode  (_zz_io_downs_1_d_payload_opcode_1[2:0]      ), //i
     .io_downs_1_d_payload_param   (ramBridge_up_bus_d_payload_param[2:0]       ), //i
     .io_downs_1_d_payload_source  (ramBridge_up_bus_d_payload_source[2:0]      ), //i
     .io_downs_1_d_payload_size    (ramBridge_up_bus_d_payload_size[2:0]        ), //i
@@ -1525,7 +1611,7 @@ module EndeavourSoc (
   WidthAdapter_1 widthAdapter_3 (
     .io_up_a_valid             (decoder_2_io_downs_0_a_valid                  ), //i
     .io_up_a_ready             (widthAdapter_3_io_up_a_ready                  ), //o
-    .io_up_a_payload_opcode    (_zz_io_up_a_payload_opcode_8[2:0]             ), //i
+    .io_up_a_payload_opcode    (_zz_io_up_a_payload_opcode_6[2:0]             ), //i
     .io_up_a_payload_param     (decoder_2_io_downs_0_a_payload_param[2:0]     ), //i
     .io_up_a_payload_source    (decoder_2_io_downs_0_a_payload_source[2:0]    ), //i
     .io_up_a_payload_address   (decoder_2_io_downs_0_a_payload_address[30:0]  ), //i
@@ -1543,7 +1629,7 @@ module EndeavourSoc (
     .io_up_d_payload_data      (widthAdapter_3_io_up_d_payload_data[63:0]     ), //o
     .io_up_d_payload_corrupt   (widthAdapter_3_io_up_d_payload_corrupt        ), //o
     .io_down_a_valid           (widthAdapter_3_io_down_a_valid                ), //o
-    .io_down_a_ready           (decoder_3_io_up_a_ready                       ), //i
+    .io_down_a_ready           (bus32_bus_a_ready                             ), //i
     .io_down_a_payload_opcode  (widthAdapter_3_io_down_a_payload_opcode[2:0]  ), //o
     .io_down_a_payload_param   (widthAdapter_3_io_down_a_payload_param[2:0]   ), //o
     .io_down_a_payload_source  (widthAdapter_3_io_down_a_payload_source[2:0]  ), //o
@@ -1552,78 +1638,78 @@ module EndeavourSoc (
     .io_down_a_payload_mask    (widthAdapter_3_io_down_a_payload_mask[3:0]    ), //o
     .io_down_a_payload_data    (widthAdapter_3_io_down_a_payload_data[31:0]   ), //o
     .io_down_a_payload_corrupt (widthAdapter_3_io_down_a_payload_corrupt      ), //o
-    .io_down_d_valid           (decoder_3_io_up_d_valid                       ), //i
+    .io_down_d_valid           (bus32_bus_d_valid                             ), //i
     .io_down_d_ready           (widthAdapter_3_io_down_d_ready                ), //o
-    .io_down_d_payload_opcode  (_zz_io_down_d_payload_opcode_3[2:0]           ), //i
-    .io_down_d_payload_param   (decoder_3_io_up_d_payload_param[2:0]          ), //i
-    .io_down_d_payload_source  (decoder_3_io_up_d_payload_source[2:0]         ), //i
-    .io_down_d_payload_size    (decoder_3_io_up_d_payload_size[2:0]           ), //i
-    .io_down_d_payload_denied  (decoder_3_io_up_d_payload_denied              ), //i
-    .io_down_d_payload_data    (decoder_3_io_up_d_payload_data[31:0]          ), //i
-    .io_down_d_payload_corrupt (decoder_3_io_up_d_payload_corrupt             ), //i
+    .io_down_d_payload_opcode  (_zz_io_down_d_payload_opcode_2[2:0]           ), //i
+    .io_down_d_payload_param   (bus32_bus_d_payload_param[2:0]                ), //i
+    .io_down_d_payload_source  (bus32_bus_d_payload_source[2:0]               ), //i
+    .io_down_d_payload_size    (bus32_bus_d_payload_size[2:0]                 ), //i
+    .io_down_d_payload_denied  (bus32_bus_d_payload_denied                    ), //i
+    .io_down_d_payload_data    (bus32_bus_d_payload_data[31:0]                ), //i
+    .io_down_d_payload_corrupt (bus32_bus_d_payload_corrupt                   ), //i
     .clk_cpu                   (board_ctrl_clk_cpu                            ), //i
     .reset_cpu                 (board_ctrl_reset_cpu                          )  //i
   );
-  Decoder_1 decoder_3 (
-    .io_up_a_valid                (widthAdapter_3_io_down_a_valid                ), //i
-    .io_up_a_ready                (decoder_3_io_up_a_ready                       ), //o
-    .io_up_a_payload_opcode       (_zz_io_up_a_payload_opcode_5[2:0]             ), //i
-    .io_up_a_payload_param        (widthAdapter_3_io_down_a_payload_param[2:0]   ), //i
-    .io_up_a_payload_source       (widthAdapter_3_io_down_a_payload_source[2:0]  ), //i
-    .io_up_a_payload_address      (widthAdapter_3_io_down_a_payload_address[30:0]), //i
-    .io_up_a_payload_size         (widthAdapter_3_io_down_a_payload_size[2:0]    ), //i
-    .io_up_a_payload_mask         (widthAdapter_3_io_down_a_payload_mask[3:0]    ), //i
-    .io_up_a_payload_data         (widthAdapter_3_io_down_a_payload_data[31:0]   ), //i
-    .io_up_a_payload_corrupt      (widthAdapter_3_io_down_a_payload_corrupt      ), //i
-    .io_up_d_valid                (decoder_3_io_up_d_valid                       ), //o
-    .io_up_d_ready                (widthAdapter_3_io_down_d_ready                ), //i
-    .io_up_d_payload_opcode       (decoder_3_io_up_d_payload_opcode[2:0]         ), //o
-    .io_up_d_payload_param        (decoder_3_io_up_d_payload_param[2:0]          ), //o
-    .io_up_d_payload_source       (decoder_3_io_up_d_payload_source[2:0]         ), //o
-    .io_up_d_payload_size         (decoder_3_io_up_d_payload_size[2:0]           ), //o
-    .io_up_d_payload_denied       (decoder_3_io_up_d_payload_denied              ), //o
-    .io_up_d_payload_data         (decoder_3_io_up_d_payload_data[31:0]          ), //o
-    .io_up_d_payload_corrupt      (decoder_3_io_up_d_payload_corrupt             ), //o
-    .io_downs_0_a_valid           (decoder_3_io_downs_0_a_valid                  ), //o
-    .io_downs_0_a_ready           (toApb_up_bus_a_ready                          ), //i
-    .io_downs_0_a_payload_opcode  (decoder_3_io_downs_0_a_payload_opcode[2:0]    ), //o
-    .io_downs_0_a_payload_param   (decoder_3_io_downs_0_a_payload_param[2:0]     ), //o
-    .io_downs_0_a_payload_source  (decoder_3_io_downs_0_a_payload_source[2:0]    ), //o
-    .io_downs_0_a_payload_address (decoder_3_io_downs_0_a_payload_address[26:0]  ), //o
-    .io_downs_0_a_payload_size    (decoder_3_io_downs_0_a_payload_size[2:0]      ), //o
-    .io_downs_0_a_payload_mask    (decoder_3_io_downs_0_a_payload_mask[3:0]      ), //o
-    .io_downs_0_a_payload_data    (decoder_3_io_downs_0_a_payload_data[31:0]     ), //o
-    .io_downs_0_a_payload_corrupt (decoder_3_io_downs_0_a_payload_corrupt        ), //o
-    .io_downs_0_d_valid           (toApb_up_bus_d_valid                          ), //i
-    .io_downs_0_d_ready           (decoder_3_io_downs_0_d_ready                  ), //o
-    .io_downs_0_d_payload_opcode  (_zz_io_downs_0_d_payload_opcode_2[2:0]        ), //i
-    .io_downs_0_d_payload_param   (toApb_up_bus_d_payload_param[2:0]             ), //i
-    .io_downs_0_d_payload_source  (toApb_up_bus_d_payload_source[2:0]            ), //i
-    .io_downs_0_d_payload_size    (toApb_up_bus_d_payload_size[2:0]              ), //i
-    .io_downs_0_d_payload_denied  (toApb_up_bus_d_payload_denied                 ), //i
-    .io_downs_0_d_payload_data    (toApb_up_bus_d_payload_data[31:0]             ), //i
-    .io_downs_0_d_payload_corrupt (toApb_up_bus_d_payload_corrupt                ), //i
-    .io_downs_1_a_valid           (decoder_3_io_downs_1_a_valid                  ), //o
-    .io_downs_1_a_ready           (internalRam_up_bus_a_ready                    ), //i
-    .io_downs_1_a_payload_opcode  (decoder_3_io_downs_1_a_payload_opcode[2:0]    ), //o
-    .io_downs_1_a_payload_param   (decoder_3_io_downs_1_a_payload_param[2:0]     ), //o
-    .io_downs_1_a_payload_source  (decoder_3_io_downs_1_a_payload_source[2:0]    ), //o
-    .io_downs_1_a_payload_address (decoder_3_io_downs_1_a_payload_address[13:0]  ), //o
-    .io_downs_1_a_payload_size    (decoder_3_io_downs_1_a_payload_size[2:0]      ), //o
-    .io_downs_1_a_payload_mask    (decoder_3_io_downs_1_a_payload_mask[3:0]      ), //o
-    .io_downs_1_a_payload_data    (decoder_3_io_downs_1_a_payload_data[31:0]     ), //o
-    .io_downs_1_a_payload_corrupt (decoder_3_io_downs_1_a_payload_corrupt        ), //o
-    .io_downs_1_d_valid           (internalRam_up_bus_d_valid                    ), //i
-    .io_downs_1_d_ready           (decoder_3_io_downs_1_d_ready                  ), //o
-    .io_downs_1_d_payload_opcode  (_zz_io_downs_1_d_payload_opcode_3[2:0]        ), //i
-    .io_downs_1_d_payload_param   (internalRam_up_bus_d_payload_param[2:0]       ), //i
-    .io_downs_1_d_payload_source  (internalRam_up_bus_d_payload_source[2:0]      ), //i
-    .io_downs_1_d_payload_size    (internalRam_up_bus_d_payload_size[2:0]        ), //i
-    .io_downs_1_d_payload_denied  (internalRam_up_bus_d_payload_denied           ), //i
-    .io_downs_1_d_payload_data    (internalRam_up_bus_d_payload_data[31:0]       ), //i
-    .io_downs_1_d_payload_corrupt (internalRam_up_bus_d_payload_corrupt          ), //i
-    .clk_cpu                      (board_ctrl_clk_cpu                            ), //i
-    .reset_cpu                    (board_ctrl_reset_cpu                          )  //i
+  Decoder_1 bus32_decoder_core (
+    .io_up_a_valid                (bus32_bus_a_valid                                    ), //i
+    .io_up_a_ready                (bus32_decoder_core_io_up_a_ready                     ), //o
+    .io_up_a_payload_opcode       (bus32_bus_a_payload_opcode[2:0]                      ), //i
+    .io_up_a_payload_param        (bus32_bus_a_payload_param[2:0]                       ), //i
+    .io_up_a_payload_source       (bus32_bus_a_payload_source[2:0]                      ), //i
+    .io_up_a_payload_address      (bus32_bus_a_payload_address[30:0]                    ), //i
+    .io_up_a_payload_size         (bus32_bus_a_payload_size[2:0]                        ), //i
+    .io_up_a_payload_mask         (bus32_bus_a_payload_mask[3:0]                        ), //i
+    .io_up_a_payload_data         (bus32_bus_a_payload_data[31:0]                       ), //i
+    .io_up_a_payload_corrupt      (bus32_bus_a_payload_corrupt                          ), //i
+    .io_up_d_valid                (bus32_decoder_core_io_up_d_valid                     ), //o
+    .io_up_d_ready                (bus32_bus_d_ready                                    ), //i
+    .io_up_d_payload_opcode       (bus32_decoder_core_io_up_d_payload_opcode[2:0]       ), //o
+    .io_up_d_payload_param        (bus32_decoder_core_io_up_d_payload_param[2:0]        ), //o
+    .io_up_d_payload_source       (bus32_decoder_core_io_up_d_payload_source[2:0]       ), //o
+    .io_up_d_payload_size         (bus32_decoder_core_io_up_d_payload_size[2:0]         ), //o
+    .io_up_d_payload_denied       (bus32_decoder_core_io_up_d_payload_denied            ), //o
+    .io_up_d_payload_data         (bus32_decoder_core_io_up_d_payload_data[31:0]        ), //o
+    .io_up_d_payload_corrupt      (bus32_decoder_core_io_up_d_payload_corrupt           ), //o
+    .io_downs_0_a_valid           (bus32_decoder_core_io_downs_0_a_valid                ), //o
+    .io_downs_0_a_ready           (bus32_to_toApb_up_up_bus_a_ready                     ), //i
+    .io_downs_0_a_payload_opcode  (bus32_decoder_core_io_downs_0_a_payload_opcode[2:0]  ), //o
+    .io_downs_0_a_payload_param   (bus32_decoder_core_io_downs_0_a_payload_param[2:0]   ), //o
+    .io_downs_0_a_payload_source  (bus32_decoder_core_io_downs_0_a_payload_source[2:0]  ), //o
+    .io_downs_0_a_payload_address (bus32_decoder_core_io_downs_0_a_payload_address[26:0]), //o
+    .io_downs_0_a_payload_size    (bus32_decoder_core_io_downs_0_a_payload_size[2:0]    ), //o
+    .io_downs_0_a_payload_mask    (bus32_decoder_core_io_downs_0_a_payload_mask[3:0]    ), //o
+    .io_downs_0_a_payload_data    (bus32_decoder_core_io_downs_0_a_payload_data[31:0]   ), //o
+    .io_downs_0_a_payload_corrupt (bus32_decoder_core_io_downs_0_a_payload_corrupt      ), //o
+    .io_downs_0_d_valid           (bus32_to_toApb_up_up_bus_d_valid                     ), //i
+    .io_downs_0_d_ready           (bus32_decoder_core_io_downs_0_d_ready                ), //o
+    .io_downs_0_d_payload_opcode  (bus32_to_toApb_up_up_bus_d_payload_opcode[2:0]       ), //i
+    .io_downs_0_d_payload_param   (bus32_to_toApb_up_up_bus_d_payload_param[2:0]        ), //i
+    .io_downs_0_d_payload_source  (bus32_to_toApb_up_up_bus_d_payload_source[2:0]       ), //i
+    .io_downs_0_d_payload_size    (bus32_to_toApb_up_up_bus_d_payload_size[2:0]         ), //i
+    .io_downs_0_d_payload_denied  (bus32_to_toApb_up_up_bus_d_payload_denied            ), //i
+    .io_downs_0_d_payload_data    (bus32_to_toApb_up_up_bus_d_payload_data[31:0]        ), //i
+    .io_downs_0_d_payload_corrupt (bus32_to_toApb_up_up_bus_d_payload_corrupt           ), //i
+    .io_downs_1_a_valid           (bus32_decoder_core_io_downs_1_a_valid                ), //o
+    .io_downs_1_a_ready           (bus32_to_internalRam_up_up_bus_a_ready               ), //i
+    .io_downs_1_a_payload_opcode  (bus32_decoder_core_io_downs_1_a_payload_opcode[2:0]  ), //o
+    .io_downs_1_a_payload_param   (bus32_decoder_core_io_downs_1_a_payload_param[2:0]   ), //o
+    .io_downs_1_a_payload_source  (bus32_decoder_core_io_downs_1_a_payload_source[2:0]  ), //o
+    .io_downs_1_a_payload_address (bus32_decoder_core_io_downs_1_a_payload_address[13:0]), //o
+    .io_downs_1_a_payload_size    (bus32_decoder_core_io_downs_1_a_payload_size[2:0]    ), //o
+    .io_downs_1_a_payload_mask    (bus32_decoder_core_io_downs_1_a_payload_mask[3:0]    ), //o
+    .io_downs_1_a_payload_data    (bus32_decoder_core_io_downs_1_a_payload_data[31:0]   ), //o
+    .io_downs_1_a_payload_corrupt (bus32_decoder_core_io_downs_1_a_payload_corrupt      ), //o
+    .io_downs_1_d_valid           (bus32_to_internalRam_up_up_bus_d_valid               ), //i
+    .io_downs_1_d_ready           (bus32_decoder_core_io_downs_1_d_ready                ), //o
+    .io_downs_1_d_payload_opcode  (bus32_to_internalRam_up_up_bus_d_payload_opcode[2:0] ), //i
+    .io_downs_1_d_payload_param   (bus32_to_internalRam_up_up_bus_d_payload_param[2:0]  ), //i
+    .io_downs_1_d_payload_source  (bus32_to_internalRam_up_up_bus_d_payload_source[2:0] ), //i
+    .io_downs_1_d_payload_size    (bus32_to_internalRam_up_up_bus_d_payload_size[2:0]   ), //i
+    .io_downs_1_d_payload_denied  (bus32_to_internalRam_up_up_bus_d_payload_denied      ), //i
+    .io_downs_1_d_payload_data    (bus32_to_internalRam_up_up_bus_d_payload_data[31:0]  ), //i
+    .io_downs_1_d_payload_corrupt (bus32_to_internalRam_up_up_bus_d_payload_corrupt     ), //i
+    .clk_cpu                      (board_ctrl_clk_cpu                                   ), //i
+    .reset_cpu                    (board_ctrl_reset_cpu                                 )  //i
   );
   Apb3Decoder_1 toApb_down_decoder (
     .io_input_PADDR      (toApb_down_PADDR[26:0]                   ), //i
@@ -2029,13 +2115,33 @@ module EndeavourSoc (
     endcase
   end
   always @(*) begin
-    case(_zz_io_up_a_payload_opcode_5)
-      A_PUT_FULL_DATA : _zz_io_up_a_payload_opcode_5_string = "PUT_FULL_DATA   ";
-      A_PUT_PARTIAL_DATA : _zz_io_up_a_payload_opcode_5_string = "PUT_PARTIAL_DATA";
-      A_GET : _zz_io_up_a_payload_opcode_5_string = "GET             ";
-      A_ACQUIRE_BLOCK : _zz_io_up_a_payload_opcode_5_string = "ACQUIRE_BLOCK   ";
-      A_ACQUIRE_PERM : _zz_io_up_a_payload_opcode_5_string = "ACQUIRE_PERM    ";
-      default : _zz_io_up_a_payload_opcode_5_string = "????????????????";
+    case(bus32_bus_a_payload_opcode)
+      A_PUT_FULL_DATA : bus32_bus_a_payload_opcode_string = "PUT_FULL_DATA   ";
+      A_PUT_PARTIAL_DATA : bus32_bus_a_payload_opcode_string = "PUT_PARTIAL_DATA";
+      A_GET : bus32_bus_a_payload_opcode_string = "GET             ";
+      A_ACQUIRE_BLOCK : bus32_bus_a_payload_opcode_string = "ACQUIRE_BLOCK   ";
+      A_ACQUIRE_PERM : bus32_bus_a_payload_opcode_string = "ACQUIRE_PERM    ";
+      default : bus32_bus_a_payload_opcode_string = "????????????????";
+    endcase
+  end
+  always @(*) begin
+    case(bus32_bus_d_payload_opcode)
+      D_ACCESS_ACK : bus32_bus_d_payload_opcode_string = "ACCESS_ACK     ";
+      D_ACCESS_ACK_DATA : bus32_bus_d_payload_opcode_string = "ACCESS_ACK_DATA";
+      D_GRANT : bus32_bus_d_payload_opcode_string = "GRANT          ";
+      D_GRANT_DATA : bus32_bus_d_payload_opcode_string = "GRANT_DATA     ";
+      D_RELEASE_ACK : bus32_bus_d_payload_opcode_string = "RELEASE_ACK    ";
+      default : bus32_bus_d_payload_opcode_string = "???????????????";
+    endcase
+  end
+  always @(*) begin
+    case(_zz_bus32_bus_a_payload_opcode)
+      A_PUT_FULL_DATA : _zz_bus32_bus_a_payload_opcode_string = "PUT_FULL_DATA   ";
+      A_PUT_PARTIAL_DATA : _zz_bus32_bus_a_payload_opcode_string = "PUT_PARTIAL_DATA";
+      A_GET : _zz_bus32_bus_a_payload_opcode_string = "GET             ";
+      A_ACQUIRE_BLOCK : _zz_bus32_bus_a_payload_opcode_string = "ACQUIRE_BLOCK   ";
+      A_ACQUIRE_PERM : _zz_bus32_bus_a_payload_opcode_string = "ACQUIRE_PERM    ";
+      default : _zz_bus32_bus_a_payload_opcode_string = "????????????????";
     endcase
   end
   always @(*) begin
@@ -2046,26 +2152,6 @@ module EndeavourSoc (
       D_GRANT_DATA : _zz_io_down_d_payload_opcode_2_string = "GRANT_DATA     ";
       D_RELEASE_ACK : _zz_io_down_d_payload_opcode_2_string = "RELEASE_ACK    ";
       default : _zz_io_down_d_payload_opcode_2_string = "???????????????";
-    endcase
-  end
-  always @(*) begin
-    case(_zz_io_up_a_payload_opcode_6)
-      A_PUT_FULL_DATA : _zz_io_up_a_payload_opcode_6_string = "PUT_FULL_DATA   ";
-      A_PUT_PARTIAL_DATA : _zz_io_up_a_payload_opcode_6_string = "PUT_PARTIAL_DATA";
-      A_GET : _zz_io_up_a_payload_opcode_6_string = "GET             ";
-      A_ACQUIRE_BLOCK : _zz_io_up_a_payload_opcode_6_string = "ACQUIRE_BLOCK   ";
-      A_ACQUIRE_PERM : _zz_io_up_a_payload_opcode_6_string = "ACQUIRE_PERM    ";
-      default : _zz_io_up_a_payload_opcode_6_string = "????????????????";
-    endcase
-  end
-  always @(*) begin
-    case(_zz_io_down_d_payload_opcode_3)
-      D_ACCESS_ACK : _zz_io_down_d_payload_opcode_3_string = "ACCESS_ACK     ";
-      D_ACCESS_ACK_DATA : _zz_io_down_d_payload_opcode_3_string = "ACCESS_ACK_DATA";
-      D_GRANT : _zz_io_down_d_payload_opcode_3_string = "GRANT          ";
-      D_GRANT_DATA : _zz_io_down_d_payload_opcode_3_string = "GRANT_DATA     ";
-      D_RELEASE_ACK : _zz_io_down_d_payload_opcode_3_string = "RELEASE_ACK    ";
-      default : _zz_io_down_d_payload_opcode_3_string = "???????????????";
     endcase
   end
   always @(*) begin
@@ -2129,13 +2215,13 @@ module EndeavourSoc (
     endcase
   end
   always @(*) begin
-    case(_zz_io_up_a_payload_opcode_7)
-      A_PUT_FULL_DATA : _zz_io_up_a_payload_opcode_7_string = "PUT_FULL_DATA   ";
-      A_PUT_PARTIAL_DATA : _zz_io_up_a_payload_opcode_7_string = "PUT_PARTIAL_DATA";
-      A_GET : _zz_io_up_a_payload_opcode_7_string = "GET             ";
-      A_ACQUIRE_BLOCK : _zz_io_up_a_payload_opcode_7_string = "ACQUIRE_BLOCK   ";
-      A_ACQUIRE_PERM : _zz_io_up_a_payload_opcode_7_string = "ACQUIRE_PERM    ";
-      default : _zz_io_up_a_payload_opcode_7_string = "????????????????";
+    case(_zz_io_up_a_payload_opcode_5)
+      A_PUT_FULL_DATA : _zz_io_up_a_payload_opcode_5_string = "PUT_FULL_DATA   ";
+      A_PUT_PARTIAL_DATA : _zz_io_up_a_payload_opcode_5_string = "PUT_PARTIAL_DATA";
+      A_GET : _zz_io_up_a_payload_opcode_5_string = "GET             ";
+      A_ACQUIRE_BLOCK : _zz_io_up_a_payload_opcode_5_string = "ACQUIRE_BLOCK   ";
+      A_ACQUIRE_PERM : _zz_io_up_a_payload_opcode_5_string = "ACQUIRE_PERM    ";
+      default : _zz_io_up_a_payload_opcode_5_string = "????????????????";
     endcase
   end
   always @(*) begin
@@ -2189,23 +2275,23 @@ module EndeavourSoc (
     endcase
   end
   always @(*) begin
-    case(_zz_toApb_up_bus_a_payload_opcode)
-      A_PUT_FULL_DATA : _zz_toApb_up_bus_a_payload_opcode_string = "PUT_FULL_DATA   ";
-      A_PUT_PARTIAL_DATA : _zz_toApb_up_bus_a_payload_opcode_string = "PUT_PARTIAL_DATA";
-      A_GET : _zz_toApb_up_bus_a_payload_opcode_string = "GET             ";
-      A_ACQUIRE_BLOCK : _zz_toApb_up_bus_a_payload_opcode_string = "ACQUIRE_BLOCK   ";
-      A_ACQUIRE_PERM : _zz_toApb_up_bus_a_payload_opcode_string = "ACQUIRE_PERM    ";
-      default : _zz_toApb_up_bus_a_payload_opcode_string = "????????????????";
+    case(bus32_to_toApb_up_down_bus_a_payload_opcode)
+      A_PUT_FULL_DATA : bus32_to_toApb_up_down_bus_a_payload_opcode_string = "PUT_FULL_DATA   ";
+      A_PUT_PARTIAL_DATA : bus32_to_toApb_up_down_bus_a_payload_opcode_string = "PUT_PARTIAL_DATA";
+      A_GET : bus32_to_toApb_up_down_bus_a_payload_opcode_string = "GET             ";
+      A_ACQUIRE_BLOCK : bus32_to_toApb_up_down_bus_a_payload_opcode_string = "ACQUIRE_BLOCK   ";
+      A_ACQUIRE_PERM : bus32_to_toApb_up_down_bus_a_payload_opcode_string = "ACQUIRE_PERM    ";
+      default : bus32_to_toApb_up_down_bus_a_payload_opcode_string = "????????????????";
     endcase
   end
   always @(*) begin
-    case(_zz_io_downs_0_d_payload_opcode)
-      D_ACCESS_ACK : _zz_io_downs_0_d_payload_opcode_string = "ACCESS_ACK     ";
-      D_ACCESS_ACK_DATA : _zz_io_downs_0_d_payload_opcode_string = "ACCESS_ACK_DATA";
-      D_GRANT : _zz_io_downs_0_d_payload_opcode_string = "GRANT          ";
-      D_GRANT_DATA : _zz_io_downs_0_d_payload_opcode_string = "GRANT_DATA     ";
-      D_RELEASE_ACK : _zz_io_downs_0_d_payload_opcode_string = "RELEASE_ACK    ";
-      default : _zz_io_downs_0_d_payload_opcode_string = "???????????????";
+    case(bus32_to_toApb_up_down_bus_d_payload_opcode)
+      D_ACCESS_ACK : bus32_to_toApb_up_down_bus_d_payload_opcode_string = "ACCESS_ACK     ";
+      D_ACCESS_ACK_DATA : bus32_to_toApb_up_down_bus_d_payload_opcode_string = "ACCESS_ACK_DATA";
+      D_GRANT : bus32_to_toApb_up_down_bus_d_payload_opcode_string = "GRANT          ";
+      D_GRANT_DATA : bus32_to_toApb_up_down_bus_d_payload_opcode_string = "GRANT_DATA     ";
+      D_RELEASE_ACK : bus32_to_toApb_up_down_bus_d_payload_opcode_string = "RELEASE_ACK    ";
+      default : bus32_to_toApb_up_down_bus_d_payload_opcode_string = "???????????????";
     endcase
   end
   always @(*) begin
@@ -2229,43 +2315,43 @@ module EndeavourSoc (
     endcase
   end
   always @(*) begin
-    case(_zz_internalRam_up_bus_a_payload_opcode)
-      A_PUT_FULL_DATA : _zz_internalRam_up_bus_a_payload_opcode_string = "PUT_FULL_DATA   ";
-      A_PUT_PARTIAL_DATA : _zz_internalRam_up_bus_a_payload_opcode_string = "PUT_PARTIAL_DATA";
-      A_GET : _zz_internalRam_up_bus_a_payload_opcode_string = "GET             ";
-      A_ACQUIRE_BLOCK : _zz_internalRam_up_bus_a_payload_opcode_string = "ACQUIRE_BLOCK   ";
-      A_ACQUIRE_PERM : _zz_internalRam_up_bus_a_payload_opcode_string = "ACQUIRE_PERM    ";
-      default : _zz_internalRam_up_bus_a_payload_opcode_string = "????????????????";
+    case(bus32_to_internalRam_up_down_bus_a_payload_opcode)
+      A_PUT_FULL_DATA : bus32_to_internalRam_up_down_bus_a_payload_opcode_string = "PUT_FULL_DATA   ";
+      A_PUT_PARTIAL_DATA : bus32_to_internalRam_up_down_bus_a_payload_opcode_string = "PUT_PARTIAL_DATA";
+      A_GET : bus32_to_internalRam_up_down_bus_a_payload_opcode_string = "GET             ";
+      A_ACQUIRE_BLOCK : bus32_to_internalRam_up_down_bus_a_payload_opcode_string = "ACQUIRE_BLOCK   ";
+      A_ACQUIRE_PERM : bus32_to_internalRam_up_down_bus_a_payload_opcode_string = "ACQUIRE_PERM    ";
+      default : bus32_to_internalRam_up_down_bus_a_payload_opcode_string = "????????????????";
     endcase
   end
   always @(*) begin
-    case(_zz_io_downs_1_d_payload_opcode_1)
-      D_ACCESS_ACK : _zz_io_downs_1_d_payload_opcode_1_string = "ACCESS_ACK     ";
-      D_ACCESS_ACK_DATA : _zz_io_downs_1_d_payload_opcode_1_string = "ACCESS_ACK_DATA";
-      D_GRANT : _zz_io_downs_1_d_payload_opcode_1_string = "GRANT          ";
-      D_GRANT_DATA : _zz_io_downs_1_d_payload_opcode_1_string = "GRANT_DATA     ";
-      D_RELEASE_ACK : _zz_io_downs_1_d_payload_opcode_1_string = "RELEASE_ACK    ";
-      default : _zz_io_downs_1_d_payload_opcode_1_string = "???????????????";
+    case(bus32_to_internalRam_up_down_bus_d_payload_opcode)
+      D_ACCESS_ACK : bus32_to_internalRam_up_down_bus_d_payload_opcode_string = "ACCESS_ACK     ";
+      D_ACCESS_ACK_DATA : bus32_to_internalRam_up_down_bus_d_payload_opcode_string = "ACCESS_ACK_DATA";
+      D_GRANT : bus32_to_internalRam_up_down_bus_d_payload_opcode_string = "GRANT          ";
+      D_GRANT_DATA : bus32_to_internalRam_up_down_bus_d_payload_opcode_string = "GRANT_DATA     ";
+      D_RELEASE_ACK : bus32_to_internalRam_up_down_bus_d_payload_opcode_string = "RELEASE_ACK    ";
+      default : bus32_to_internalRam_up_down_bus_d_payload_opcode_string = "???????????????";
     endcase
   end
   always @(*) begin
-    case(_zz_io_up_a_payload_opcode_8)
-      A_PUT_FULL_DATA : _zz_io_up_a_payload_opcode_8_string = "PUT_FULL_DATA   ";
-      A_PUT_PARTIAL_DATA : _zz_io_up_a_payload_opcode_8_string = "PUT_PARTIAL_DATA";
-      A_GET : _zz_io_up_a_payload_opcode_8_string = "GET             ";
-      A_ACQUIRE_BLOCK : _zz_io_up_a_payload_opcode_8_string = "ACQUIRE_BLOCK   ";
-      A_ACQUIRE_PERM : _zz_io_up_a_payload_opcode_8_string = "ACQUIRE_PERM    ";
-      default : _zz_io_up_a_payload_opcode_8_string = "????????????????";
+    case(_zz_io_up_a_payload_opcode_6)
+      A_PUT_FULL_DATA : _zz_io_up_a_payload_opcode_6_string = "PUT_FULL_DATA   ";
+      A_PUT_PARTIAL_DATA : _zz_io_up_a_payload_opcode_6_string = "PUT_PARTIAL_DATA";
+      A_GET : _zz_io_up_a_payload_opcode_6_string = "GET             ";
+      A_ACQUIRE_BLOCK : _zz_io_up_a_payload_opcode_6_string = "ACQUIRE_BLOCK   ";
+      A_ACQUIRE_PERM : _zz_io_up_a_payload_opcode_6_string = "ACQUIRE_PERM    ";
+      default : _zz_io_up_a_payload_opcode_6_string = "????????????????";
     endcase
   end
   always @(*) begin
-    case(_zz_io_downs_0_d_payload_opcode_1)
-      D_ACCESS_ACK : _zz_io_downs_0_d_payload_opcode_1_string = "ACCESS_ACK     ";
-      D_ACCESS_ACK_DATA : _zz_io_downs_0_d_payload_opcode_1_string = "ACCESS_ACK_DATA";
-      D_GRANT : _zz_io_downs_0_d_payload_opcode_1_string = "GRANT          ";
-      D_GRANT_DATA : _zz_io_downs_0_d_payload_opcode_1_string = "GRANT_DATA     ";
-      D_RELEASE_ACK : _zz_io_downs_0_d_payload_opcode_1_string = "RELEASE_ACK    ";
-      default : _zz_io_downs_0_d_payload_opcode_1_string = "???????????????";
+    case(_zz_io_downs_0_d_payload_opcode)
+      D_ACCESS_ACK : _zz_io_downs_0_d_payload_opcode_string = "ACCESS_ACK     ";
+      D_ACCESS_ACK_DATA : _zz_io_downs_0_d_payload_opcode_string = "ACCESS_ACK_DATA";
+      D_GRANT : _zz_io_downs_0_d_payload_opcode_string = "GRANT          ";
+      D_GRANT_DATA : _zz_io_downs_0_d_payload_opcode_string = "GRANT_DATA     ";
+      D_RELEASE_ACK : _zz_io_downs_0_d_payload_opcode_string = "RELEASE_ACK    ";
+      default : _zz_io_downs_0_d_payload_opcode_string = "???????????????";
     endcase
   end
   always @(*) begin
@@ -2279,53 +2365,53 @@ module EndeavourSoc (
     endcase
   end
   always @(*) begin
-    case(_zz_io_downs_1_d_payload_opcode_2)
-      D_ACCESS_ACK : _zz_io_downs_1_d_payload_opcode_2_string = "ACCESS_ACK     ";
-      D_ACCESS_ACK_DATA : _zz_io_downs_1_d_payload_opcode_2_string = "ACCESS_ACK_DATA";
-      D_GRANT : _zz_io_downs_1_d_payload_opcode_2_string = "GRANT          ";
-      D_GRANT_DATA : _zz_io_downs_1_d_payload_opcode_2_string = "GRANT_DATA     ";
-      D_RELEASE_ACK : _zz_io_downs_1_d_payload_opcode_2_string = "RELEASE_ACK    ";
-      default : _zz_io_downs_1_d_payload_opcode_2_string = "???????????????";
+    case(_zz_io_downs_1_d_payload_opcode_1)
+      D_ACCESS_ACK : _zz_io_downs_1_d_payload_opcode_1_string = "ACCESS_ACK     ";
+      D_ACCESS_ACK_DATA : _zz_io_downs_1_d_payload_opcode_1_string = "ACCESS_ACK_DATA";
+      D_GRANT : _zz_io_downs_1_d_payload_opcode_1_string = "GRANT          ";
+      D_GRANT_DATA : _zz_io_downs_1_d_payload_opcode_1_string = "GRANT_DATA     ";
+      D_RELEASE_ACK : _zz_io_downs_1_d_payload_opcode_1_string = "RELEASE_ACK    ";
+      default : _zz_io_downs_1_d_payload_opcode_1_string = "???????????????";
     endcase
   end
   always @(*) begin
-    case(_zz_toApb_up_bus_a_payload_opcode_1)
-      A_PUT_FULL_DATA : _zz_toApb_up_bus_a_payload_opcode_1_string = "PUT_FULL_DATA   ";
-      A_PUT_PARTIAL_DATA : _zz_toApb_up_bus_a_payload_opcode_1_string = "PUT_PARTIAL_DATA";
-      A_GET : _zz_toApb_up_bus_a_payload_opcode_1_string = "GET             ";
-      A_ACQUIRE_BLOCK : _zz_toApb_up_bus_a_payload_opcode_1_string = "ACQUIRE_BLOCK   ";
-      A_ACQUIRE_PERM : _zz_toApb_up_bus_a_payload_opcode_1_string = "ACQUIRE_PERM    ";
-      default : _zz_toApb_up_bus_a_payload_opcode_1_string = "????????????????";
+    case(bus32_to_toApb_up_up_bus_a_payload_opcode)
+      A_PUT_FULL_DATA : bus32_to_toApb_up_up_bus_a_payload_opcode_string = "PUT_FULL_DATA   ";
+      A_PUT_PARTIAL_DATA : bus32_to_toApb_up_up_bus_a_payload_opcode_string = "PUT_PARTIAL_DATA";
+      A_GET : bus32_to_toApb_up_up_bus_a_payload_opcode_string = "GET             ";
+      A_ACQUIRE_BLOCK : bus32_to_toApb_up_up_bus_a_payload_opcode_string = "ACQUIRE_BLOCK   ";
+      A_ACQUIRE_PERM : bus32_to_toApb_up_up_bus_a_payload_opcode_string = "ACQUIRE_PERM    ";
+      default : bus32_to_toApb_up_up_bus_a_payload_opcode_string = "????????????????";
     endcase
   end
   always @(*) begin
-    case(_zz_io_downs_0_d_payload_opcode_2)
-      D_ACCESS_ACK : _zz_io_downs_0_d_payload_opcode_2_string = "ACCESS_ACK     ";
-      D_ACCESS_ACK_DATA : _zz_io_downs_0_d_payload_opcode_2_string = "ACCESS_ACK_DATA";
-      D_GRANT : _zz_io_downs_0_d_payload_opcode_2_string = "GRANT          ";
-      D_GRANT_DATA : _zz_io_downs_0_d_payload_opcode_2_string = "GRANT_DATA     ";
-      D_RELEASE_ACK : _zz_io_downs_0_d_payload_opcode_2_string = "RELEASE_ACK    ";
-      default : _zz_io_downs_0_d_payload_opcode_2_string = "???????????????";
+    case(bus32_to_toApb_up_up_bus_d_payload_opcode)
+      D_ACCESS_ACK : bus32_to_toApb_up_up_bus_d_payload_opcode_string = "ACCESS_ACK     ";
+      D_ACCESS_ACK_DATA : bus32_to_toApb_up_up_bus_d_payload_opcode_string = "ACCESS_ACK_DATA";
+      D_GRANT : bus32_to_toApb_up_up_bus_d_payload_opcode_string = "GRANT          ";
+      D_GRANT_DATA : bus32_to_toApb_up_up_bus_d_payload_opcode_string = "GRANT_DATA     ";
+      D_RELEASE_ACK : bus32_to_toApb_up_up_bus_d_payload_opcode_string = "RELEASE_ACK    ";
+      default : bus32_to_toApb_up_up_bus_d_payload_opcode_string = "???????????????";
     endcase
   end
   always @(*) begin
-    case(_zz_internalRam_up_bus_a_payload_opcode_1)
-      A_PUT_FULL_DATA : _zz_internalRam_up_bus_a_payload_opcode_1_string = "PUT_FULL_DATA   ";
-      A_PUT_PARTIAL_DATA : _zz_internalRam_up_bus_a_payload_opcode_1_string = "PUT_PARTIAL_DATA";
-      A_GET : _zz_internalRam_up_bus_a_payload_opcode_1_string = "GET             ";
-      A_ACQUIRE_BLOCK : _zz_internalRam_up_bus_a_payload_opcode_1_string = "ACQUIRE_BLOCK   ";
-      A_ACQUIRE_PERM : _zz_internalRam_up_bus_a_payload_opcode_1_string = "ACQUIRE_PERM    ";
-      default : _zz_internalRam_up_bus_a_payload_opcode_1_string = "????????????????";
+    case(bus32_to_internalRam_up_up_bus_a_payload_opcode)
+      A_PUT_FULL_DATA : bus32_to_internalRam_up_up_bus_a_payload_opcode_string = "PUT_FULL_DATA   ";
+      A_PUT_PARTIAL_DATA : bus32_to_internalRam_up_up_bus_a_payload_opcode_string = "PUT_PARTIAL_DATA";
+      A_GET : bus32_to_internalRam_up_up_bus_a_payload_opcode_string = "GET             ";
+      A_ACQUIRE_BLOCK : bus32_to_internalRam_up_up_bus_a_payload_opcode_string = "ACQUIRE_BLOCK   ";
+      A_ACQUIRE_PERM : bus32_to_internalRam_up_up_bus_a_payload_opcode_string = "ACQUIRE_PERM    ";
+      default : bus32_to_internalRam_up_up_bus_a_payload_opcode_string = "????????????????";
     endcase
   end
   always @(*) begin
-    case(_zz_io_downs_1_d_payload_opcode_3)
-      D_ACCESS_ACK : _zz_io_downs_1_d_payload_opcode_3_string = "ACCESS_ACK     ";
-      D_ACCESS_ACK_DATA : _zz_io_downs_1_d_payload_opcode_3_string = "ACCESS_ACK_DATA";
-      D_GRANT : _zz_io_downs_1_d_payload_opcode_3_string = "GRANT          ";
-      D_GRANT_DATA : _zz_io_downs_1_d_payload_opcode_3_string = "GRANT_DATA     ";
-      D_RELEASE_ACK : _zz_io_downs_1_d_payload_opcode_3_string = "RELEASE_ACK    ";
-      default : _zz_io_downs_1_d_payload_opcode_3_string = "???????????????";
+    case(bus32_to_internalRam_up_up_bus_d_payload_opcode)
+      D_ACCESS_ACK : bus32_to_internalRam_up_up_bus_d_payload_opcode_string = "ACCESS_ACK     ";
+      D_ACCESS_ACK_DATA : bus32_to_internalRam_up_up_bus_d_payload_opcode_string = "ACCESS_ACK_DATA";
+      D_GRANT : bus32_to_internalRam_up_up_bus_d_payload_opcode_string = "GRANT          ";
+      D_GRANT_DATA : bus32_to_internalRam_up_up_bus_d_payload_opcode_string = "GRANT_DATA     ";
+      D_RELEASE_ACK : bus32_to_internalRam_up_up_bus_d_payload_opcode_string = "RELEASE_ACK    ";
+      default : bus32_to_internalRam_up_up_bus_d_payload_opcode_string = "???????????????";
     endcase
   end
   `endif
@@ -2511,6 +2597,7 @@ module EndeavourSoc (
   assign plic_target_ie_0 = _zz_plic_target_ie_0;
   assign plic_target_ie_1 = _zz_plic_target_ie_1;
   assign plic_target_ie_2 = _zz_plic_target_ie_2;
+  assign _zz_PrivilegedPlugin_logic_harts_0_int_m_external = plic_target_iep;
   assign plic_targetMapping_0_targetCompletion_payload = plic_apb_PWDATA[1 : 0];
   assign when_Apb3SlaveFactory_l81 = 1'b1;
   assign _zz_FetchL1TileLinkPlugin_logic_down_a_ready = (! _zz_FetchL1TileLinkPlugin_logic_down_a_ready_1);
@@ -2567,8 +2654,17 @@ module EndeavourSoc (
   assign _zz_LsuL1TileLinkPlugin_logic_down_d_payload_opcode_4 = arbiter_1_io_ups_2_d_payload_opcode;
   assign _zz_io_up_a_payload_opcode_4 = arbiter_1_io_down_a_payload_opcode;
   assign _zz_io_ups_2_a_payload_opcode = vexiiRiscv_1_LsuL1TileLinkPlugin_logic_down_a_payload_opcode;
-  assign _zz_io_up_a_payload_opcode_5 = _zz_io_up_a_payload_opcode_6;
-  assign _zz_io_down_d_payload_opcode_3 = _zz_io_down_d_payload_opcode_2;
+  assign bus32_bus_a_valid = widthAdapter_3_io_down_a_valid;
+  assign bus32_bus_a_payload_opcode = _zz_bus32_bus_a_payload_opcode;
+  assign bus32_bus_a_payload_param = widthAdapter_3_io_down_a_payload_param;
+  assign bus32_bus_a_payload_source = widthAdapter_3_io_down_a_payload_source;
+  assign bus32_bus_a_payload_address = widthAdapter_3_io_down_a_payload_address;
+  assign bus32_bus_a_payload_size = widthAdapter_3_io_down_a_payload_size;
+  assign bus32_bus_a_payload_mask = widthAdapter_3_io_down_a_payload_mask;
+  assign bus32_bus_a_payload_data = widthAdapter_3_io_down_a_payload_data;
+  assign bus32_bus_a_payload_corrupt = widthAdapter_3_io_down_a_payload_corrupt;
+  assign bus32_bus_d_ready = widthAdapter_3_io_down_d_ready;
+  assign _zz_io_down_d_payload_opcode_2 = bus32_bus_d_payload_opcode;
   assign ramBridge_up_bus_a_valid = decoder_2_io_downs_1_a_valid;
   assign ramBridge_up_bus_a_payload_opcode = _zz_ramBridge_up_bus_a_payload_opcode;
   assign ramBridge_up_bus_a_payload_param = decoder_2_io_downs_1_a_payload_param;
@@ -2582,7 +2678,7 @@ module EndeavourSoc (
   assign _zz_io_downs_1_d_payload_opcode = ramBridge_up_bus_d_payload_opcode;
   assign _zz_io_ups_0_a_payload_opcode_7 = _zz_io_ups_0_a_payload_opcode_1;
   assign _zz_FetchL1TileLinkPlugin_logic_down_d_payload_opcode_1 = _zz_FetchL1TileLinkPlugin_logic_down_d_payload_opcode_5;
-  assign _zz_io_up_a_payload_opcode_7 = _zz_io_up_a_payload_opcode_1;
+  assign _zz_io_up_a_payload_opcode_5 = _zz_io_up_a_payload_opcode_1;
   assign _zz_LsuTileLinkPlugin_logic_bridge_down_d_payload_opcode_1 = _zz_LsuTileLinkPlugin_logic_bridge_down_d_payload_opcode_4;
   assign _zz_io_ups_2_a_payload_opcode_5 = _zz_io_ups_2_a_payload_opcode_1;
   assign _zz_LsuL1TileLinkPlugin_logic_down_d_payload_opcode_1 = _zz_LsuL1TileLinkPlugin_logic_down_d_payload_opcode_5;
@@ -2621,28 +2717,44 @@ module EndeavourSoc (
   assign _zz_io_ups_1_a_payload_opcode = widthAdapter_2_io_down_a_payload_opcode;
   assign _zz_io_ups_2_a_payload_opcode_4 = _zz_io_ups_2_a_payload_opcode_5;
   assign _zz_LsuL1TileLinkPlugin_logic_down_d_payload_opcode_5 = _zz_LsuL1TileLinkPlugin_logic_down_d_payload_opcode_4;
-  assign toApb_up_bus_a_valid = decoder_3_io_downs_0_a_valid;
-  assign toApb_up_bus_a_payload_opcode = _zz_toApb_up_bus_a_payload_opcode;
-  assign toApb_up_bus_a_payload_param = decoder_3_io_downs_0_a_payload_param;
-  assign toApb_up_bus_a_payload_source = decoder_3_io_downs_0_a_payload_source;
-  assign toApb_up_bus_a_payload_address = decoder_3_io_downs_0_a_payload_address;
-  assign toApb_up_bus_a_payload_size = decoder_3_io_downs_0_a_payload_size;
-  assign toApb_up_bus_a_payload_mask = decoder_3_io_downs_0_a_payload_mask;
-  assign toApb_up_bus_a_payload_data = decoder_3_io_downs_0_a_payload_data;
-  assign toApb_up_bus_a_payload_corrupt = decoder_3_io_downs_0_a_payload_corrupt;
-  assign toApb_up_bus_d_ready = decoder_3_io_downs_0_d_ready;
-  assign _zz_io_downs_0_d_payload_opcode = toApb_up_bus_d_payload_opcode;
-  assign internalRam_up_bus_a_valid = decoder_3_io_downs_1_a_valid;
-  assign internalRam_up_bus_a_payload_opcode = _zz_internalRam_up_bus_a_payload_opcode;
-  assign internalRam_up_bus_a_payload_param = decoder_3_io_downs_1_a_payload_param;
-  assign internalRam_up_bus_a_payload_source = decoder_3_io_downs_1_a_payload_source;
-  assign internalRam_up_bus_a_payload_address = decoder_3_io_downs_1_a_payload_address;
-  assign internalRam_up_bus_a_payload_size = decoder_3_io_downs_1_a_payload_size;
-  assign internalRam_up_bus_a_payload_mask = decoder_3_io_downs_1_a_payload_mask;
-  assign internalRam_up_bus_a_payload_data = decoder_3_io_downs_1_a_payload_data;
-  assign internalRam_up_bus_a_payload_corrupt = decoder_3_io_downs_1_a_payload_corrupt;
-  assign internalRam_up_bus_d_ready = decoder_3_io_downs_1_d_ready;
-  assign _zz_io_downs_1_d_payload_opcode_1 = internalRam_up_bus_d_payload_opcode;
+  assign toApb_up_bus_a_valid = bus32_to_toApb_up_down_bus_a_valid;
+  assign bus32_to_toApb_up_down_bus_a_ready = toApb_up_bus_a_ready;
+  assign toApb_up_bus_a_payload_opcode = bus32_to_toApb_up_down_bus_a_payload_opcode;
+  assign toApb_up_bus_a_payload_param = bus32_to_toApb_up_down_bus_a_payload_param;
+  assign toApb_up_bus_a_payload_source = bus32_to_toApb_up_down_bus_a_payload_source;
+  assign toApb_up_bus_a_payload_address = bus32_to_toApb_up_down_bus_a_payload_address;
+  assign toApb_up_bus_a_payload_size = bus32_to_toApb_up_down_bus_a_payload_size;
+  assign toApb_up_bus_a_payload_mask = bus32_to_toApb_up_down_bus_a_payload_mask;
+  assign toApb_up_bus_a_payload_data = bus32_to_toApb_up_down_bus_a_payload_data;
+  assign toApb_up_bus_a_payload_corrupt = bus32_to_toApb_up_down_bus_a_payload_corrupt;
+  assign bus32_to_toApb_up_down_bus_d_valid = toApb_up_bus_d_valid;
+  assign toApb_up_bus_d_ready = bus32_to_toApb_up_down_bus_d_ready;
+  assign bus32_to_toApb_up_down_bus_d_payload_opcode = toApb_up_bus_d_payload_opcode;
+  assign bus32_to_toApb_up_down_bus_d_payload_param = toApb_up_bus_d_payload_param;
+  assign bus32_to_toApb_up_down_bus_d_payload_source = toApb_up_bus_d_payload_source;
+  assign bus32_to_toApb_up_down_bus_d_payload_size = toApb_up_bus_d_payload_size;
+  assign bus32_to_toApb_up_down_bus_d_payload_denied = toApb_up_bus_d_payload_denied;
+  assign bus32_to_toApb_up_down_bus_d_payload_data = toApb_up_bus_d_payload_data;
+  assign bus32_to_toApb_up_down_bus_d_payload_corrupt = toApb_up_bus_d_payload_corrupt;
+  assign internalRam_up_bus_a_valid = bus32_to_internalRam_up_down_bus_a_valid;
+  assign bus32_to_internalRam_up_down_bus_a_ready = internalRam_up_bus_a_ready;
+  assign internalRam_up_bus_a_payload_opcode = bus32_to_internalRam_up_down_bus_a_payload_opcode;
+  assign internalRam_up_bus_a_payload_param = bus32_to_internalRam_up_down_bus_a_payload_param;
+  assign internalRam_up_bus_a_payload_source = bus32_to_internalRam_up_down_bus_a_payload_source;
+  assign internalRam_up_bus_a_payload_address = bus32_to_internalRam_up_down_bus_a_payload_address;
+  assign internalRam_up_bus_a_payload_size = bus32_to_internalRam_up_down_bus_a_payload_size;
+  assign internalRam_up_bus_a_payload_mask = bus32_to_internalRam_up_down_bus_a_payload_mask;
+  assign internalRam_up_bus_a_payload_data = bus32_to_internalRam_up_down_bus_a_payload_data;
+  assign internalRam_up_bus_a_payload_corrupt = bus32_to_internalRam_up_down_bus_a_payload_corrupt;
+  assign bus32_to_internalRam_up_down_bus_d_valid = internalRam_up_bus_d_valid;
+  assign internalRam_up_bus_d_ready = bus32_to_internalRam_up_down_bus_d_ready;
+  assign bus32_to_internalRam_up_down_bus_d_payload_opcode = internalRam_up_bus_d_payload_opcode;
+  assign bus32_to_internalRam_up_down_bus_d_payload_param = internalRam_up_bus_d_payload_param;
+  assign bus32_to_internalRam_up_down_bus_d_payload_source = internalRam_up_bus_d_payload_source;
+  assign bus32_to_internalRam_up_down_bus_d_payload_size = internalRam_up_bus_d_payload_size;
+  assign bus32_to_internalRam_up_down_bus_d_payload_denied = internalRam_up_bus_d_payload_denied;
+  assign bus32_to_internalRam_up_down_bus_d_payload_data = internalRam_up_bus_d_payload_data;
+  assign bus32_to_internalRam_up_down_bus_d_payload_corrupt = internalRam_up_bus_d_payload_corrupt;
   assign ramBridge_down_ar_ready = streamArbiter_10_io_inputs_0_ready;
   assign ramBridge_down_aw_ready = streamArbiter_10_io_inputs_1_ready;
   assign ram_axi_arw_valid = streamArbiter_10_io_output_valid;
@@ -2687,11 +2799,11 @@ module EndeavourSoc (
   assign ram_axi_r_payload_id = ram_axi_cc_io_input_r_payload_id;
   assign ram_axi_r_payload_resp = ram_axi_cc_io_input_r_payload_resp;
   assign ram_axi_r_payload_last = ram_axi_cc_io_input_r_payload_last;
-  assign vexiiRiscv_1_PrivilegedPlugin_logic_harts_0_int_m_timer = (|1'b0);
+  assign vexiiRiscv_1_PrivilegedPlugin_logic_harts_0_int_m_timer = (|board_ctrl_timer_interrupt);
   assign vexiiRiscv_1_PrivilegedPlugin_logic_harts_0_int_m_software = (|1'b0);
-  assign vexiiRiscv_1_PrivilegedPlugin_logic_harts_0_int_m_external = (|1'b0);
-  assign vexiiRiscv_1_PrivilegedPlugin_logic_harts_0_int_s_external = (|1'b0);
-  assign _zz_io_up_a_payload_opcode_8 = decoder_2_io_downs_0_a_payload_opcode;
+  assign vexiiRiscv_1_PrivilegedPlugin_logic_harts_0_int_m_external = (|_zz_PrivilegedPlugin_logic_harts_0_int_m_external);
+  assign vexiiRiscv_1_PrivilegedPlugin_logic_harts_0_int_s_external = (|_zz_PrivilegedPlugin_logic_harts_0_int_m_external);
+  assign _zz_io_up_a_payload_opcode_6 = decoder_2_io_downs_0_a_payload_opcode;
   assign _zz_ramBridge_up_bus_a_payload_opcode_1 = decoder_2_io_downs_1_a_payload_opcode;
   assign _zz_io_down_d_payload_opcode = decoder_2_io_up_d_payload_opcode;
   assign toApb_up_bus_a_ready = toApb_logic_bridge_io_up_a_ready;
@@ -2717,13 +2829,39 @@ module EndeavourSoc (
   assign internalRam_up_bus_d_payload_denied = internalRam_thread_logic_io_up_d_payload_denied;
   assign internalRam_up_bus_d_payload_data = internalRam_thread_logic_io_up_d_payload_data;
   assign internalRam_up_bus_d_payload_corrupt = internalRam_thread_logic_io_up_d_payload_corrupt;
-  assign _zz_io_downs_0_d_payload_opcode_1 = widthAdapter_3_io_up_d_payload_opcode;
-  assign _zz_io_up_a_payload_opcode_6 = widthAdapter_3_io_down_a_payload_opcode;
+  assign _zz_io_downs_0_d_payload_opcode = widthAdapter_3_io_up_d_payload_opcode;
+  assign _zz_bus32_bus_a_payload_opcode = widthAdapter_3_io_down_a_payload_opcode;
   assign _zz_ramBridge_up_bus_a_payload_opcode = _zz_ramBridge_up_bus_a_payload_opcode_1;
-  assign _zz_io_downs_1_d_payload_opcode_2 = _zz_io_downs_1_d_payload_opcode;
-  assign _zz_toApb_up_bus_a_payload_opcode_1 = decoder_3_io_downs_0_a_payload_opcode;
-  assign _zz_internalRam_up_bus_a_payload_opcode_1 = decoder_3_io_downs_1_a_payload_opcode;
-  assign _zz_io_down_d_payload_opcode_2 = decoder_3_io_up_d_payload_opcode;
+  assign _zz_io_downs_1_d_payload_opcode_1 = _zz_io_downs_1_d_payload_opcode;
+  assign bus32_to_toApb_up_up_bus_a_valid = bus32_decoder_core_io_downs_0_a_valid;
+  assign bus32_to_toApb_up_up_bus_a_payload_opcode = bus32_decoder_core_io_downs_0_a_payload_opcode;
+  assign bus32_to_toApb_up_up_bus_a_payload_param = bus32_decoder_core_io_downs_0_a_payload_param;
+  assign bus32_to_toApb_up_up_bus_a_payload_source = bus32_decoder_core_io_downs_0_a_payload_source;
+  assign bus32_to_toApb_up_up_bus_a_payload_address = bus32_decoder_core_io_downs_0_a_payload_address;
+  assign bus32_to_toApb_up_up_bus_a_payload_size = bus32_decoder_core_io_downs_0_a_payload_size;
+  assign bus32_to_toApb_up_up_bus_a_payload_mask = bus32_decoder_core_io_downs_0_a_payload_mask;
+  assign bus32_to_toApb_up_up_bus_a_payload_data = bus32_decoder_core_io_downs_0_a_payload_data;
+  assign bus32_to_toApb_up_up_bus_a_payload_corrupt = bus32_decoder_core_io_downs_0_a_payload_corrupt;
+  assign bus32_to_toApb_up_up_bus_d_ready = bus32_decoder_core_io_downs_0_d_ready;
+  assign bus32_to_internalRam_up_up_bus_a_valid = bus32_decoder_core_io_downs_1_a_valid;
+  assign bus32_to_internalRam_up_up_bus_a_payload_opcode = bus32_decoder_core_io_downs_1_a_payload_opcode;
+  assign bus32_to_internalRam_up_up_bus_a_payload_param = bus32_decoder_core_io_downs_1_a_payload_param;
+  assign bus32_to_internalRam_up_up_bus_a_payload_source = bus32_decoder_core_io_downs_1_a_payload_source;
+  assign bus32_to_internalRam_up_up_bus_a_payload_address = bus32_decoder_core_io_downs_1_a_payload_address;
+  assign bus32_to_internalRam_up_up_bus_a_payload_size = bus32_decoder_core_io_downs_1_a_payload_size;
+  assign bus32_to_internalRam_up_up_bus_a_payload_mask = bus32_decoder_core_io_downs_1_a_payload_mask;
+  assign bus32_to_internalRam_up_up_bus_a_payload_data = bus32_decoder_core_io_downs_1_a_payload_data;
+  assign bus32_to_internalRam_up_up_bus_a_payload_corrupt = bus32_decoder_core_io_downs_1_a_payload_corrupt;
+  assign bus32_to_internalRam_up_up_bus_d_ready = bus32_decoder_core_io_downs_1_d_ready;
+  assign bus32_bus_a_ready = bus32_decoder_core_io_up_a_ready;
+  assign bus32_bus_d_valid = bus32_decoder_core_io_up_d_valid;
+  assign bus32_bus_d_payload_opcode = bus32_decoder_core_io_up_d_payload_opcode;
+  assign bus32_bus_d_payload_param = bus32_decoder_core_io_up_d_payload_param;
+  assign bus32_bus_d_payload_source = bus32_decoder_core_io_up_d_payload_source;
+  assign bus32_bus_d_payload_size = bus32_decoder_core_io_up_d_payload_size;
+  assign bus32_bus_d_payload_denied = bus32_decoder_core_io_up_d_payload_denied;
+  assign bus32_bus_d_payload_data = bus32_decoder_core_io_up_d_payload_data;
+  assign bus32_bus_d_payload_corrupt = bus32_decoder_core_io_up_d_payload_corrupt;
   assign toApb_down_PREADY = toApb_down_decoder_io_input_PREADY;
   assign toApb_down_PRDATA = toApb_down_decoder_io_input_PRDATA;
   assign toApb_down_PSLVERROR = toApb_down_decoder_io_input_PSLVERROR;
@@ -2735,10 +2873,44 @@ module EndeavourSoc (
   assign plic_apb_PENABLE = apb3Router_3_io_outputs_3_PENABLE;
   assign plic_apb_PWRITE = apb3Router_3_io_outputs_3_PWRITE;
   assign plic_apb_PWDATA = apb3Router_3_io_outputs_3_PWDATA;
-  assign _zz_toApb_up_bus_a_payload_opcode = _zz_toApb_up_bus_a_payload_opcode_1;
-  assign _zz_io_downs_0_d_payload_opcode_2 = _zz_io_downs_0_d_payload_opcode;
-  assign _zz_internalRam_up_bus_a_payload_opcode = _zz_internalRam_up_bus_a_payload_opcode_1;
-  assign _zz_io_downs_1_d_payload_opcode_3 = _zz_io_downs_1_d_payload_opcode_1;
+  assign bus32_to_toApb_up_down_bus_a_valid = bus32_to_toApb_up_up_bus_a_valid;
+  assign bus32_to_toApb_up_up_bus_a_ready = bus32_to_toApb_up_down_bus_a_ready;
+  assign bus32_to_toApb_up_down_bus_a_payload_opcode = bus32_to_toApb_up_up_bus_a_payload_opcode;
+  assign bus32_to_toApb_up_down_bus_a_payload_param = bus32_to_toApb_up_up_bus_a_payload_param;
+  assign bus32_to_toApb_up_down_bus_a_payload_source = bus32_to_toApb_up_up_bus_a_payload_source;
+  assign bus32_to_toApb_up_down_bus_a_payload_address = bus32_to_toApb_up_up_bus_a_payload_address;
+  assign bus32_to_toApb_up_down_bus_a_payload_size = bus32_to_toApb_up_up_bus_a_payload_size;
+  assign bus32_to_toApb_up_down_bus_a_payload_mask = bus32_to_toApb_up_up_bus_a_payload_mask;
+  assign bus32_to_toApb_up_down_bus_a_payload_data = bus32_to_toApb_up_up_bus_a_payload_data;
+  assign bus32_to_toApb_up_down_bus_a_payload_corrupt = bus32_to_toApb_up_up_bus_a_payload_corrupt;
+  assign bus32_to_toApb_up_up_bus_d_valid = bus32_to_toApb_up_down_bus_d_valid;
+  assign bus32_to_toApb_up_down_bus_d_ready = bus32_to_toApb_up_up_bus_d_ready;
+  assign bus32_to_toApb_up_up_bus_d_payload_opcode = bus32_to_toApb_up_down_bus_d_payload_opcode;
+  assign bus32_to_toApb_up_up_bus_d_payload_param = bus32_to_toApb_up_down_bus_d_payload_param;
+  assign bus32_to_toApb_up_up_bus_d_payload_source = bus32_to_toApb_up_down_bus_d_payload_source;
+  assign bus32_to_toApb_up_up_bus_d_payload_size = bus32_to_toApb_up_down_bus_d_payload_size;
+  assign bus32_to_toApb_up_up_bus_d_payload_denied = bus32_to_toApb_up_down_bus_d_payload_denied;
+  assign bus32_to_toApb_up_up_bus_d_payload_data = bus32_to_toApb_up_down_bus_d_payload_data;
+  assign bus32_to_toApb_up_up_bus_d_payload_corrupt = bus32_to_toApb_up_down_bus_d_payload_corrupt;
+  assign bus32_to_internalRam_up_down_bus_a_valid = bus32_to_internalRam_up_up_bus_a_valid;
+  assign bus32_to_internalRam_up_up_bus_a_ready = bus32_to_internalRam_up_down_bus_a_ready;
+  assign bus32_to_internalRam_up_down_bus_a_payload_opcode = bus32_to_internalRam_up_up_bus_a_payload_opcode;
+  assign bus32_to_internalRam_up_down_bus_a_payload_param = bus32_to_internalRam_up_up_bus_a_payload_param;
+  assign bus32_to_internalRam_up_down_bus_a_payload_source = bus32_to_internalRam_up_up_bus_a_payload_source;
+  assign bus32_to_internalRam_up_down_bus_a_payload_address = bus32_to_internalRam_up_up_bus_a_payload_address;
+  assign bus32_to_internalRam_up_down_bus_a_payload_size = bus32_to_internalRam_up_up_bus_a_payload_size;
+  assign bus32_to_internalRam_up_down_bus_a_payload_mask = bus32_to_internalRam_up_up_bus_a_payload_mask;
+  assign bus32_to_internalRam_up_down_bus_a_payload_data = bus32_to_internalRam_up_up_bus_a_payload_data;
+  assign bus32_to_internalRam_up_down_bus_a_payload_corrupt = bus32_to_internalRam_up_up_bus_a_payload_corrupt;
+  assign bus32_to_internalRam_up_up_bus_d_valid = bus32_to_internalRam_up_down_bus_d_valid;
+  assign bus32_to_internalRam_up_down_bus_d_ready = bus32_to_internalRam_up_up_bus_d_ready;
+  assign bus32_to_internalRam_up_up_bus_d_payload_opcode = bus32_to_internalRam_up_down_bus_d_payload_opcode;
+  assign bus32_to_internalRam_up_up_bus_d_payload_param = bus32_to_internalRam_up_down_bus_d_payload_param;
+  assign bus32_to_internalRam_up_up_bus_d_payload_source = bus32_to_internalRam_up_down_bus_d_payload_source;
+  assign bus32_to_internalRam_up_up_bus_d_payload_size = bus32_to_internalRam_up_down_bus_d_payload_size;
+  assign bus32_to_internalRam_up_up_bus_d_payload_denied = bus32_to_internalRam_up_down_bus_d_payload_denied;
+  assign bus32_to_internalRam_up_up_bus_d_payload_data = bus32_to_internalRam_up_down_bus_d_payload_data;
+  assign bus32_to_internalRam_up_up_bus_d_payload_corrupt = bus32_to_internalRam_up_down_bus_d_payload_corrupt;
   always @(posedge board_ctrl_clk_cpu) begin
     usb_interrupt <= peripheral_usb_ctrl_io_interrupt;
     plic_target_bestRequest_priority <= (_zz_plic_target_bestRequest_priority_2 ? _zz_plic_target_bestRequest_priority : _zz_plic_target_bestRequest_priority_1);
