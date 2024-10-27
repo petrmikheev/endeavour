@@ -8,9 +8,6 @@ import spinal.lib.bus.tilelink
 import spinal.lib.bus.misc.SizeMapping
 import spinal.lib.misc.plic._
 import spinal.lib.system.tag.PMA
-//import spinal.lib.system.tag.{MemoryConnection, MemoryEndpoint, MemoryEndpointTag, MemoryTransferTag, MemoryTransfers, PMA, VirtualEndpoint}
-
-//import vexriscv.plugin._
 
 import endeavour.interfaces._
 import endeavour.blackboxes._
@@ -61,6 +58,7 @@ class EndeavourSoc extends Component {
   video_ctrl.io.tmds_pixel_clk <> board_ctrl.io.clk_tmds_pixel
   video_ctrl.io.tmds_x5_clk <> board_ctrl.io.clk_tmds_x5
   video_ctrl.io.dvi <> io.dvi
+  video_ctrl.io.axi.setBlocked() // TMP
 
   val peripheral = new ClockingArea(ClockDomain(
       clock = board_ctrl.io.clk_peripheral,
@@ -100,20 +98,6 @@ class EndeavourSoc extends Component {
   val peripheral_apb_bridge = new ApbClockBridge(19)
   peripheral_apb_bridge.io.clk_output <> board_ctrl.io.clk_peripheral
   peripheral_apb_bridge.io.output <> peripheral.apb
-
-  val ram_ctrl = new DDRSdramController(rowBits = 14, colBits = 10, idWidth = 4)
-  ram_ctrl.io.ddr <> io.ddr_sdram
-  ram_ctrl.io.clk <> board_ctrl.io.clk_ram_bus
-  ram_ctrl.io.clk_shifted <> board_ctrl.io.clk_ram
-  ram_ctrl.io.reset <> board_ctrl.io.reset_ram
-
-  val ram_cc = new Axi4SharedCC(
-    ram_ctrl.io.axi.config,
-    inputCd = ClockDomain.current,
-    outputCd = ClockDomain(clock = board_ctrl.io.clk_ram_bus, reset = board_ctrl.io.reset_ram),
-    arwFifoSize = 8, rFifoSize = 128, wFifoSize = 8, bFifoSize = 8
-  )
-  ram_cc.io.output <> ram_ctrl.io.axi
 
   val usb_interrupt = RegNext(peripheral.usb_ctrl.io.interrupt) addTag(crossClockDomain)
 
@@ -156,10 +140,6 @@ class EndeavourSoc extends Component {
     case _ =>
   }*/
 
-  val internalRam = new tilelink.fabric.RamFiber(internalRamSize)
-  internalRam.up at internalRamBaseAddr of cpu.bus32
-  fiber.Handle { internalRam.thread.logic.mem.generateAsBlackBox() }
-
   val toApb = new tilelink.fabric.Apb3BridgeFiber()
   toApb.down.addTag(new system.tag.MemoryEndpointTag(SizeMapping(ioBaseAddr, ioSize)))
   toApb.up at (ioBaseAddr, ioSize) of cpu.bus32
@@ -175,20 +155,46 @@ class EndeavourSoc extends Component {
     )
   }
 
-  val toAxi4 = new tilelink.fabric.Axi4Bridge()
-  toAxi4.down.addTag(PMA.MAIN)
-  toAxi4.down.addTag(PMA.EXECUTABLE)
-  toAxi4.down.addTag(new system.tag.MemoryEndpointTag(SizeMapping(externalRamBaseAddr, externalRamSize)))
+  val internalRam = new tilelink.fabric.RamFiber(internalRamSize)
+  fiber.Handle { internalRam.thread.logic.mem.generateAsBlackBox() }
+  internalRam.up at internalRamBaseAddr of cpu.bus32
+
+  val ramBridge = new tilelink.fabric.Axi4Bridge()
+    ramBridge.down.addTag(PMA.MAIN)
+    ramBridge.down.addTag(PMA.EXECUTABLE)
+    ramBridge.down.addTag(new system.tag.MemoryEndpointTag(SizeMapping(0, externalRamSize)))
+    ramBridge.up at (externalRamBaseAddr, externalRamSize) of cpu.bus
+
+  val ram = fiber.Fiber build new Area {
+    val axi = ramBridge.down.get.toShared
+
+    val ddr_ctrl = new DDRSdramController(rowBits = 14, colBits = 10, idWidth = axi.config.idWidth)
+    ddr_ctrl.io.ddr <> io.ddr_sdram
+    ddr_ctrl.io.clk <> board_ctrl.io.clk_ram_bus
+    ddr_ctrl.io.clk_shifted <> board_ctrl.io.clk_ram
+    ddr_ctrl.io.reset <> board_ctrl.io.reset_ram
+
+    val axi_cc = new Axi4SharedCC(
+      ddr_ctrl.io.axi.config,
+      inputCd = ClockDomain.current,
+      outputCd = ClockDomain(clock = board_ctrl.io.clk_ram_bus, reset = board_ctrl.io.reset_ram),
+      arwFifoSize = 2, rFifoSize = 128, wFifoSize = 16, bFifoSize = 2
+    )
+    axi_cc.io.output <> ddr_ctrl.io.axi
+    axi_cc.io.input <> axi
+  }
+
+  //toAxi4.down.addTag(new system.tag.MemoryEndpointTag(SizeMapping(externalRamBaseAddr, externalRamSize)))
   /*toAxi4.up.setUpConnection(d = new StreamPipe {
     override def apply[T <: Data](m: Stream[T]) = m.queue(256)
   })*/
-  toAxi4.up << cpu.bus32
+  /*toAxi4.up << cpu.bus32
   fiber.Handle {
     val axiCrossbar = Axi4CrossbarFactory()
     axiCrossbar.addSlaves(ram_cc.io.input -> SizeMapping(externalRamBaseAddr, externalRamSize))
     axiCrossbar.addConnections(toAxi4.down.get -> List(ram_cc.io.input), video_ctrl.io.axi -> List(ram_cc.io.input))
     axiCrossbar.build()
-  }
+  }*/
 }
 
 object EndeavourSoc {

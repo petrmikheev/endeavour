@@ -115,7 +115,7 @@ module BoardController(
   parameter CPU_FREQ = 60_000_000;
   localparam CPU_PERIOD = 1_000_000_000.0 / CPU_FREQ;
 
-  parameter RAM_FREQ = 120_000_000;
+  parameter RAM_FREQ = 100_000_000;
   localparam RAM_PERIOD = 1_000_000_000.0 / RAM_FREQ;
 
   initial begin
@@ -281,17 +281,15 @@ module BoardController(
     end
   end
 
-  reg [15:0] pll_conf [0:211];
+  reg [15:0] pll_conf [0:125]; //[0:211];
   initial begin
     $readmemh("../verilog/pll_conf.mem", pll_conf);
   end
 
-  //parameter PLL_CONF_FROM = 8'd0;   // 80mhz
-  parameter PLL_CONF_FROM = 8'd53;  // 85mhz
-  //parameter PLL_CONF_FROM = 8'd106; // 90mhz
-  //parameter PLL_CONF_FROM = 8'd159; // 132mhz
+  //parameter PLL_CONF_FROM = 8'd0;   // 120mhz ram, 60mhz cpu
+  parameter PLL_CONF_FROM = 8'd63;   // 100mhz ram, 60mhz cpu
 
-  parameter PLL_CONF_TO = PLL_CONF_FROM + 8'd53;
+  parameter PLL_CONF_TO = PLL_CONF_FROM + 8'd63;
 
   reg [7:0] pll_cid = PLL_CONF_FROM;
   reg [1:0] pll_cstate = 2'd0;

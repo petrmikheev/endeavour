@@ -21,20 +21,23 @@ module DDRSdramController #(
     input  wire                          wvalid,
     output reg                           wready,
     input  wire                          wlast,
-    input  wire                   [31:0] wdata,
-    input wire                     [3:0] wstrb,
+    input  wire                   [63:0] wdata,
+    input wire                     [7:0] wstrb,
     output wire                          bvalid,
     input  wire                          bready,
+    output wire                    [1:0] bresp,
     output wire                          rvalid,
     input  wire                          rready,
+    output wire                    [1:0] rresp,
     output wire                          rlast,
-    output wire                   [31:0] rdata,
+    output wire                   [63:0] rdata,
     //
     input wire   [ID_WIDTH-1:0] arw_id,
-    input wire   [2:0] arw_size,  // ignored, expected 4 byte (0x2)
-    input wire   [1:0] arw_burst, // ignored, expected INCR
     output reg   [ID_WIDTH-1:0] bid,
     output wire  [ID_WIDTH-1:0] rid,
+    input wire   [2:0] arw_size,     // ignored, expected 4 byte (0x2)
+    input wire   [1:0] arw_burst,    // ignored, expected INCR
+    input wire         arw_allStrb,  // ignored
     // DDR-SDRAM interface
     output wire                                ddr_ck_p, ddr_ck_n,
     output reg                                 ddr_cke,
@@ -106,7 +109,11 @@ end
 // -------------------------------------------------------------------------------------
 assign bvalid  = stat==WRESP;
 assign arw_ready = stat==IDLE && ref_real==ref_idle;
+assign rresp = 2'b0;
+assign bresp = 2'b0;
 assign rid = bid;
+reg wready32 = 0;
+assign wready = wready32 & cnt[0];
 
 // -------------------------------------------------------------------------------------
 //   main FSM for generating DDR-SDRAM behavior
@@ -120,7 +127,7 @@ always @ (posedge clk)
         ref_real <= 3'd0;
         cnt <= 8'd0;
         stat <= RESET;
-        wready <= 0;
+        wready32 <= 0;
     end else begin
         case (stat)
             RESET: begin
@@ -170,7 +177,7 @@ always @ (posedge clk)
                 end else
                     {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // NOP
                 if (new_command) begin
-                    burst_len <= arw_len;
+                    burst_len <= {arw_len[6:0], 1'b1};
                     stat <= arw_write ? WPRE : RPRE;
                     bid <= arw_id;
                     {next_ba, next_a, col_addr} <= arw_addr[ROW_BITS+COL_BITS+2:2];
@@ -190,7 +197,7 @@ always @ (posedge clk)
                 {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // controlled in new_rcw_n assignment
                 cnt <= 8'd0;
                 stat <= WRITE;
-                wready <= 1;
+                wready32 <= 1;
             end
             RPRE: begin
                 {next_ras_n, next_cas_n, next_we_n} <= 3'b101; // READ    Note: if clk>110mhz then second NOP is needed
@@ -200,10 +207,10 @@ always @ (posedge clk)
             WRITE: begin
                 if(wvalid) begin
                     col_addr <= col_addr + {{(COL_BITS-2){1'b0}}, 1'b1};
-                    if(burst_last | wlast) begin
+                    if(burst_last | (wlast & cnt[0])) begin
                         cnt <= 8'd0;
                         stat <= WRESP;
-                        wready <= 0;
+                        wready32 <= 0;
                         {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // NOP
                     end else begin
                         cnt <= cnt + 8'd1;
@@ -340,6 +347,7 @@ endgenerate
 // -------------------------------------------------------------------------------------
 //   output data latches
 // -------------------------------------------------------------------------------------
+wire [31:0] wdata32 = cnt[0] ? wdata[63:32] : wdata[31:0];
 always @(posedge clk) begin
     if(reset) begin
         ddr_out_valid_buf <= 1'b0;
@@ -347,9 +355,9 @@ always @(posedge clk) begin
         ddr_out_buf <= 32'b0;
     end else begin
         ddr_out_valid_buf <= (stat==WRITE && wvalid);
-        ddr_out_buf <= wdata[15:0];
-        ddr_out <= {wdata[31:16], ddr_out_buf};
-        wstrb1 <= wstrb;
+        ddr_out_buf <= wdata32[15:0];
+        ddr_out <= {wdata32[31:16], ddr_out_buf};
+        wstrb1 <= cnt[0] ? wstrb[7:4] : wstrb[3:0];
         wstrb2 <= wstrb1;
     end
 end
@@ -369,13 +377,16 @@ reg         i_v_d = 1'b0;
 reg         i_l_d = 1'b0;
 reg         i_v_e = 1'b0;
 reg         i_l_e = 1'b0;
+reg [31:0] rdata_lo;
 
-always @ (posedge clk)
+always @ (posedge clk) begin
     if(reset) begin
         {i_v_a, i_v_b, i_v_c, i_v_d} <= 0;
         {i_l_a, i_l_b, i_l_c, i_l_d} <= 0;
+        i_v_e <= 1'b0;
+        i_l_e <= 1'b0;
     end else begin
-        i_v_a <= stat==READ ? 1'b1 : 1'b0;
+        i_v_a <= (stat==READ) && cnt[0];
         i_l_a <= burst_last;
         i_v_b <= i_v_a;
         i_l_b <= i_l_a & i_v_a;
@@ -383,19 +394,14 @@ always @ (posedge clk)
         i_l_c <= i_l_b;
         i_v_d <= i_v_c;
         i_l_d <= i_l_c;
-    end
-
-always @ (posedge clk)
-    if(reset) begin
-        i_v_e <= 1'b0;
-        i_l_e <= 1'b0;
-    end else begin
         i_v_e <= i_v_d;
         i_l_e <= i_l_d;
+        rdata_lo <= ddr_in;
     end
+end
 
 assign rvalid = i_v_e;
 assign rlast = i_l_e;
-assign rdata = ddr_in;
+assign rdata = {ddr_in, rdata_lo};
 
 endmodule

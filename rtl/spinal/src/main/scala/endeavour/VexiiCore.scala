@@ -54,9 +54,9 @@ class VexiiCore(resetVector: Long) {
   param.allowBypassFrom = 0
   param.storeRs2Late = true
 
-  param.withRvf = true
+  /*param.withRvf = true
   param.fpuFmaFullAccuracy = false
-  param.fpuIgnoreSubnormal = true
+  param.fpuIgnoreSubnormal = true*/
 
   // To consider
   //fetchL1Prefetch

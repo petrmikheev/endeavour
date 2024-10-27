@@ -112,10 +112,10 @@ module testbench;
   wire [127:0] ram_int_a_opcode = testbench.system.internalRam_thread_logic.io_up_a_payload_opcode_string;
   wire         ram_int_d_fire   = testbench.system.internalRam_thread_logic.io_up_d_ready & testbench.system.internalRam_thread_logic.io_up_d_valid;
 
-  wire         ram_ext_a_fire   = testbench.system.toAxi4_logic_bridge.io_up_a_fire;
+  /*wire         ram_ext_a_fire   = testbench.system.toAxi4_logic_bridge.io_up_a_fire;
   wire [31:0]  ram_ext_a_addr   = testbench.system.toAxi4_logic_bridge.io_up_a_payload_address;
   wire [127:0] ram_ext_a_opcode = testbench.system.toAxi4_logic_bridge.io_up_a_payload_opcode_string;
-  wire         ram_ext_d_fire   = testbench.system.toAxi4_logic_bridge.io_up_d_fire;
+  wire         ram_ext_d_fire   = testbench.system.toAxi4_logic_bridge.io_up_d_fire;*/
 
   wire [26:0]  apb_addr   = testbench.system.toApb_logic_bridge.io_down_PADDR;
   wire         apb_en_sel = testbench.system.toApb_logic_bridge.io_down_PENABLE & testbench.system.toApb_logic_bridge.io_down_PSEL;

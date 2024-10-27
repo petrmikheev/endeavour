@@ -42,19 +42,19 @@ set_time_format -unit ns -decimal_places 3
 create_clock -name {clk48}       -period 20.833 -waveform { 0.0  10.416 } [get_ports {io_clk_in}]
 
 # RAM 100 Mhz
-#create_clock -name {clk_ram_bus} -period 10.000 -waveform { 0.0  5.000 }  [get_ports {io_plla_clk0}]
-#create_clock -name {clk_ram}     -period 10.000 -waveform { 2.5  7.5 }    [get_ports {io_plla_clk1}]
+create_clock -name {clk_ram_bus} -period 10.000 -waveform { 0.0  5.000 }  [get_ports {io_plla_clk0}]
+create_clock -name {clk_ram}     -period 10.000 -waveform { 2.5  7.5 }    [get_ports {io_plla_clk1}]
 
 # RAM 110 MHz
 #create_clock -name {clk_ram_bus} -period 9.09   -waveform { 0.0   4.545 } [get_ports {io_plla_clk0}]
 #create_clock -name {clk_ram}     -period 9.09   -waveform { 2.273 6.818 } [get_ports {io_plla_clk1}]
 
 # RAM 120 MHz
-create_clock -name {clk_ram_bus} -period 8.333  -waveform { 0.0   4.167 } [get_ports {io_plla_clk0}]
-create_clock -name {clk_ram}     -period 8.333  -waveform { 2.083 6.250 } [get_ports {io_plla_clk1}]
+#create_clock -name {clk_ram_bus} -period 8.333  -waveform { 0.0   4.167 } [get_ports {io_plla_clk0}]
+#create_clock -name {clk_ram}     -period 8.333  -waveform { 2.083 6.250 } [get_ports {io_plla_clk1}]
 
 # CPU 60 Mhz
-create_clock -name {clk_cpu}     -period 16.667 -waveform { 0.0   8.333 } [get_ports {io_plla_clk2}]
+create_clock -name {clk_cpu}     -period 16.666 -waveform { 0.0   8.333 } [get_ports {io_plla_clk2}]
 
 #create_clock -name {io_pllb_clk0} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk0}]
 #create_clock -name {io_pllb_clk1} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk1}]

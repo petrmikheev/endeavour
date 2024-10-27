@@ -162,9 +162,10 @@ class DDRSdramController(rowBits: Int, colBits: Int, idWidth: Int) extends Black
     val reset = in Bool()
     val axi = slave(Axi4Shared(Axi4Config(
       addressWidth = rowBits + colBits + 3,
-      dataWidth = 32,
+      dataWidth = 64,
       idWidth = idWidth,
-      useResp = false,
+      useResp = true,
+      useAllStrb = true,
       useLock = false,
       useRegion = false,
       useCache = false,
