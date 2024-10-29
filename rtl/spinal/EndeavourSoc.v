@@ -1,6 +1,6 @@
 // Generator : SpinalHDL dev    git head : c796d9fc761d68c4391d98f72d852457e34aeb32
 // Component : EndeavourSoc
-// Git hash  : e57fc267d7e23ccfa1a76e090a28bfed2a860d93
+// Git hash  : f4873c37aaa205cfd04ed81dd9a0c3a3db3a6709
 
 `timescale 1ns/1ps
 
@@ -962,35 +962,35 @@ module EndeavourSoc (
     .apb_PRDATA       (board_ctrl_apb_PRDATA[31:0]           )  //o
   );
   VideoController video_ctrl (
-    .clk                  (board_ctrl_clk_cpu                    ), //i
-    .reset                (board_ctrl_reset_cpu                  ), //i
-    .video_mode_out       (video_ctrl_video_mode_out[1:0]        ), //o
-    .tmds_pixel_clk       (board_ctrl_clk_tmds_pixel             ), //i
-    .tmds_x5_clk          (board_ctrl_clk_tmds_x5                ), //i
-    .dvi_tmds0p           (video_ctrl_dvi_tmds0p                 ), //o
-    .dvi_tmds0m           (video_ctrl_dvi_tmds0m                 ), //o
-    .dvi_tmds1p           (video_ctrl_dvi_tmds1p                 ), //o
-    .dvi_tmds1m           (video_ctrl_dvi_tmds1m                 ), //o
-    .dvi_tmds2p           (video_ctrl_dvi_tmds2p                 ), //o
-    .dvi_tmds2m           (video_ctrl_dvi_tmds2m                 ), //o
-    .dvi_tmdsCp           (video_ctrl_dvi_tmdsCp                 ), //o
-    .dvi_tmdsCm           (video_ctrl_dvi_tmdsCm                 ), //o
-    .apb_PADDR            (video_ctrl_apb_PADDR[4:0]             ), //i
-    .apb_PSEL             (apb3Router_3_io_outputs_2_PSEL        ), //i
-    .apb_PENABLE          (apb3Router_3_io_outputs_2_PENABLE     ), //i
-    .apb_PREADY           (video_ctrl_apb_PREADY                 ), //o
-    .apb_PWRITE           (apb3Router_3_io_outputs_2_PWRITE      ), //i
-    .apb_PWDATA           (apb3Router_3_io_outputs_2_PWDATA[31:0]), //i
-    .apb_PRDATA           (video_ctrl_apb_PRDATA[31:0]           ), //o
-    .axi_ar_valid         (video_ctrl_axi_ar_valid               ), //o
-    .axi_ar_ready         (1'b0                                  ), //i
-    .axi_ar_payload_addr  (video_ctrl_axi_ar_payload_addr[31:0]  ), //o
-    .axi_ar_payload_len   (video_ctrl_axi_ar_payload_len[7:0]    ), //o
-    .axi_ar_payload_burst (video_ctrl_axi_ar_payload_burst[1:0]  ), //o
-    .axi_r_valid          (1'b0                                  ), //i
-    .axi_r_ready          (video_ctrl_axi_r_ready                ), //o
-    .axi_r_payload_data   (32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  ), //i
-    .axi_r_payload_last   (1'bx                                  )  //i
+    .clk                  (board_ctrl_clk_cpu                                                  ), //i
+    .reset                (board_ctrl_reset_cpu                                                ), //i
+    .video_mode_out       (video_ctrl_video_mode_out[1:0]                                      ), //o
+    .tmds_pixel_clk       (board_ctrl_clk_tmds_pixel                                           ), //i
+    .tmds_x5_clk          (board_ctrl_clk_tmds_x5                                              ), //i
+    .dvi_tmds0p           (video_ctrl_dvi_tmds0p                                               ), //o
+    .dvi_tmds0m           (video_ctrl_dvi_tmds0m                                               ), //o
+    .dvi_tmds1p           (video_ctrl_dvi_tmds1p                                               ), //o
+    .dvi_tmds1m           (video_ctrl_dvi_tmds1m                                               ), //o
+    .dvi_tmds2p           (video_ctrl_dvi_tmds2p                                               ), //o
+    .dvi_tmds2m           (video_ctrl_dvi_tmds2m                                               ), //o
+    .dvi_tmdsCp           (video_ctrl_dvi_tmdsCp                                               ), //o
+    .dvi_tmdsCm           (video_ctrl_dvi_tmdsCm                                               ), //o
+    .apb_PADDR            (video_ctrl_apb_PADDR[4:0]                                           ), //i
+    .apb_PSEL             (apb3Router_3_io_outputs_2_PSEL                                      ), //i
+    .apb_PENABLE          (apb3Router_3_io_outputs_2_PENABLE                                   ), //i
+    .apb_PREADY           (video_ctrl_apb_PREADY                                               ), //o
+    .apb_PWRITE           (apb3Router_3_io_outputs_2_PWRITE                                    ), //i
+    .apb_PWDATA           (apb3Router_3_io_outputs_2_PWDATA[31:0]                              ), //i
+    .apb_PRDATA           (video_ctrl_apb_PRDATA[31:0]                                         ), //o
+    .axi_ar_valid         (video_ctrl_axi_ar_valid                                             ), //o
+    .axi_ar_ready         (1'b0                                                                ), //i
+    .axi_ar_payload_addr  (video_ctrl_axi_ar_payload_addr[31:0]                                ), //o
+    .axi_ar_payload_len   (video_ctrl_axi_ar_payload_len[7:0]                                  ), //o
+    .axi_ar_payload_burst (video_ctrl_axi_ar_payload_burst[1:0]                                ), //o
+    .axi_r_valid          (1'b0                                                                ), //i
+    .axi_r_ready          (video_ctrl_axi_r_ready                                              ), //o
+    .axi_r_payload_data   (64'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx), //i
+    .axi_r_payload_last   (1'bx                                                                )  //i
   );
   UartController peripheral_uart_ctrl (
     .clk         (board_ctrl_clk_peripheral             ), //i

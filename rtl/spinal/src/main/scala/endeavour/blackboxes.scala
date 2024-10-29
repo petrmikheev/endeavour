@@ -73,7 +73,7 @@ class VideoController extends BlackBox {
     )))
     val axi = master(Axi4ReadOnly(Axi4Config(
       addressWidth = 32,
-      dataWidth = 32,
+      dataWidth = 64,
       useId = false,
       useResp = false,
       useLock = false,

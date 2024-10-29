@@ -58,7 +58,27 @@ class EndeavourSoc extends Component {
   video_ctrl.io.tmds_pixel_clk <> board_ctrl.io.clk_tmds_pixel
   video_ctrl.io.tmds_x5_clk <> board_ctrl.io.clk_tmds_x5
   video_ctrl.io.dvi <> io.dvi
-  video_ctrl.io.axi.setBlocked() // TMP
+
+  video_ctrl.io.axi.setBlocked()
+  /*val video_ctrl_bridge = new Axi4ReadOnlyToTilelink(video_ctrl.io.axi.config.copy(idWidth=0, useId=true, useSize=true), 512)
+  video_ctrl_bridge.io.up << video_ctrl.io.axi
+  val video_bus = tilelink.fabric.Node.master()
+  val video_read = fiber.Fiber build new Area {
+    var range = tilelink.SizeRange.upTo(512)
+    video_bus.m2s.proposed load tilelink.M2sSupport(
+      addressWidth = video_ctrl.io.axi.config.addressWidth,
+      dataWidth = video_ctrl.io.axi.config.dataWidth,
+      transfers = tilelink.M2sTransfers(get = range)
+    )
+    video_bus.m2s.parameters load tilelink.M2sParameters(
+      sourceCount = 1,
+      support = video_bus.m2s.proposed.copy(
+        transfers = tilelink.M2sTransfers(get = range)
+      )
+    )
+    video_bus.s2m.supported load tilelink.S2mSupport.none()
+    video_ctrl_bridge.io.down >> video_bus.bus
+  }*/
 
   val peripheral = new ClockingArea(ClockDomain(
       clock = board_ctrl.io.clk_peripheral,
@@ -125,6 +145,8 @@ class EndeavourSoc extends Component {
   cpu.interrupts.timer := board_ctrl.io.timer_interrupt
   cpu.interrupts.software := False
   cpu.interrupts.external := plic_target.iep
+
+  //cpu.bus << video_bus
 
   val bus32 = tilelink.fabric.Node().forceDataWidth(32)
   bus32 << cpu.bus
