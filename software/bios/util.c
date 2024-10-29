@@ -189,10 +189,12 @@ int uart_read(char* dst, int size, int divisor) {
     IO_PORT(UART_CFG) = (IO_PORT(UART_CFG) & 0xffff0000) | divisor;
   }
   for (int i = 0; i < size; ++i) {
-    int x = uart_getc(0);
+    int x;
+    do { x = IO_PORT(UART_RX); } while (x < 0);
     if (x < 0x100) {
       *(dst++) = (char)x;
     } else {
+      IO_PORT(BOARD_LEDS) |= 0x4;  // third LED means UART error
       uart_flush();
       if (divisor >= 0) {
         IO_PORT(UART_CFG) = uart_cfg;
