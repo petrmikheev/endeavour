@@ -65,17 +65,8 @@ create_clock -name {clk_cpu}     -period 16.666 -waveform { 0.0   8.333 } [get_p
 # Create Generated Clock
 #**************************************************************
 
-#derive_pll_clocks -create_base_clocks
-
-#create_generated_clock -multiply_by 61 -divide_by 45 -source [get_ports io_clk_in] -name clk_tmds_pixel [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[0]]
-#create_generated_clock -multiply_by 61 -divide_by 9 -source [get_ports io_clk_in] -name clk_tmds_x5 [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[1]]
-#create_generated_clock -multiply_by 61 -divide_by 33 -source [get_ports io_clk_in] -name clk_cpu [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[2]]
-#create_generated_clock -multiply_by 61 -divide_by 33 -phase 90 -source [get_ports io_clk_in] -name clk_ram [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[3]]
-
 create_generated_clock -multiply_by 116 -divide_by 75 -source [get_ports io_clk_in] -name clk_tmds_pixel [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[0]]
 create_generated_clock -multiply_by 116 -divide_by 15 -source [get_ports io_clk_in] -name clk_tmds_x5 [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[1]]
-#create_generated_clock -multiply_by 116 -divide_by 65 -source [get_ports io_clk_in] -name clk_cpu [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[2]]
-#create_generated_clock -multiply_by 116 -divide_by 65 -phase 90 -source [get_ports io_clk_in] -name clk_ram [get_pins board_ctrl|pll|altpll_component|auto_generated|pll1|clk[3]]
 
 #**************************************************************
 # Set Clock Latency
@@ -136,7 +127,10 @@ set_false_path -hold -to [get_ports {io_sdcard_* io_usb*}]
 
 set_max_delay -from clk_cpu -to clk48 10.000
 set_max_delay -from clk48 -to clk_cpu 10.000
-set_max_delay -from clk48 -to clk_ram_bus 10.000
+set_max_delay -from clk_cpu -to clk_ram_bus 10.000
+set_max_delay -from clk_ram_bus -to clk_cpu 10.000
+set_max_delay -from clk48 -to clk_ram_bus 20.000
+set_max_delay -from clk_ram_bus -to clk48 20.000
 set_max_delay -from clk_cpu -to clk_tmds_pixel 30.000
 set_max_delay -from clk_tmds_pixel -to clk_cpu 30.000
 

@@ -19,7 +19,7 @@ module DDRSdramController #(
     input  wire                    [7:0] arw_len,
     input  wire                          arw_write,
     input  wire                          wvalid,
-    output reg                           wready,
+    output wire                          wready,
     input  wire                          wlast,
     input  wire                   [63:0] wdata,
     input wire                     [7:0] wstrb,

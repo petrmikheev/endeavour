@@ -6,8 +6,8 @@ OPTIONS=-march=rv32imc -mabi=ilp32 -nostdlib -ffreestanding -I../include -Os -Wl
 .PHONY: all
 all: bios.hex bios_sim.bin
 
-bios.hex: bios.bin ../../scripts/gen_hex.py
-	../../scripts/gen_hex.py bios.bin > bios.hex
+bios.hex: bios.bin gen_hex.py
+	./gen_hex.py bios.bin > bios.hex
 
 bios.elf: $(sources) ../include/endeavour_defs.h
 	${TOOLCHAIN}gcc ${OPTIONS} -o bios.elf $(sources)
@@ -28,6 +28,10 @@ hexdump: bios.bin
 .PHONE: objdump
 objdump: bios.elf
 	${TOOLCHAIN}objdump -d bios.elf
+
+.PHONE: objdump_sim
+objdump_sim: bios_sim.elf
+	${TOOLCHAIN}objdump -d bios_sim.elf
 
 ter-u16.bdf:
 	wget http://downloads.sourceforge.net/project/terminus-font/terminus-font-4.49/terminus-font-4.49.1.tar.gz

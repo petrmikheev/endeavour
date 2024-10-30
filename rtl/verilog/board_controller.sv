@@ -106,9 +106,11 @@ module BoardController(
   reg [17:0] cpu_freq = CPU_FREQ / 1024;
   reg [17:0] ram_freq = RAM_FREQ / 1024;
 `else
-  reg [17:0] cpu_freq, ram_freq;
+  reg [17:0] cpu_freq, ram_freq, ram_freq_b;
   FrequencyCounter cpu_freq_counter(.clk(clk_cpu), .utime(utime[9:0]), .freq_khz(cpu_freq));
-  FrequencyCounter ram_freq_counter(.clk(clk_ram_bus), .utime(utime[9:0]), .freq_khz(ram_freq));
+  FrequencyCounter ram_freq_counter(.clk(clk_ram_bus), .utime(utime_value[9:0]), .freq_khz(ram_freq_b));
+
+  always @(posedge clk_peripheral) ram_freq <= ram_freq_b;
 `endif
 
 `ifdef IVERILOG

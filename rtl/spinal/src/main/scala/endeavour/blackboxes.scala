@@ -193,38 +193,3 @@ class DDRSdramController(rowBits: Int, colBits: Int, idWidth: Int) extends Black
 
   addPrePopTask(() => renameIO())
 }
-
-/*class InternalRam(size: BigInt) extends BlackBox {
-  val io = new Bundle {
-    val clk = in Bool()
-    val reset = in Bool()
-    val axi = slave(Axi4Shared(Axi4Config(
-      addressWidth = log2Up(size),
-      dataWidth = 32,
-      idWidth = 2,
-      useResp = false,
-      useLock = false,
-      useRegion = false,
-      useCache = false,
-      useProt = false,
-      useQos = false,
-      useSize = false
-    )))
-  }
-  noIoPrefix()
-  mapClockDomain(clock=io.clk, reset=io.reset)
-}*/
-
-/*class InternalRam extends BlackBox {
-  val io = new Bundle {
-    val clk = in Bool()
-    val en = in Bool()
-    val wr = in Bool()
-    val addr = in Bits(12 bits)
-    val mask = in Bits(4 bits)
-    val wrData = in Bits(32 bits)
-    val rdData = out Bits(32 bits)
-  }
-  noIoPrefix()
-  mapClockDomain(clock=io.clk)
-}*/

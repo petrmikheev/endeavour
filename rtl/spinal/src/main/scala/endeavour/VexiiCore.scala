@@ -15,6 +15,7 @@ class VexiiCore(resetVector: Long) {
   param.hartCount = 1
   param.bootMemClear = true
   param.withCaches
+  param.lsuL1Coherency = true
 
   param.fetchMemDataWidthMin = 64
   param.lsuMemDataWidthMin = 64
@@ -61,7 +62,6 @@ class VexiiCore(resetVector: Long) {
   //fetchL1Prefetch
   //lsuSoftwarePrefetch
   //lsuHardwarePrefetch
-  //lsuL1Coherency
   //fetchL1Ways
   //lsuL1Ways
 
@@ -90,14 +90,10 @@ class VexiiCore(resetVector: Long) {
     case None =>
   }
 
-  core.iBus.setDownConnection { (down, up) =>
+  /*core.iBus.setDownConnection { (down, up) =>
     down.a << up.a.halfPipe().halfPipe()
     up.d << down.d.m2sPipe()
   }
-  //core.lsuL1Bus.setDownConnection(a = withCoherency.mux(StreamPipe.HALF, StreamPipe.FULL), b = StreamPipe.HALF_KEEP, c = StreamPipe.FULL, d = StreamPipe.M2S_KEEP, e = StreamPipe.HALF)
   core.lsuL1Bus.setDownConnection(a = StreamPipe.HALF, b = StreamPipe.HALF_KEEP, c = StreamPipe.FULL, d = StreamPipe.M2S_KEEP, e = StreamPipe.HALF)
-  core.dBus.setDownConnection(a = StreamPipe.HALF, d = StreamPipe.M2S_KEEP)
-
-  val bus = tilelink.fabric.Node()
-  bus << core.buses
+  core.dBus.setDownConnection(a = StreamPipe.HALF, d = StreamPipe.M2S_KEEP)*/
 }

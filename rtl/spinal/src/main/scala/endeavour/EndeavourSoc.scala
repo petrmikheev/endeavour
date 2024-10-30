@@ -53,6 +53,14 @@ class EndeavourSoc extends Component {
 
   ClockDomainStack.set(ClockDomain(clock=board_ctrl.io.clk_cpu, reset=board_ctrl.io.reset_cpu))
 
+  val coherent_bus = tilelink.fabric.Node().forceDataWidth(64)
+  val mem_bus = tilelink.fabric.Node().forceDataWidth(64)
+  val io_bus = tilelink.fabric.Node().forceDataWidth(32)
+
+  val tilelink_hub = new tilelink.coherent.HubFiber()
+  tilelink_hub.up << coherent_bus
+  mem_bus << tilelink_hub.down
+
   val video_ctrl = new VideoController()
   video_ctrl.io.video_mode_out <> board_ctrl.io.video_mode
   video_ctrl.io.tmds_pixel_clk <> board_ctrl.io.clk_tmds_pixel
@@ -78,7 +86,9 @@ class EndeavourSoc extends Component {
     )
     video_bus.s2m.supported load tilelink.S2mSupport.none()
     video_ctrl_bridge.io.down >> video_bus.bus
-  }*/
+  }
+  coherent_bus << video_bus
+  */
 
   val peripheral = new ClockingArea(ClockDomain(
       clock = board_ctrl.io.clk_peripheral,
@@ -146,14 +156,13 @@ class EndeavourSoc extends Component {
   cpu.interrupts.software := False
   cpu.interrupts.external := plic_target.iep
 
-  //cpu.bus << video_bus
-
-  val bus32 = tilelink.fabric.Node().forceDataWidth(32)
-  bus32 << cpu.bus
+  coherent_bus << cpu.core.lsuL1Bus
+  mem_bus << cpu.core.iBus
+  io_bus << cpu.core.dBus
 
   val toApb = new tilelink.fabric.Apb3BridgeFiber()
   toApb.down.addTag(new system.tag.MemoryEndpointTag(SizeMapping(ioBaseAddr, ioSize)))
-  toApb.up at (ioBaseAddr, ioSize) of bus32
+  toApb.up at (ioBaseAddr, ioSize) of io_bus
   fiber.Handle {
     val apbDecoder = Apb3Decoder(
       master = toApb.down.get,
@@ -168,13 +177,13 @@ class EndeavourSoc extends Component {
 
   val internalRam = new tilelink.fabric.RamFiber(internalRamSize)
   fiber.Handle { internalRam.thread.logic.mem.generateAsBlackBox() }
-  internalRam.up at internalRamBaseAddr of bus32
+  internalRam.up at (internalRamBaseAddr, internalRamSize) of mem_bus
 
   val ramBridge = new tilelink.fabric.Axi4Bridge()
-    ramBridge.down.addTag(PMA.MAIN)
-    ramBridge.down.addTag(PMA.EXECUTABLE)
-    ramBridge.down.addTag(new system.tag.MemoryEndpointTag(SizeMapping(0, externalRamSize)))
-    ramBridge.up at (externalRamBaseAddr, externalRamSize) of cpu.bus
+  ramBridge.down.addTag(PMA.MAIN)
+  ramBridge.down.addTag(PMA.EXECUTABLE)
+  ramBridge.down.addTag(new system.tag.MemoryEndpointTag(SizeMapping(0, externalRamSize)))
+  ramBridge.up at (externalRamBaseAddr, externalRamSize) of mem_bus
 
   val ram = fiber.Fiber build new Area {
     val axi = ramBridge.down.get.toShared

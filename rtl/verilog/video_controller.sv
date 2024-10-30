@@ -118,7 +118,7 @@ module VideoController(
   assign apb_PRDATA = apb_reg == 3'd0 ? {20'b0, use_graphic_alpha, font_width, font_height, show_graphic, show_text, video_mode} :
                       apb_reg == 3'd1 ? text_addr :
                       apb_reg == 3'd2 ? graphic_addr :
-                                        {22'b0, charmap_index};
+                                        {21'b0, charmap_index};
 
   // *** Counters
 
@@ -234,7 +234,7 @@ module VideoController(
       axi_ar_payload_addr <= {text_addr[31:16], 7'(text_addr[31:9] + vCharCounter), text_addr[8:0]};
       axi_ar_payload_len <= {2'b0, text_read_len};  // max 53 -> 432 bytes
       axi_ar_valid <= 1'b1;
-      text_line_index <= {~vCharCounter[0], 7'd0};
+      text_line_index <= {~vCharCounter[0], 6'd0};
     end
   end
 

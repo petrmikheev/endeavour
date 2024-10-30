@@ -14,6 +14,7 @@ hardware/rev2/endeavour-backups
 mbftdi
 rtl/spinal/target
 rtl/spinal/project
+rtl/spinal/*.v
 rtl/board_rev1/db
 rtl/board_rev1/incremental_db
 rtl/board_rev1/output_files
@@ -22,7 +23,9 @@ rtl/board_rev2/db
 rtl/board_rev2/incremental_db
 rtl/board_rev2/output_files
 rtl/board_rev2/simulation
+rtl/board_rev2/greybox_tmp
 software/.clangd
 software/bios/ter*
+software/bootloader/*.packed
 software/bootloader/endeavour.dtb
 README.html
