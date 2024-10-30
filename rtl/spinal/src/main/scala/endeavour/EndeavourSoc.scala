@@ -51,8 +51,6 @@ class EndeavourSoc extends Component {
   board_ctrl.io.leds <> io.leds
   board_ctrl.io.keys <> io.keys
 
-  ClockDomainStack.set(ClockDomain(clock=board_ctrl.io.clk_cpu, reset=board_ctrl.io.reset_cpu))
-
   val coherent_bus = tilelink.fabric.Node().forceDataWidth(64)
   val mem_bus = tilelink.fabric.Node().forceDataWidth(64)
   val io_bus = tilelink.fabric.Node().forceDataWidth(32)
@@ -60,6 +58,8 @@ class EndeavourSoc extends Component {
   val tilelink_hub = new tilelink.coherent.HubFiber()
   tilelink_hub.up << coherent_bus
   mem_bus << tilelink_hub.down
+
+  ClockDomainStack.set(ClockDomain(clock=board_ctrl.io.clk_cpu, reset=board_ctrl.io.reset_cpu))
 
   val video_ctrl = new VideoController()
   video_ctrl.io.video_mode_out <> board_ctrl.io.video_mode
