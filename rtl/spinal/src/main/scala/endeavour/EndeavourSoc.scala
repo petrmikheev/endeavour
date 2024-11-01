@@ -67,28 +67,27 @@ class EndeavourSoc extends Component {
   video_ctrl.io.tmds_x5_clk <> board_ctrl.io.clk_tmds_x5
   video_ctrl.io.dvi <> io.dvi
 
-  video_ctrl.io.axi.setBlocked()
-  /*val video_ctrl_bridge = new Axi4ReadOnlyToTilelink(video_ctrl.io.axi.config.copy(idWidth=0, useId=true, useSize=true), 512)
-  video_ctrl_bridge.io.up << video_ctrl.io.axi
-  val video_bus = tilelink.fabric.Node.master()
-  val video_read = fiber.Fiber build new Area {
-    var range = tilelink.SizeRange.upTo(512)
-    video_bus.m2s.proposed load tilelink.M2sSupport(
-      addressWidth = video_ctrl.io.axi.config.addressWidth,
-      dataWidth = video_ctrl.io.axi.config.dataWidth,
-      transfers = tilelink.M2sTransfers(get = range)
-    )
-    video_bus.m2s.parameters load tilelink.M2sParameters(
-      sourceCount = 1,
-      support = video_bus.m2s.proposed.copy(
-        transfers = tilelink.M2sTransfers(get = range)
+  val video_bus = tilelink.fabric.Node.down()
+  val video_bus_fiber = fiber.Fiber build new Area {
+    video_bus.m2s forceParameters tilelink.M2sParameters(
+      addressWidth = 32,
+      dataWidth = 64,
+      masters = List(
+        tilelink.M2sAgent(
+          name = video_ctrl,
+          mapping = List(
+            tilelink.M2sSource(
+              id = SizeMapping(0, 7),
+              emits = tilelink.M2sTransfers(get = tilelink.SizeRange(64, 64))
+            )
+          )
+        )
       )
     )
     video_bus.s2m.supported load tilelink.S2mSupport.none()
-    video_ctrl_bridge.io.down >> video_bus.bus
+    video_bus.bus << video_ctrl.io.tl_bus
   }
   coherent_bus << video_bus
-  */
 
   val peripheral = new ClockingArea(ClockDomain(
       clock = board_ctrl.io.clk_peripheral,
@@ -157,7 +156,8 @@ class EndeavourSoc extends Component {
   cpu.interrupts.external := plic_target.iep
 
   coherent_bus << cpu.core.lsuL1Bus
-  mem_bus << cpu.core.iBus
+  // mem_bus << cpu.core.iBus  // Doesn't work because `fence.i` doesn't flush lsuL1.
+  coherent_bus << cpu.core.iBus
   io_bus << cpu.core.dBus
 
   val toApb = new tilelink.fabric.Apb3BridgeFiber()

@@ -17,15 +17,22 @@ module VideoController(
   input  [31:0] apb_PWDATA,
   output [31:0] apb_PRDATA,
 
-  output reg        axi_ar_valid,
-  input             axi_ar_ready,
-  output reg [31:0] axi_ar_payload_addr,
-  output reg  [7:0] axi_ar_payload_len,
-  output      [1:0] axi_ar_payload_burst,
-  input             axi_r_valid,
-  output            axi_r_ready,
-  input      [63:0] axi_r_payload_data,
-  input             axi_r_payload_last
+  output reg        tl_bus_a_valid,
+  input             tl_bus_a_ready,
+  output     [2:0]  tl_bus_a_payload_opcode,
+  output     [2:0]  tl_bus_a_payload_param,
+  output     [2:0]  tl_bus_a_payload_source,
+  output reg [31:0] tl_bus_a_payload_address,
+  output     [2:0]  tl_bus_a_payload_size,
+  input             tl_bus_d_valid,
+  output            tl_bus_d_ready,
+  input      [2:0]  tl_bus_d_payload_opcode,
+  input      [2:0]  tl_bus_d_payload_param,
+  input      [2:0]  tl_bus_d_payload_source,
+  input      [2:0]  tl_bus_d_payload_size,
+  input             tl_bus_d_payload_denied,
+  input      [63:0] tl_bus_d_payload_data,
+  input             tl_bus_d_payload_corrupt
 );
 
   reg [10:0] hDrawEnd;
@@ -128,7 +135,7 @@ module VideoController(
   reg  [6:0] vCharCounter = 0;
   reg  [2:0] char_px;
   reg  [3:0] char_py = 0;
-  reg  [5:0] text_read_len = 6'd20;
+  reg  [5:0] text_read_len = 6'd19;
 
   reg hDraw = 0;
   reg vDraw = 0;
@@ -164,7 +171,7 @@ module VideoController(
       if (hCounter == PIXEL_DELAY) hDraw <= 1;
       if (hCounter == hDrawEnd) begin
         hDraw <= 0;
-        text_read_len <= hCharCounter[7:2];
+        text_read_len <= hCharCounter[7:2] - 1'd1;
       end
       if (hCounter == hSyncStart) hSync <= 1;
       if (hCounter == hSyncEnd) begin
@@ -185,10 +192,17 @@ module VideoController(
 
   // *** RAM interface
 
-  assign axi_ar_payload_burst = 2'd1;
-  assign axi_r_ready = 1'b1;
+  assign tl_bus_a_payload_opcode = 3'd4; // GET
+  assign tl_bus_a_payload_param = 3'd0;  // 0
+  assign tl_bus_a_payload_size = 3'd6;   // 64 bytes
+  assign tl_bus_a_payload_source = tl_bus_a_payload_address[8:6];
+  assign tl_bus_d_ready = 1'b1;
 
-  reg [6:0] text_line_index = 0;
+  reg [2:0] tl_request_count = 0;
+  reg [5:0] tl_beat_count = 0;
+
+  reg text_line_sel = 0;
+  reg [2:0] text_line_index = 0;
   reg [8:0] graphic_line_index = 0;
   reg text_line_request_parity_buf = 0;
   reg [2:0] pixel_group_request_counter_buf = 0;
@@ -196,45 +210,61 @@ module VideoController(
   reg [13:0] pixel_group_addr;
   reg pixel_loading = 0;
   reg text_loading = 0;
+
   always @(posedge clk) begin
     text_line_request_parity_buf <= text_line_request_parity;
     pixel_group_request_counter_buf <= pixel_group_request_counter;
     if (reset) begin
       pixel_loading <= 0;
       text_loading <= 0;
+      tl_bus_a_valid <= 0;
+      tl_request_count <= 0;
+      tl_beat_count <= 0;
     end if (pixel_loading | text_loading) begin
-      if (axi_ar_valid & axi_ar_ready) axi_ar_valid <= 1'b0;
-      if (axi_r_valid & text_loading) begin
-        text_line_index <= text_line_index + 1'b1;
-        text_line[text_line_index] <= axi_r_payload_data;
-        if (axi_r_payload_last) text_loading <= 1'b0;
+      if (tl_bus_a_valid & tl_bus_a_ready) begin
+        tl_request_count <= tl_request_count - 1'b1;
+        tl_bus_a_payload_address <= tl_bus_a_payload_address + 32'd64;
+        if (tl_request_count == 1'b1) tl_bus_a_valid <= 1'b0;
       end
-      if (axi_r_valid & pixel_loading) begin
+      if (tl_bus_d_valid) begin
+        tl_beat_count <= tl_beat_count - 1'b1;
+        if (tl_beat_count == 1'b1) begin
+          text_loading <= 1'b0;
+          pixel_loading <= 1'b0;
+        end
+      end
+      if (tl_bus_d_valid & text_loading) begin
+        text_line_index <= text_line_index + 1'b1;
+        text_line[{text_line_sel, tl_bus_d_payload_source, text_line_index}] <= tl_bus_d_payload_data;
+      end
+      if (tl_bus_d_valid & pixel_loading) begin
         graphic_line_index <= graphic_line_index + 1'b1;
-        graphic_line[graphic_line_index] <= axi_r_payload_data;
-        if (axi_r_payload_last) pixel_loading <= 1'b0;
+        graphic_line[{graphic_line_index[8:6], tl_bus_d_payload_source, graphic_line_index[2:0]}] <= tl_bus_d_payload_data;
       end
     end else if (pixel_group_request_counter_buf != pixel_group_done_counter) begin
       pixel_group_done_counter <= pixel_group_done_counter + 1'b1;
       pixel_loading <= 1;
-      axi_ar_valid <= 1'b1;
-      axi_ar_payload_len <= 8'd31; // 32*8 = 256 bytes per request
+      tl_bus_a_valid <= 1'b1;
+      tl_request_count <= 3'd4; // 4 requests per 64 byte
+      tl_beat_count <= 6'd32; // 32*8 = 256 bytes
       if (pixel_load_y != vCounter) begin
         pixel_load_y <= vCounter;
         pixel_group_addr <= {10'(graphic_addr[21:12] + vCounter), graphic_addr[11:8]};
-        axi_ar_payload_addr <= {graphic_addr[31:22], 10'(graphic_addr[21:12] + vCounter), graphic_addr[11:0]};
+        tl_bus_a_payload_address <= {graphic_addr[31:22], 10'(graphic_addr[21:12] + vCounter), graphic_addr[11:0]};
         graphic_line_index <= 0;
       end else begin
         pixel_group_addr <= pixel_group_addr + 1'd1;
-        axi_ar_payload_addr <= {graphic_addr[31:22], 14'(pixel_group_addr + 1'd1), graphic_addr[7:0]};
+        tl_bus_a_payload_address <= {graphic_addr[31:22], 14'(pixel_group_addr + 1'd1), graphic_addr[7:0]};
       end
     end else if (text_line_request_parity_buf != text_line_done_parity) begin
       text_line_done_parity <= ~text_line_done_parity;
       text_loading <= 1;
-      axi_ar_payload_addr <= {text_addr[31:16], 7'(text_addr[31:9] + vCharCounter), text_addr[8:0]};
-      axi_ar_payload_len <= {2'b0, text_read_len};  // max 53 -> 432 bytes
-      axi_ar_valid <= 1'b1;
-      text_line_index <= {~vCharCounter[0], 6'd0};
+      tl_bus_a_payload_address <= {text_addr[31:16], 7'(text_addr[31:9] + vCharCounter), text_addr[8:0]};
+      tl_request_count <= (text_read_len[5:3] + 1'b1); // max 7 requests
+      tl_beat_count <= {text_read_len[5:3] + 1'b1, 3'b0}; // max 7 * 64 -> 448 bytes
+      tl_bus_a_valid <= 1'b1;
+      text_line_sel <= ~vCharCounter[0];
+      text_line_index <= 3'd0;
     end
   end
 
@@ -254,9 +284,9 @@ module VideoController(
   reg [7:0] char_shift = 0;
   reg [31:0] char_fg, char_bg;
   wire [31:0] tcolor = char_shift[7] ? char_fg : char_bg;
-  wire [15:0] gcolor16 = hCounter[1:0] == 2'b01 ? gword[15:0]  :
-                         hCounter[1:0] == 2'b10 ? gword[31:16] :
-                         hCounter[1:0] == 2'b11 ? gword[47:32] :
+  wire [15:0] gcolor16 = hCounter[1:0] == 2'b10 ? gword[15:0]  :
+                         hCounter[1:0] == 2'b11 ? gword[31:16] :
+                         hCounter[1:0] == 2'b00 ? gword[47:32] :
                                                   gword[63:48];
   wire        galpha = use_graphic_alpha ? gcolor16[5] : 1'b0;
   wire [23:0] gcolor24 = {

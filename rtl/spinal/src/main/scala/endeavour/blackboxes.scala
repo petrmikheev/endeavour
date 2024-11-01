@@ -4,6 +4,7 @@ import spinal.core._
 import spinal.lib._
 import spinal.lib.bus.amba3.apb.{Apb3, Apb3Config}
 import spinal.lib.bus.amba4.axi._
+import spinal.lib.bus.tilelink
 
 import endeavour.interfaces._
 
@@ -71,17 +72,18 @@ class VideoController extends BlackBox {
       dataWidth     = 32,
       useSlaveError = false
     )))
-    val axi = master(Axi4ReadOnly(Axi4Config(
+    val tl_bus = master(tilelink.Bus(tilelink.BusParameter(
       addressWidth = 32,
-      dataWidth = 64,
-      useId = false,
-      useResp = false,
-      useLock = false,
-      useRegion = false,
-      useCache = false,
-      useProt = false,
-      useQos = false,
-      useSize = false
+      dataWidth    = 64,
+      sizeBytes    = 64,
+      sourceWidth  = 3,
+      sinkWidth    = 0,
+      withBCE      = false,
+      withDataA    = false,
+      withDataB    = false,
+      withDataC    = false,
+      withDataD    = true,
+      node         = null
     )))
   }
   noIoPrefix()
@@ -135,22 +137,6 @@ class AudioController extends BlackBox {
   noIoPrefix()
   mapClockDomain(clock=io.clk, reset=io.reset)
 }
-
-/*class USBHostController extends BlackBox {
-  val io = new Bundle {
-    val clk = in Bool()
-    val reset = in Bool()
-    val usb = USB()
-    val interrupt = out Bool()
-    val apb = slave(Apb3(Apb3Config(
-      addressWidth  = 6,
-      dataWidth     = 32,
-      useSlaveError = false
-    )))
-  }
-  noIoPrefix()
-  mapClockDomain(clock=io.clk, reset=io.reset)
-}*/
 
 class DDRSdramController(rowBits: Int, colBits: Int, idWidth: Int) extends BlackBox {
   addGeneric("ROW_BITS", rowBits)

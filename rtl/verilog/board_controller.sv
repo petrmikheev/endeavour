@@ -61,7 +61,7 @@ module BoardController(
   initial reset_cpu = 1'b1;
   initial reset_ram = 1'b1;
 
-  parameter RESET_DELAY = PERIPHERAL_FREQ / 10; // 100ms
+  parameter RESET_DELAY = PERIPHERAL_FREQ / 2; // 500ms
 
   reg [$clog2(RESET_DELAY)-1:0] reset_counter = $clog2(RESET_DELAY)'(RESET_DELAY);
 
