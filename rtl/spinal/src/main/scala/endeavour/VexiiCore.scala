@@ -90,10 +90,10 @@ class VexiiCore(resetVector: Long) {
     case None =>
   }
 
-  /*core.iBus.setDownConnection { (down, up) =>
+  core.iBus.setDownConnection { (down, up) =>
     down.a << up.a.halfPipe().halfPipe()
     up.d << down.d.m2sPipe()
   }
   core.lsuL1Bus.setDownConnection(a = StreamPipe.HALF, b = StreamPipe.HALF_KEEP, c = StreamPipe.FULL, d = StreamPipe.M2S_KEEP, e = StreamPipe.HALF)
-  core.dBus.setDownConnection(a = StreamPipe.HALF, d = StreamPipe.M2S_KEEP)*/
+  core.dBus.setDownConnection(a = StreamPipe.HALF, d = StreamPipe.M2S_KEEP)
 }

@@ -76,7 +76,7 @@ class VideoController extends BlackBox {
       addressWidth = 32,
       dataWidth    = 64,
       sizeBytes    = 64,
-      sourceWidth  = 3,
+      sourceWidth  = 2,
       sinkWidth    = 0,
       withBCE      = false,
       withDataA    = false,

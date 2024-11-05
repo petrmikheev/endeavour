@@ -77,7 +77,7 @@ class EndeavourSoc extends Component {
           name = video_ctrl,
           mapping = List(
             tilelink.M2sSource(
-              id = SizeMapping(0, 7),
+              id = SizeMapping(0, 4),
               emits = tilelink.M2sTransfers(get = tilelink.SizeRange(64, 64))
             )
           )
