@@ -28,4 +28,6 @@ software/.clangd
 software/bios/ter*
 software/bootloader/*.packed
 software/bootloader/endeavour.dtb
+software/*/build
+software/build
 README.html

@@ -1,4 +1,5 @@
 #include <endeavour_defs.h>
+#include <endeavour_ext2.h>
 
 void hello_line(const char* str) {
   bios_printf("\t\t");
@@ -22,18 +23,16 @@ const char cA[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f, 0x7f, 0
 const char cB[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfc, 0xfc, 0xf8, 0xe0, 0x00};
 
 void load_wallpaper_bmp(char* dst) {
-  // debugfs:  stat wallpaper_1280x720.bmp
-  // (0):2048, (1-11):2560-2570, (IND):1545, (12-15):2571-2574, (16-63):1584-1631, (64-127):1664-1727, (128-255):1792-1919, (256-450):3200-3394
-  bios_sdread((unsigned*)dst, 2048 * 8, 8 * 1);   dst += 4096 * 1;
-  bios_sdread((unsigned*)dst, 2560 * 8, 8 * 11);  dst += 4096 * 11;
-  bios_sdread((unsigned*)dst, 2571 * 8, 8 * 4);   dst += 4096 * 4;
-  bios_sdread((unsigned*)dst, 1584 * 8, 8 * 48);  dst += 4096 * 48;
-  bios_sdread((unsigned*)dst, 1664 * 8, 8 * 64);  dst += 4096 * 64;
-  bios_sdread((unsigned*)dst, 1792 * 8, 8 * 128); dst += 4096 * 128;
-  bios_sdread((unsigned*)dst, 3200 * 8, 8 * 195); dst += 4096 * 195;
+  init_ext2_reader(2048);
+  struct Inode* inode = find_inode("/boot/wallpaper_1280x720.bmp");
+  if (inode)
+    read_file(inode, dst, inode->size_lo);
+  else
+    bios_printf("Wallpaper not found\n");
 }
 
 int main() {
+  IO_PORT(VIDEO_CFG) = (IO_PORT(VIDEO_CFG) & ~3) | VIDEO_1280x720;
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_BG(1);
   IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(40, 40, 20) | VIDEO_TEXT_ALPHA(48);
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_FG(1);
@@ -63,7 +62,7 @@ int main() {
   bios_printf("\n\n\n");
   if (SDCARD_SECTOR_COUNT > 0) {
     char* frame_buffer  = (char*)RAM_ADDR + 0x100000;
-    char* wallpaper_bmp = (char*)RAM_ADDR + 0x400000;
+    char* wallpaper_bmp = (char*)RAM_ADDR + 0x500000;
     load_wallpaper_bmp(wallpaper_bmp);
     IO_PORT(VIDEO_GRAPHIC_ADDR) = (long)frame_buffer;
     for (int j = 0; j < 720; ++j) {

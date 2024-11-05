@@ -171,6 +171,7 @@ int main() {
           continue;
         }
         break;
+      case '\n': break;
     }
     bios_printf("Invalid command\n");
     uart_flush();

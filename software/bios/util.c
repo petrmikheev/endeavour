@@ -1,8 +1,16 @@
 #include <endeavour_defs.h>
 
+static inline unsigned text_height(int video_mode) {
+  switch (video_mode) {
+    case VIDEO_640x480: return 30;
+    case VIDEO_1024x768: return 48;
+    case VIDEO_1280x720: return 45;
+    default: return 30;
+  }
+}
+
 void init_text_mode() {
-  const int video_mode = VIDEO_1280x720;
-  const int line_count = video_mode == VIDEO_1280x720 ? 45 : (video_mode == VIDEO_1024x768 ? 48 : 30);
+  const int video_mode = VIDEO_640x480;
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_BG(0);
   IO_PORT(VIDEO_REG_VALUE) = VIDEO_TEXT_COLOR(0, 0, 0) | VIDEO_TEXT_ALPHA(0);  // text styles 0x0? - black background
   IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_FG(15);
@@ -14,7 +22,7 @@ void init_text_mode() {
   }
   unsigned* text_buf = (unsigned*)RAM_ADDR;
 #ifndef SIMULATION
-  for (int i = 0; i < 128 * line_count; ++i) {
+  for (int i = 0; i < VIDEO_TEXT_BUFFER_SIZE / 4; ++i) {
 #else
   for (int i = 0; i < 32; ++i) {
 #endif
@@ -22,7 +30,6 @@ void init_text_mode() {
   }
   BIOS_TEXT_STYLE = BIOS_DEFAULT_TEXT_STYLE;
   BIOS_CURSOR_POS = 0;
-  BIOS_SCREEN_END_POS = 512 * line_count;
   IO_PORT(VIDEO_TEXT_ADDR) = RAM_ADDR;
   IO_PORT(VIDEO_CFG) = video_mode | VIDEO_TEXT_ON | VIDEO_FONT_WIDTH(8) | VIDEO_FONT_HEIGHT(16);
 }
@@ -33,7 +40,7 @@ static void uart_putc(char c) {
 }
 
 void putc_impl(char c) {
-  int cursor_pos = BIOS_CURSOR_POS;
+  unsigned cursor_pos = BIOS_CURSOR_POS;
   char* cursor = (char*)(BIOS_TEXT_BUFFER_ADDR + cursor_pos);
   if (c == '\n') {
     cursor_pos = (cursor_pos & ~511) + 512;
@@ -49,11 +56,15 @@ void putc_impl(char c) {
     cursor_pos += 2;
   }
   cursor_pos &= (VIDEO_TEXT_BUFFER_SIZE - 1);
-  if (cursor_pos == BIOS_SCREEN_END_POS) {
-    int* line = (int*)(BIOS_TEXT_BUFFER_ADDR + cursor_pos);
-    for (int i = 0; i < 128; ++i) line[i] = (BIOS_DEFAULT_TEXT_STYLE << 8) | (BIOS_DEFAULT_TEXT_STYLE << 24);
-    BIOS_SCREEN_END_POS = (BIOS_SCREEN_END_POS + 512) & (VIDEO_TEXT_BUFFER_SIZE - 1);
-    IO_PORT(VIDEO_TEXT_ADDR) = BIOS_TEXT_BUFFER_ADDR | ((IO_PORT(VIDEO_TEXT_ADDR) + 512) & (VIDEO_TEXT_BUFFER_SIZE - 1));
+  if ((cursor_pos & 511) == 0) {
+    unsigned addr = IO_PORT(VIDEO_TEXT_ADDR);
+    int required_size = (cursor_pos - addr) & (VIDEO_TEXT_BUFFER_SIZE - 1);
+    int available_size = (text_height(IO_PORT(VIDEO_CFG) & 3) - 1) << 9;
+    if (required_size > available_size) {
+      int* line = (int*)(BIOS_TEXT_BUFFER_ADDR + cursor_pos);
+      for (int i = 0; i < 128; ++i) line[i] = (BIOS_DEFAULT_TEXT_STYLE << 8) | (BIOS_DEFAULT_TEXT_STYLE << 24);
+      IO_PORT(VIDEO_TEXT_ADDR) = BIOS_TEXT_BUFFER_ADDR + ((addr + required_size - available_size) & (VIDEO_TEXT_BUFFER_SIZE - 1));
+    }
   }
   BIOS_CURSOR_POS = cursor_pos;
   uart_putc(c);
@@ -166,19 +177,17 @@ void uart_flush() {
   }
 }
 
-int uart_getc(int show_cursor) {
+int uart_getc_with_blink() {
   int x;
   char* cursor = (char*)(BIOS_TEXT_BUFFER_ADDR + BIOS_CURSOR_POS);
-  if (show_cursor) cursor[1] = BIOS_TEXT_STYLE;
+  cursor[1] = BIOS_TEXT_STYLE;
   do {
-    if (show_cursor) {
-      unsigned time;
-      asm volatile("csrr %0, time" : "=r" (time));
-      cursor[0] = (time & (1<<19)) ? '_' : 0;
-    }
+    unsigned time;
+    asm volatile("csrr %0, time" : "=r" (time));
+    cursor[0] = (time & (1<<19)) ? '_' : 0;
     x = IO_PORT(UART_RX);
   } while (x < 0);
-  if (show_cursor) cursor[0] = 0;
+  cursor[0] = 0;
   if (x > 0xff) IO_PORT(BOARD_LEDS) |= 0x4;  // third LED means UART error
   return x;
 }
@@ -215,7 +224,7 @@ int gets_impl(char* buf, int max_size) {
   char c;
   int size = 0;
   do {
-    c = uart_getc(1);
+    c = uart_getc_with_blink();
     if (c == '\r') c = '\n';
     if (c == '\b' && size > 0) {
       size--;

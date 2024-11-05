@@ -1,5 +1,5 @@
-#ifndef EXT2_READER
-#define EXT2_READER
+#ifndef ENDEAVOUR_EXT2
+#define ENDEAVOUR_EXT2
 
 typedef unsigned int uint32_t;
 typedef unsigned short uint16_t;
@@ -29,10 +29,13 @@ struct Inode {
   uint32_t osd2[3];
 };
 
-bool init_ext2_reader();
+bool init_ext2_reader(unsigned start_sector);
 
-inline bool is_dir(const struct Inode* inode) { return (inode->mode & 0xf000) == 0x4000; }
-inline bool is_regular_file(const struct Inode* inode) { return (inode->mode & 0xf000) == 0x8000; }
+// uses RAM_ADDR + 0x20000 for memory allocations
+void* ext2_malloc(unsigned long size);
+
+static inline bool is_dir(const struct Inode* inode) { return (inode->mode & 0xf000) == 0x4000; }
+static inline bool is_regular_file(const struct Inode* inode) { return (inode->mode & 0xf000) == 0x8000; }
 
 struct Inode* find_inode(const char* path);
 void print_dir(const struct Inode* inode);

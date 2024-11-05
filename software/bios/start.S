@@ -25,8 +25,7 @@ _start:
 .align 2
 wait_reset:        # bios_wait_reset
     jal uart_flush
-    li a0, 0
-    jal uart_getc
+    jal uart_getc_with_blink
     # continue to start (reset)
 start:
     csrci mstatus, 8

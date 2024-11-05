@@ -21,8 +21,7 @@
 #define BIOS_TEXT_BUFFER_ADDR RAM_ADDR
 #define VIDEO_TEXT_BUFFER_SIZE 0x10000  // 64KB
 #define BIOS_CURSOR_POS *(unsigned long*)0x40003FF4
-#define BIOS_SCREEN_END_POS *(unsigned long*)0x40003FF0
-#define BIOS_TEXT_STYLE *(char*)0x40003FEC
+#define BIOS_TEXT_STYLE *(char*)0x40003FF0
 #define BIOS_DEFAULT_TEXT_STYLE 0x0F
 
 // IO registers
@@ -59,6 +58,7 @@
 #define VIDEO_GRAPHIC_ADDR  0x90008
 #define VIDEO_REG_INDEX     0x9000C
 #define VIDEO_REG_VALUE     0x90010  // write-only
+#define VIDEO_TEXT_OFFSET   0x90014
 
 #define IO_PORT(X) (*(volatile int*)(X))
 
@@ -90,6 +90,13 @@
 #define VIDEO_RGB565      0
 #define VIDEO_RGAB5515    0x800
 
+// TODO: Maybe add new mode
+// 4 color (2 bits) per pixel in charmap. Colors: BG / BG + 1 / FG / FG + 1
+// font lines 0, 2, 4, ... come from char codes (8-255)
+// font lines 1, 3, 5, ... come from char codes (264-511)
+// FONT_WIDTH must be 8.
+// #define VIDEO_RICH_CHAR_COLOR 0x1000
+
 // VIDEO_REG_INDEX
 #define VIDEO_COLORMAP_BG(X) (X)         // Background color RGBA (8, 8, 8, 7); bits 7 unused; X in range [0, 15]
 #define VIDEO_COLORMAP_FG(X) (16 + (X))  // Foreground color RGBA (8, 8, 8, 7); bits 7 enables alternative font (char codes 256-511); X in range [0, 15];
@@ -99,6 +106,10 @@
 #define VIDEO_TEXT_COLOR(R, G, B) ((R)<<24 | (G)<<16 | (B)<<8)
 #define VIDEO_TEXT_ALPHA(A) (A)     // 0 - 64
 #define VIDEO_ALTERNATIVE_FONT 128  // only in VIDEO_COLORMAP_FG(X)
+
+// VIDEO_TEXT_OFFSET
+#define VIDEO_TEXT_OFFSET_X(X) (X)
+#define VIDEO_TEXT_OFFSET_Y(Y) ((Y)<<8)
 
 // builtin functions
 

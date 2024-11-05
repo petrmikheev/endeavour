@@ -1,5 +1,5 @@
 #include <endeavour_defs.h>
-#include "ext2.h"
+#include <endeavour_ext2.h>
 
 #define LOAD_ADDR (void*)0x80400000ul
 
@@ -124,7 +124,7 @@ int main() {
   run_kernel((void*)LOAD_ADDR);
   // no return
 #else
-  if (!init_ext2_reader()) bios_wait_reset();
+  if (!init_ext2_reader(/*partition_start=*/2048)) bios_wait_reset();
   if (wait_for_user_interrupt()) goto console;
   struct Inode* conf_file;
   if ((conf_file = find_inode("/boot/conf")) && is_regular_file(conf_file)) {

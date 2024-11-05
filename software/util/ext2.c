@@ -1,5 +1,5 @@
 #include <endeavour_defs.h>
-#include "ext2.h"
+#include <endeavour_ext2.h>
 
 struct Superblock {
   uint32_t inode_count;
@@ -52,12 +52,13 @@ struct DirEntryHeader {
 
 static void* next_alloc;
 
-static void* malloc(unsigned long size) {
+void* ext2_malloc(unsigned long size) {
   void* res = next_alloc;
   next_alloc += size;
   return res;
 }
 
+static uint32_t partition_start;
 static struct Superblock *superblock;
 static void *group_desc_table;
 static void *inode_buf;
@@ -70,8 +71,8 @@ static void *dir_buf;
 static uint32_t block_size() { return 1024 << superblock->log_block_size; }
 static bool read_block(void* dst, uint32_t block) {
   int sectors = 2 << superblock->log_block_size;
-  if (block * sectors + sectors >= SDCARD_SECTOR_COUNT) return 0;
-  return bios_sdread(dst, block * sectors, sectors) == sectors;
+  if (partition_start + block * sectors + sectors >= SDCARD_SECTOR_COUNT) return 0;
+  return bios_sdread(dst, partition_start + block * sectors, sectors) == sectors;
 }
 
 struct Inode* get_inode(uint32_t inode) {
@@ -169,6 +170,7 @@ struct Inode* find_inode(const char* path) {
     if (!inode) return 0;
     inode_id = read_dir(inode, 0, path);
     while (*path != 0 && *path != '/') path++;
+    if (*path == '/') path++;
   }
   return get_inode(inode_id);
 }
@@ -187,43 +189,44 @@ uint32_t read_file(const struct Inode* inode, void* dst, uint32_t max_size) {
     uint32_t first_sector = block * sectors;
     uint32_t sectors_limit = (max_size - size_done + 511) >> 9;
     if (sectors > sectors_limit) sectors = sectors_limit;
-    if (bios_sdread(dst, first_sector, sectors) != sectors) return size_done;
+    if (bios_sdread(dst, partition_start + first_sector, sectors) != sectors) return size_done;
     dst += (sectors << 9);
     size_done += (sectors << 9);
   }
   return size_done < max_size ? size_done : max_size;
 }
 
-bool init_ext2_reader() {
+bool init_ext2_reader(unsigned start_sector) {
+  partition_start = start_sector;
   if (SDCARD_SECTOR_COUNT < 4) {
-    bios_printf("[BOOT] No SD card\n");
+    bios_printf("[EXT2] No SD card\n");
     return 0;
   }
   next_alloc = (void*)(RAM_ADDR + 0x20000);
-  superblock = malloc(1024);
-  if (bios_sdread(superblock, 2, 2) != 2) {
-    bios_printf("[BOOT] SD card IO error\n");
+  superblock = ext2_malloc(1024);
+  if (bios_sdread(superblock, partition_start + 2, 2) != 2) {
+    bios_printf("[EXT2] SD card IO error\n");
     return 0;
   }
   if (superblock->ext2_signature != 0xef53) {
-    bios_printf("[BOOT] No EXT2 signature\n");
+    bios_printf("[EXT2] No EXT2 signature (partition_start=%u)\n", partition_start);
     return 0;
   }
   if (superblock->version_major == 0) superblock->inode_size = 128;
-  group_desc_table = malloc(block_size());
-  inode_buf = malloc(block_size());
-  indirect1_buf = malloc(block_size());
-  indirect2_buf = malloc(block_size());
-  indirect3_buf = malloc(block_size());
-  dir_buf = malloc(block_size());
+  group_desc_table = ext2_malloc(block_size());
+  inode_buf = ext2_malloc(block_size());
+  indirect1_buf = ext2_malloc(block_size());
+  indirect2_buf = ext2_malloc(block_size());
+  indirect3_buf = ext2_malloc(block_size());
+  dir_buf = ext2_malloc(block_size());
   inode_buf_loaded_block = -1;
   if (!read_block(group_desc_table, superblock->log_block_size ? 1 : 2)) {
-    bios_printf("[BOOT] IO error\n");
+    bios_printf("[EXT2] IO error\n");
     return 0;
   }
   struct Inode* root_inode = get_inode(ROOT_INODE);
   if (!root_inode || !is_dir(root_inode)) {
-    bios_printf("[BOOT] EXT2 root not found\n");
+    bios_printf("[EXT2] Root not found\n");
     return 0;
   }
   return 1;
