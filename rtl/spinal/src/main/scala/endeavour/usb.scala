@@ -4,27 +4,19 @@ import spinal.core._
 import spinal.lib._
 import spinal.lib.bus.amba3.apb.{Apb3, Apb3Config}
 import spinal.lib.bus.bmb._
+import spinal.lib.bus.tilelink
 import spinal.lib.com.usb.ohci._
 import spinal.lib.com.usb.phy._
 
 import endeavour.interfaces._
 
-class EndeavourUSB extends Component {
-  val io = new Bundle {
-    val usb1 = USB()
-    val usb2 = USB()
-    val apb_ctrl = slave(Apb3(Apb3Config(
-      addressWidth  = 12,
-      dataWidth     = 32,
-      useSlaveError = false
-    )))
-    val apb_dma = slave(Apb3(Apb3Config(
-      addressWidth  = 12,
-      dataWidth     = 32,
-      useSlaveError = false
-    )))
-    val interrupt = out Bool()
-  }
+class EndeavourUSB(phyCd: ClockDomain, usb1: USB, usb2: USB) extends Area {
+  val apb_ctrl = Apb3(Apb3Config(
+    addressWidth  = 12,
+    dataWidth     = 32,
+    useSlaveError = false
+  ))
+  val dma = tilelink.fabric.Node.down()
 
   val ctrl_bmbp = BmbParameter(
     addressWidth = 12,
@@ -32,13 +24,6 @@ class EndeavourUSB extends Component {
     sourceWidth = 0,
     contextWidth = 0,
     lengthWidth = 2
-  )
-  val dma_bmbp = BmbParameter(
-    addressWidth = 12,
-    dataWidth = 32,
-    sourceWidth = 0,
-    contextWidth = 0,
-    lengthWidth = 6
   )
 
   val ohci_param = UsbOhciParameter(
@@ -51,36 +36,37 @@ class EndeavourUSB extends Component {
   )
 
   val ohci = UsbOhci(ohci_param, ctrl_bmbp)
-  val phy = UsbLsFsPhyModified(ohci_param.portCount)
-  val ram = BmbOnChipRamMultiPort(List(dma_bmbp, ctrl_bmbp), 0x1000)
+  val phy = phyCd(UsbLsFsPhy(ohci_param.portCount))
 
-  io.interrupt := ohci.io.interrupt.toIo
+  val phyCc = UsbHubLsFs.CtrlCc(ohci_param.portCount, ClockDomain.current, phyCd)
+  phyCc.input <> ohci.io.phy
+  phyCc.output <> phy.io.ctrl
+
+  val dmaBridge = new BmbToTilelink(ohci.io.dma.p)
+  dmaBridge.io.up << ohci.io.dma
+
+  fiber.Handle {
+    dma.m2s.forceParameters(BmbToTilelink.getTilelinkM2s(ohci.io.dma.p.access, EndeavourUSB.this))
+    dma.s2m.supported.load(tilelink.S2mSupport.none())
+    dma.bus << dmaBridge.io.down
+  }
+
+  val interrupt = ohci.io.interrupt
 
   val usb1_tri = phy.io.usb(0).toNativeIo()
-  usb1_tri.dp.read := io.usb1.dp
-  usb1_tri.dm.read := io.usb1.dn
-  when(usb1_tri.dp.writeEnable) { io.usb1.dp := usb1_tri.dp.write }
-  when(usb1_tri.dm.writeEnable) { io.usb1.dn := usb1_tri.dm.write }
+  usb1_tri.dp.read := usb1.dp
+  usb1_tri.dm.read := usb1.dn
+  when(usb1_tri.dp.writeEnable) { usb1.dp := usb1_tri.dp.write }
+  when(usb1_tri.dm.writeEnable) { usb1.dn := usb1_tri.dm.write }
 
   val usb2_tri = phy.io.usb(1).toNativeIo()
-  usb2_tri.dp.read := io.usb2.dp
-  usb2_tri.dm.read := io.usb2.dn
-  when(usb2_tri.dp.writeEnable) { io.usb2.dp := usb2_tri.dp.write }
-  when(usb2_tri.dm.writeEnable) { io.usb2.dn := usb2_tri.dm.write }
+  usb2_tri.dp.read := usb2.dp
+  usb2_tri.dm.read := usb2.dn
+  when(usb2_tri.dp.writeEnable) { usb2.dp := usb2_tri.dp.write }
+  when(usb2_tri.dm.writeEnable) { usb2.dn := usb2_tri.dm.write }
 
   phy.io.management(0).overcurrent := False
   phy.io.management(1).overcurrent := False
-  phy.io.ctrl <> ohci.io.phy
-
-  ram.io.buses(0).rsp <> ohci.io.dma.rsp
-  ram.io.buses(0).cmd.valid <> ohci.io.dma.cmd.valid
-  ram.io.buses(0).cmd.ready <> ohci.io.dma.cmd.ready
-  ram.io.buses(0).cmd.opcode <> ohci.io.dma.cmd.opcode
-  ram.io.buses(0).cmd.data <> ohci.io.dma.cmd.data
-  ram.io.buses(0).cmd.mask <> ohci.io.dma.cmd.mask
-  ram.io.buses(0).cmd.last <> ohci.io.dma.cmd.last
-  ram.io.buses(0).cmd.length <> ohci.io.dma.cmd.length
-  ram.io.buses(0).cmd.address <> ohci.io.dma.cmd.address(11 downto 0)
 
   val apb_to_bmb = (apb: Apb3, bmb: Bmb) => {
     bmb.cmd.address := apb.PADDR
@@ -97,12 +83,5 @@ class EndeavourUSB extends Component {
     bmb.cmd.valid := apb_valid & ~cmd_sent
   }
 
-  apb_to_bmb(io.apb_ctrl, ohci.io.ctrl)
-  apb_to_bmb(io.apb_dma, ram.io.buses(1))
-}
-
-object EndeavourUSB {
-  def main(args: Array[String]): Unit = {
-    SpinalConfig(mode=Verilog, defaultClockDomainFrequency=FixedFrequency(48 MHz)).generate(new EndeavourUSB)
-  }
+  apb_to_bmb(apb_ctrl, ohci.io.ctrl)
 }

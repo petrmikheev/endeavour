@@ -27,38 +27,36 @@
 // IO registers
 
 // write to RX clears framing error flag
-#define UART_RX 0x10000  // negative value - buffer empty
-#define UART_TX 0x10004  // negative value - buffer full
-#define UART_CFG 0x10008
+#define UART_RX 0x1000  // negative value - buffer empty
+#define UART_TX 0x1004  // negative value - buffer full
+#define UART_CFG 0x1008
 
-#define AUDIO_CFG 0x20000
-#define AUDIO_STREAM 0x20004  // write - add to stream, read - remaining buf size
+#define AUDIO_CFG 0x2000
+#define AUDIO_STREAM 0x2004  // write - add to stream, read - remaining buf size
 
-#define SDCARD_CMD 0x30000
-#define SDCARD_DATA 0x30004
-#define SDCARD_FIFO0 0x30008
-#define SDCARD_FIFO1 0x3000C
-#define SDCARD_PHY 0x30010
-#define SDCARD_FIFO0_LE 0x30018  // FIFO0 with big-endian -> little-endian conversion
-#define SDCARD_FIFO1_LE 0x3001C  // FIFO1 with big-endian -> little-endian conversion
+#define SDCARD_CMD 0x3000
+#define SDCARD_DATA 0x3004
+#define SDCARD_FIFO0 0x3008
+#define SDCARD_FIFO1 0x300C
+#define SDCARD_PHY 0x3010
+#define SDCARD_FIFO0_LE 0x3018  // FIFO0 with big-endian -> little-endian conversion
+#define SDCARD_FIFO1_LE 0x301C  // FIFO1 with big-endian -> little-endian conversion
 
-#define USB_OHCI_REGS 0x40000
-#define USB_OHCI_DMA  0x41000
-#define USB_OHCI_DMA_SIZE 0x1000
+#define BOARD_LEDS     0x8000
+#define BOARD_KEYS     0x8004
+#define BOARD_CPU_FREQ 0x8008
+#define BOARD_RAM_FREQ 0x800C
+#define BOARD_TIMECMP  0x8010
+#define BOARD_TIMECMPH 0x8014
 
-#define BOARD_LEDS     0x80000
-#define BOARD_KEYS     0x80004
-#define BOARD_CPU_FREQ 0x80008
-#define BOARD_RAM_FREQ 0x8000C
-#define BOARD_TIMECMP  0x80010
-#define BOARD_TIMECMPH 0x80014
+#define VIDEO_CFG           0x9000
+#define VIDEO_TEXT_ADDR     0x9004
+#define VIDEO_GRAPHIC_ADDR  0x9008
+#define VIDEO_REG_INDEX     0x900C
+#define VIDEO_REG_VALUE     0x9010  // write-only
+#define VIDEO_TEXT_OFFSET   0x9014
 
-#define VIDEO_CFG           0x90000
-#define VIDEO_TEXT_ADDR     0x90004
-#define VIDEO_GRAPHIC_ADDR  0x90008
-#define VIDEO_REG_INDEX     0x9000C
-#define VIDEO_REG_VALUE     0x90010  // write-only
-#define VIDEO_TEXT_OFFSET   0x90014
+#define USB_OHCI_BASE 0xA000
 
 #define IO_PORT(X) (*(volatile int*)(X))
 
