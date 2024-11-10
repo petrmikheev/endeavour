@@ -274,7 +274,8 @@ reg [31:0] ddr_out;
 reg [15:0] ddr_out_buf;
 reg ddr_out_valid = 0;
 reg ddr_out_valid_buf = 0;
-reg [3:0] wstrb1, wstrb2;
+reg [3:0] wstrb_out;
+reg [1:0] wstrb_out_buf;
 
 DDR_IO8 io_l(
   .outclock(clk),
@@ -297,8 +298,8 @@ DDR_IO8 io_h(
 DDR_O1 o_ck_p(.outclock(clk_shifted), .din(2'b10), .pad_out(ddr_ck_p));
 DDR_O1 o_ck_n(.outclock(clk_shifted), .din(2'b01), .pad_out(ddr_ck_n));
 
-DDR_O1 o_dm0(.outclock(clk), .din(~{wstrb2[2], wstrb2[0]}), .pad_out(ddr_dm[0]));
-DDR_O1 o_dm1(.outclock(clk), .din(~{wstrb2[3], wstrb2[1]}), .pad_out(ddr_dm[1]));
+DDR_O1 o_dm0(.outclock(clk), .din(~{wstrb_out[2], wstrb_out[0]}), .pad_out(ddr_dm[0]));
+DDR_O1 o_dm1(.outclock(clk), .din(~{wstrb_out[3], wstrb_out[1]}), .pad_out(ddr_dm[1]));
 
 DDR_IO1 io_dqs0(
   .outclock(clk_shifted), .inclock(clk_shifted),
@@ -348,17 +349,18 @@ endgenerate
 //   output data latches
 // -------------------------------------------------------------------------------------
 wire [31:0] wdata32 = cnt[0] ? wdata[63:32] : wdata[31:0];
+wire  [3:0] wstrb32 = cnt[0] ? wstrb[7:4]   : wstrb[3:0];
 always @(posedge clk) begin
     if(reset) begin
         ddr_out_valid_buf <= 1'b0;
         ddr_out <= 32'b0;
-        ddr_out_buf <= 32'b0;
+        ddr_out_buf <= 16'b0;
     end else begin
         ddr_out_valid_buf <= (stat==WRITE && wvalid);
         ddr_out_buf <= wdata32[15:0];
         ddr_out <= {wdata32[31:16], ddr_out_buf};
-        wstrb1 <= cnt[0] ? wstrb[7:4] : wstrb[3:0];
-        wstrb2 <= wstrb1;
+        wstrb_out_buf <= wstrb32[1:0];
+        wstrb_out <= {wstrb32[3:2], wstrb_out_buf};
     end
 end
 always @(negedge clk) ddr_out_valid <= ddr_out_valid_buf;
