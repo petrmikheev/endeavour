@@ -5,3 +5,9 @@
 	path = rtl/ext/sdspi
 	url = https://github.com/petrmikheev/sdspi.git
 	branch = some_hacks
+[submodule "rtl/ext/core_usb_cdc"]
+	path = rtl/ext/core_usb_cdc
+	url = https://github.com/ultraembedded/core_usb_cdc
+[submodule "rtl/ext/core_usb_fs_phy"]
+	path = rtl/ext/core_usb_fs_phy
+	url = https://github.com/ultraembedded/core_usb_fs_phy

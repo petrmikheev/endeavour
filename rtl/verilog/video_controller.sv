@@ -117,7 +117,6 @@ module VideoController(
             vSyncEnd   <= 10'd730;
             vLast      <= 10'd749;
           end
-          {vTextOffset, hTextOffset} <= 0;
         end
         if (apb_reg == 3'd1) text_addr_next <= apb_PWDATA[31:6];
         if (apb_reg == 3'd2) {graphic_addr_next, hOffsetNext} <= apb_PWDATA[31:1];

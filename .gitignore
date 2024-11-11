@@ -15,6 +15,7 @@ mbftdi
 rtl/spinal/target
 rtl/spinal/project
 rtl/spinal/*.v
+rtl/spinal/sim/*.v
 rtl/board_rev1/db
 rtl/board_rev1/incremental_db
 rtl/board_rev1/output_files

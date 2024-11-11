@@ -34,9 +34,16 @@ module testbench;
   pullup(SD_CMD);
 
   wire USB1_DP, USB1_DN, USB2_DP, USB2_DN;
+
+//`define USE_DUMMY_USB_DEVICE
+`ifdef USE_DUMMY_USB_DEVICE
+  DummyUsbDevice usb1(.clk(clk48mhz), .usb_dp(USB1_DP), .usb_dn(USB1_DN));
+`else
   pulldown(USB1_DN);
-  pullup(USB1_DP);
-  pullup(USB2_DN);
+  pulldown(USB1_DP);
+`endif
+
+  pulldown(USB2_DN);
   pulldown(USB2_DP);
 
   wire PLLA_SCL, PLLA_SDA;
@@ -112,10 +119,25 @@ module testbench;
   wire [127:0] ram_int_a_opcode = testbench.system.internalRam_thread_logic.io_up_a_payload_opcode_string;
   wire         ram_int_d_fire   = testbench.system.internalRam_thread_logic.io_up_d_ready & testbench.system.internalRam_thread_logic.io_up_d_valid;
 
-  /*wire         ram_ext_a_fire   = testbench.system.toAxi4_logic_bridge.io_up_a_fire;
-  wire [31:0]  ram_ext_a_addr   = testbench.system.toAxi4_logic_bridge.io_up_a_payload_address;
-  wire [127:0] ram_ext_a_opcode = testbench.system.toAxi4_logic_bridge.io_up_a_payload_opcode_string;
-  wire         ram_ext_d_fire   = testbench.system.toAxi4_logic_bridge.io_up_d_fire;*/
+  wire         ram_ext_arw_valid = testbench.system.ram_ddr_ctrl.arw_valid;
+  wire         ram_ext_arw_fire = testbench.system.ram_ddr_ctrl.arw_valid & testbench.system.ram_ddr_ctrl.arw_ready;
+  wire [31:0]  ram_ext_arw_addr = testbench.system.ram_ddr_ctrl.arw_addr;
+  wire         ram_ext_arw_write = testbench.system.ram_ddr_ctrl.arw_write;
+  wire [7:0]   ram_ext_arw_len = testbench.system.ram_ddr_ctrl.arw_len;
+
+  wire         ram_ext_bvalid = testbench.system.ram_ddr_ctrl.bvalid;
+  wire         ram_ext_bfire = testbench.system.ram_ddr_ctrl.bvalid & testbench.system.ram_ddr_ctrl.bready;
+
+  wire         ram_ext_rvalid = testbench.system.ram_ddr_ctrl.rvalid;
+  wire         ram_ext_rfire = testbench.system.ram_ddr_ctrl.rvalid & testbench.system.ram_ddr_ctrl.rready;
+  wire [63:0]  ram_ext_rdata = testbench.system.ram_ddr_ctrl.rdata;
+  wire         ram_ext_rlast = testbench.system.ram_ddr_ctrl.rlast;
+
+  wire         ram_ext_wvalid = testbench.system.ram_ddr_ctrl.wvalid;
+  wire         ram_ext_wfire = testbench.system.ram_ddr_ctrl.wvalid & testbench.system.ram_ddr_ctrl.wready;
+  wire [63:0]  ram_ext_wdata = testbench.system.ram_ddr_ctrl.wdata;
+  wire         ram_ext_wlast = testbench.system.ram_ddr_ctrl.wlast;
+  wire [7:0]   ram_ext_wstrb = testbench.system.ram_ddr_ctrl.wstrb;
 
   wire [26:0]  apb_addr   = testbench.system.toApb_logic_bridge.io_down_PADDR;
   wire         apb_en_sel = testbench.system.toApb_logic_bridge.io_down_PENABLE & testbench.system.toApb_logic_bridge.io_down_PSEL;

@@ -12,7 +12,7 @@ import spinal.lib.system.tag.PMA
 import endeavour.interfaces._
 import endeavour.blackboxes._
 
-class EndeavourSoc extends Component {
+class EndeavourSoc(sim : Boolean = false) extends Component {
   val ioBaseAddr = 0x0
   val ioSize = 0x8000000
 
@@ -124,7 +124,7 @@ class EndeavourSoc extends Component {
   peripheral_apb_bridge.io.clk_output <> board_ctrl.io.clk_peripheral
   peripheral_apb_bridge.io.output <> peripheral.apb
 
-  val usb_ctrl = new EndeavourUSB(peripheral_cd, io.usb1, io.usb2)
+  val usb_ctrl = new EndeavourUSB(peripheral_cd, io.usb1, io.usb2, sim=sim)
   coherent_bus << usb_ctrl.dma
 
   val plicPriorityWidth = 1
@@ -204,5 +204,8 @@ class EndeavourSoc extends Component {
 }
 
 object EndeavourSoc {
-  def main(args: Array[String]): Unit = SpinalVerilog(new EndeavourSoc())
+  def main(args: Array[String]): Unit = {
+    SpinalConfig(mode=Verilog).generate(new EndeavourSoc())
+    SpinalConfig(mode=Verilog, targetDirectory="sim").generate(new EndeavourSoc(sim = true))
+  }
 }

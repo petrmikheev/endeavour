@@ -33,7 +33,7 @@ run_kernel:
     csrw mideleg, t0
 
     # delegate exceptions to S mode
-    li t0, (1<<3) | (1<<5) | (1<<6) | (1<<8) | (1<<12) | (1<<13) | (1<<15)
+    li t0, (1<<2) | (1<<3) | (1<<5) | (1<<6) | (1<<8) | (1<<12) | (1<<13) | (1<<15)
     csrw medeleg, t0
 
     csrwi satp, 0  # turn off virtual memory in S mode

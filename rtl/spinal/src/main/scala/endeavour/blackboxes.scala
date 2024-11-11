@@ -179,3 +179,18 @@ class DDRSdramController(rowBits: Int, colBits: Int, idWidth: Int) extends Black
 
   addPrePopTask(() => renameIO())
 }
+
+class SDR_IO1 extends BlackBox {
+  val io = new Bundle {
+    val inclock = in Bool()
+    val dout = out Bool()
+
+    val outclock = in Bool()
+    val din = in Bool()
+
+    val oe = in Bool()
+
+    val pad_io = inout(Analog(Bool()))
+  }
+  noIoPrefix()
+}

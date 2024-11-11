@@ -127,4 +127,21 @@ module SDR_O1 (
   end
 endmodule
 
+module SDR_IO1(
+  input inclock, output reg dout,
+  input outclock, input din,
+  input oe,
+  inout pad_io
+);
+  reg buf_out, buf_oe;
+  always @(posedge inclock) begin
+    dout <= pad_io;
+  end
+  always @(posedge outclock) begin
+    buf_out <= din;
+    buf_oe <= oe;
+  end
+  assign pad_io = buf_oe ? buf_out : 1'bz;
+endmodule
+
 `endif

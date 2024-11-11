@@ -8,9 +8,10 @@ import spinal.lib.bus.tilelink
 import spinal.lib.com.usb.ohci._
 import spinal.lib.com.usb.phy._
 
-import endeavour.interfaces._
+import endeavour.interfaces.USB
+import endeavour.blackboxes.SDR_IO1
 
-class EndeavourUSB(phyCd: ClockDomain, usb1: USB, usb2: USB) extends Area {
+class EndeavourUSB(phyCd: ClockDomain, usb1: USB, usb2: USB, sim : Boolean = false) extends Area {
   val apb_ctrl = Apb3(Apb3Config(
     addressWidth  = 12,
     dataWidth     = 32,
@@ -36,7 +37,7 @@ class EndeavourUSB(phyCd: ClockDomain, usb1: USB, usb2: USB) extends Area {
   )
 
   val ohci = UsbOhci(ohci_param, ctrl_bmbp)
-  val phy = phyCd(UsbLsFsPhy(ohci_param.portCount))
+  val phy = phyCd(UsbLsFsPhy(ohci_param.portCount, sim))
 
   val phyCc = UsbHubLsFs.CtrlCc(ohci_param.portCount, ClockDomain.current, phyCd)
   phyCc.input <> ohci.io.phy
@@ -53,20 +54,28 @@ class EndeavourUSB(phyCd: ClockDomain, usb1: USB, usb2: USB) extends Area {
 
   val interrupt = ohci.io.interrupt
 
-  val usb1_tri = phy.io.usb(0).toNativeIo()
-  usb1_tri.dp.read := usb1.dp
-  usb1_tri.dm.read := usb1.dn
-  when(usb1_tri.dp.writeEnable) { usb1.dp := usb1_tri.dp.write }
-  when(usb1_tri.dm.writeEnable) { usb1.dn := usb1_tri.dm.write }
-
-  val usb2_tri = phy.io.usb(1).toNativeIo()
-  usb2_tri.dp.read := usb2.dp
-  usb2_tri.dm.read := usb2.dn
-  when(usb2_tri.dp.writeEnable) { usb2.dp := usb2_tri.dp.write }
-  when(usb2_tri.dm.writeEnable) { usb2.dn := usb2_tri.dm.write }
-
   phy.io.management(0).overcurrent := False
   phy.io.management(1).overcurrent := False
+
+  val connect_pads = (native_io: UsbPhyFsNativeIo, pads: USB) => {
+    val dp = new SDR_IO1()
+    val dm = new SDR_IO1()
+    dp.io.inclock := phyCd.clock
+    dp.io.outclock := phyCd.clock
+    dm.io.inclock := phyCd.clock
+    dm.io.outclock := phyCd.clock
+    dp.io.pad_io := pads.dp
+    dm.io.pad_io := pads.dn
+    dp.io.oe := native_io.dp.writeEnable
+    dm.io.oe := native_io.dm.writeEnable
+    dp.io.din := native_io.dp.write
+    dm.io.din := native_io.dm.write
+    native_io.dp.read := dp.io.dout
+    native_io.dm.read := dm.io.dout
+  }
+
+  connect_pads(phy.io.usb(0).toNativeIo(), usb1)
+  connect_pads(phy.io.usb(1).toNativeIo(), usb2)
 
   val apb_to_bmb = (apb: Apb3, bmb: Bmb) => {
     bmb.cmd.address := apb.PADDR
