@@ -16,6 +16,9 @@ void* malloc(unsigned long size) {
   return res;
 }
 
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+
 struct OHCICtrl {
   unsigned HcRevision;         // 0x00
   unsigned HcControl;          // 0x04
@@ -50,8 +53,8 @@ struct TD {
 
 struct ED {
   unsigned flags;
-  struct TD *tail;
-  struct TD *head;
+  unsigned tail;
+  unsigned head;
   struct ED *nextED;
 };
 
@@ -62,12 +65,9 @@ struct HCCA {
   int done_head;
 };
 
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-
 struct UsbRequest {
   uint8_t bmRequestType;
-  uint8_t bRequst;
+  uint8_t bRequest;
   uint16_t wValue;
   uint16_t wIndex;
   uint16_t wLength;
@@ -90,104 +90,144 @@ struct UsbDeviceDescriptor {
     uint8_t bNumConfigurations;
 };
 
-#define SIMULATION
+volatile static struct OHCICtrl* ctrl = (void*)USB_OHCI_BASE;
+volatile static struct HCCA* hcca;
+volatile static struct ED* default_ed;
+volatile static struct TD* default_tds;
 
-int main() {
-  volatile struct OHCICtrl* ctrl = (void*)USB_OHCI_BASE;
-  bios_printf("HcRevision: 0x%x\n", ctrl->HcRevision);
-  ctrl->HcControl = 0x0;  // hub reset
+void init_hub() {
+  ctrl->HcControl = 0x0;  // reset hub
 
-#ifndef SIMULATION
-  wait(10000); // keep hub reset for 10ms
-#else
-  wait(20); // during simulation 10ms is too long
-#endif
-
-  // * Should this initialization be done during hub reset, or after switching to operational state?
-  // * What is the appropriate value for FSLargestDataPackage?
-  //
   ctrl->HcFmInterval = (1<<31 /*FIT=1*/) | (0x2000 << 16 /*FSLargestDataPackage=1KB*/) | (0x2edf /*FrameInterval for 1ms frame*/);
   ctrl->HcPeriodicStart = 0x2a2f; // 90% of FrameInterval
   ctrl->HcInterruptEnable = 0x80000000; // disable all
 
-  volatile struct HCCA* hcca = malloc(256);  // 0x80500000 - 0x805000ff
+  hcca = malloc(256);
   for (int i = 0; i < 32; ++i) hcca->interrupt_table[i] = 0;
   ctrl->HcHCCA = (long)hcca;
 
-  volatile struct ED *ed = malloc(16);       // 0x80500100 - 0x8050010f
-  volatile struct TD *td = malloc(16 * 3);   // 0x80500110 - 0x8050013f
+  default_ed = malloc(16);
+  default_tds = malloc(16 * 3);
 
-  // Initialize default endpoint for control transfers
-  //
-  // * How to control which port should be used for this endpoint?
-  //
-  ed->flags = 64 << 16; // max 64 byte, full-speed, get direction from TD, USB address = 0, endpoint number = 0
-  ed->head = ed->tail = &td[0]; // head==tail, so it has no TDs
-  ed->nextED = 0;
+  default_ed->head = default_ed->tail = (long)default_tds;
+  default_ed->nextED = 0;
 
-  // Set to operational state, enable control lists.
-  // But ed.head == ed.tail, so it shouldn't do anything yet.
-  ctrl->HcControlHeadED = (unsigned)ed;
-  ctrl->HcControl = 0x80 + (1<<4);
+  ctrl->HcControlHeadED = (long)default_ed;
 
-#ifndef SIMULATION
-  wait(500);
+  wait(50000);  // reset for 50ms
 
-  // reset both ports
-  ctrl->HcRhPortStatus[0] = 1<<4;
-  ctrl->HcRhPortStatus[1] = 1<<4;
+  ctrl->HcControl = 0x80 + (1<<4);  // operational state, allow only control transfers
 
+  wait(1000);  // wait 1ms to update port connection status
+
+  // disable ports
+  ctrl->HcRhPortStatus[0] = 1;
+  ctrl->HcRhPortStatus[1] = 1;
+}
+
+int usb_request(volatile struct ED* ed, const volatile struct UsbRequest* request, volatile void* data) {
+  default_tds[0].flags = 0xf2000000;
+  default_tds[0].nextTD = (void*)&default_tds[1];
+  default_tds[0].buf_start = (void*)request;
+  default_tds[0].buf_end = (char*)request + sizeof(struct UsbRequest)-1;
+
+  int read = request->bmRequestType & 0x80;
+  default_tds[1].flags = 0xf3040000 | (read ? 2<<19 : 1<<19);
+  default_tds[1].nextTD = (void*)&default_tds[2];
+  default_tds[1].buf_start = (void*)data;
+  default_tds[1].buf_end = (void*)data + request->wLength - 1;
+
+  ed->head = (long)&default_tds[0];
+  ed->tail = (long)&default_tds[2];
+
+  ctrl->HcCommandStatus = 2;
   wait(100000);
-  for (int i = 0; i < 2; ++i) {
-    int state = ctrl->HcRhPortStatus[i];
-    bios_printf("port%u: connected=%u enabled=%u\n", i, state & 1, (state>>1) & 1);
-  }
-#else
-  // skip port reset because it is too slow for simulation
-#endif
 
-  struct UsbRequest *request = malloc(sizeof(struct UsbRequest));                 // 0x80500140 - 0x80500147
-  struct UsbDeviceDescriptor *descr = malloc(sizeof(struct UsbDeviceDescriptor)); // 0x80500148 - 0x80500159
-  for (char* p = descr; p < (char*)(descr + 1); ++p) *p = 0; // fill with zeros
-
-  // Request UsbDeviceDescriptor
-  request->bmRequestType = 0x80;
-  request->bRequst = 6; // GET_DESCRIPTOR
-  request->wValue = 1;
-  request->wIndex = 0;
-  request->wLength = sizeof(struct UsbDeviceDescriptor);
-
-  td[0].flags = (7<<21 /*no interrupt*/) | (0<<19 /*SETUP*/);
-  td[0].nextTD = &td[1];
-  td[0].buf_start = request;
-  td[0].buf_end = (char*)request + sizeof(struct UsbRequest)-1;
-
-  // Receive UsbDeviceDescriptor
-  td[1].flags = (7<<21 /*no interrupt*/) | (2<<19 /*IN*/);
-  td[1].nextTD = &td[2];
-  td[1].buf_start = descr;
-  td[1].buf_end = (char*)descr + sizeof(struct UsbDeviceDescriptor)-1;
-
-  for (int i = 0; i < 2; ++i) {
-    bios_printf("td[%u] = { %08x %08x %08x %08x }\n", i, td[i].flags, td[i].buf_start, td[i].nextTD, td[i].buf_end);
+  if (ctrl->HcCommandStatus == 0 && (ed->head & 1) == 0 && (default_tds[0].flags>>28) == 0 && (default_tds[0].flags>>28) == 0) {
+    return 0;
   }
 
-  // Start processing UsbDeviceDescriptor request
-  ed->tail = &td[2];
-  ctrl->HcCommandStatus = 2;  // ControlListFilled=1
+  bios_printf("ERROR\nHcCommandStatus: 0x%x\n", ctrl->HcCommandStatus);
+  bios_printf("ed.flags=%8x %d td[0].flags=%8x td[1].flags=%8x\n", ed->flags, (unsigned)ed->head&3, default_tds[0].flags, default_tds[1].flags);
+  return -1;
+}
 
-#ifndef SIMULATION
-  wait(1000000);
-#else
-  wait(1000);  // Simulation fails with "FAILURE Tilelink decoder miss ???"
-#endif
+int reset_port(int p) {
+  ctrl->HcRhPortStatus[p] = 1 << 4;
+  wait(100000);
+  unsigned pstate = ctrl->HcRhPortStatus[p];
+  if ((pstate&3) != 3) return -1;
 
-  bios_printf("HcCommandStatus: 0x%x\n", ctrl->HcCommandStatus);
-  bios_printf("ed.flags=%8x %d td[0].flags=%8x td[1].flags=%8x\n", ed->flags, (unsigned)ed->head&3, td[0].flags, td[1].flags);
+  // max 8 byte, get direction from TD, USB address = 0, endpoint number = 0
+  if (pstate & (1<<9))
+    default_ed->flags = (8 << 16) | (1 << 13); // low speed
+  else
+    default_ed->flags = (8 << 16); // full speed
 
-  for (char* p = descr; p < (char*)(descr + 1); ++p) bios_printf("%02x ", *p);
-  bios_printf("\n");
+  struct UsbRequest request;
+  struct UsbDeviceDescriptor descr;
 
-  bios_printf("end\n");
+  request.bmRequestType = 0x80;
+  request.bRequest = 6; // GET_DESCRIPTOR
+  request.wValue = 1 << 8; // device descriptor
+  request.wIndex = 0;
+  request.wLength = 8;
+
+  if (usb_request(default_ed, &request, &descr) < 0) {
+    ctrl->HcRhPortStatus[p] = 1;
+    return -1;
+  }
+
+  default_ed->flags = ((unsigned)descr.bMaxPacketSize0 << 16) | (default_ed->flags & 0xffff);
+  return 0;
+}
+
+int main() {
+  bios_printf("OHCI test. HcRevision: 0x%x\n", ctrl->HcRevision);
+  init_hub();
+
+  for (int port = 0; port < 2; ++port) {
+    bios_printf("USB%u: ", port + 1);
+    if (!(ctrl->HcRhPortStatus[port] & 1)) {
+      bios_printf("not connected\n");
+      continue;
+    }
+    if (reset_port(port) < 0) goto test_port_error;
+
+    struct UsbRequest request;
+    struct UsbDeviceDescriptor ddev;
+
+    request.bmRequestType = 0x80;
+    request.bRequest = 6; // GET_DESCRIPTOR
+    request.wValue = 1 << 8; // device descriptor
+    request.wIndex = 0;
+    request.wLength = sizeof(struct UsbDeviceDescriptor);
+
+    if (usb_request(default_ed, &request, &ddev) < 0) goto test_port_error;
+
+    char dstr[256];
+
+    request.wValue = (3 << 8 /*string descriptor*/) | ddev.iManufacturer;
+    request.wLength = 1;
+    if (usb_request(default_ed, &request, &dstr) < 0) goto test_port_error;
+    request.wLength = dstr[0];
+    if (usb_request(default_ed, &request, &dstr) < 0) goto test_port_error;
+    for (int i = 2; i < request.wLength; i += 2) bios_putc(dstr[i]);
+    bios_putc(' ');
+
+    request.wValue = (3 << 8 /*string descriptor*/) | ddev.iProduct;
+    request.wLength = 1;
+    if (usb_request(default_ed, &request, &dstr) < 0) goto test_port_error;
+    request.wLength = dstr[0];
+    if (usb_request(default_ed, &request, &dstr) < 0) goto test_port_error;
+    for (int i = 2; i < request.wLength; i += 2) bios_putc(dstr[i]);
+    bios_putc('\n');
+
+    goto test_port_ok;
+test_port_error:
+    bios_printf("error\n");
+test_port_ok:
+    ctrl->HcRhPortStatus[port] = 1;  // disable
+  }
   return 0;
 }
