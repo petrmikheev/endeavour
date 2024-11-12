@@ -180,7 +180,7 @@ module VideoController(
     end else begin
       hCounter <= hCounter + 1'd1;
       if (show_graphic && hDraw && &hCounter[6:0] && vCounter < vDrawEnd) pixel_group_request_counter <= pixel_group_request_counter + 1'b1;
-      if (show_graphic && vDraw && hCounter == 1'd1) pixel_new_line_parity <= ~pixel_new_line_parity;
+      if (show_graphic && vDraw && hCounter == 1'd1 && |hOffset) pixel_new_line_parity <= ~pixel_new_line_parity;
       if (hCounter == hDrawStartO) hDraw <= 1;
       if (hCounter == hDrawEndO) begin
         hDraw <= 0;
@@ -232,15 +232,20 @@ module VideoController(
   reg pixel_new_line_parity_buf = 0;
   reg [2:0] pixel_group_request_counter_buf = 0;
   reg [9:0] pixel_load_y = 10'd1023;
-  reg [13:0] pixel_group_addr;
+  reg [13:0] pixel_group_addr, next_pixel_group_addr;
+  reg [15:6] next_text_addr_part;
   reg pixel_loading = 0;
   reg text_loading = 0;
   wire [3:0] char_npy = font_height - char_py;
+  reg pixel_new_line;
 
   always @(posedge clk) begin
     pixel_group_request_counter_buf <= pixel_group_request_counter;
     text_line_request_parity_buf <= text_line_request_parity;
     pixel_new_line_parity_buf <= pixel_new_line_parity;
+    pixel_new_line <= pixel_load_y != vCounter;
+    next_pixel_group_addr <= pixel_new_line ? {10'(graphic_addr[21:12] + vCounter), graphic_addr[11:8]} : 14'(pixel_group_addr + 1'd1);
+    next_text_addr_part <= {7'(text_addr[15:9] + vCharCounter), 3'(text_addr[8:6] + {char_npy[1:0], 1'b0})};
     if (reset) begin
       pixel_loading <= 0;
       text_loading <= 0;
@@ -271,14 +276,12 @@ module VideoController(
       end
     end else if (pixel_new_line_parity_buf != pixel_new_line_done_parity) begin
       pixel_new_line_done_parity <= ~pixel_new_line_done_parity;
-      if (|hOffset) begin
-        pixel_loading <= 1;
-        tl_bus_a_valid <= 1'b1;
-        tl_request_count <= 3'd1;
-        tl_beat_count <= 6'd8;
-        tl_bus_a_payload_source <= 1'b0;
-        tl_bus_a_payload_address <= {graphic_addr[31:22], 14'(pixel_group_addr + 1'd1), graphic_addr[7:6], 6'd0};
-      end
+      pixel_loading <= 1;
+      tl_bus_a_valid <= 1'b1;
+      tl_request_count <= 3'd1;
+      tl_beat_count <= 6'd8;
+      tl_bus_a_payload_source <= 1'b0;
+      tl_bus_a_payload_address <= {graphic_addr[31:22], 14'(pixel_group_addr + 1'd1), graphic_addr[7:6], 6'd0};
     end else if (pixel_group_request_counter_buf != pixel_group_done_counter) begin
       pixel_group_done_counter <= pixel_group_done_counter + 1'b1;
       pixel_loading <= 1;
@@ -286,20 +289,17 @@ module VideoController(
       tl_request_count <= 3'd4; // 4 requests, 64 byte each
       tl_beat_count <= 6'd32; // 32*8 = 256 bytes
       tl_bus_a_payload_source <= 1'b0;
-      if (pixel_load_y != vCounter) begin
+      tl_bus_a_payload_address <= {graphic_addr[31:22], next_pixel_group_addr, graphic_addr[7:6], 6'd0};
+      pixel_group_addr <= next_pixel_group_addr;
+      if (pixel_new_line) begin
         pixel_load_y <= vCounter;
-        pixel_group_addr <= {10'(graphic_addr[21:12] + vCounter), graphic_addr[11:8]};
-        tl_bus_a_payload_address <= {graphic_addr[31:22], 10'(graphic_addr[21:12] + vCounter), graphic_addr[11:6], 6'd0};
         graphic_line_index <= 0;
-      end else begin
-        pixel_group_addr <= pixel_group_addr + 1'd1;
-        tl_bus_a_payload_address <= {graphic_addr[31:22], 14'(pixel_group_addr + 1'd1), graphic_addr[7:6], 6'd0};
       end
     end else if (text_line_request_parity_buf != text_line_done_parity) begin
       text_line_done_parity <= ~text_line_done_parity;
       if (char_npy < text_read_steps) begin
         text_loading <= 1;
-        tl_bus_a_payload_address <= {text_addr[31:16], 7'(text_addr[31:9] + vCharCounter), 3'(text_addr[8:6] + {char_npy[1:0], 1'b0}), 6'd0};
+        tl_bus_a_payload_address <= {text_addr[31:16], next_text_addr_part, 6'd0};
         tl_bus_a_payload_source <= 1'b0;
         tl_request_count <= 3'd2;
         tl_beat_count <= 6'd16;
