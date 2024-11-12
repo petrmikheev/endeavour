@@ -8,12 +8,12 @@ import spinal.lib.bus.tilelink.fabric.Node
 import vexiiriscv.ParamSimple
 import vexiiriscv.soc.TilelinkVexiiRiscvFiber
 
-class VexiiCore(resetVector: Long) {
+class VexiiCore(resetVector: Long, sim: Boolean = false) {
   val param = new ParamSimple()
   param.resetVector = resetVector
   param.xlen = 32
   param.hartCount = 1
-  param.bootMemClear = true
+  param.bootMemClear = sim
   param.withCaches
   param.lsuL1Coherency = true
 

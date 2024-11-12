@@ -145,7 +145,7 @@ class EndeavourSoc(sim : Boolean = false) extends Component {
     targets = List(plic_target)
   )
 
-  val cpu = new VexiiCore(resetVector=internalRamBaseAddr)
+  val cpu = new VexiiCore(resetVector=internalRamBaseAddr, sim=sim)
 
   cpu.utime := board_ctrl.io.utime
   cpu.interrupts.timer := board_ctrl.io.timer_interrupt
