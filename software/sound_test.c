@@ -1,0 +1,16 @@
+#include <endeavour_defs.h>
+
+int main() {
+  IO_PORT(AUDIO_CFG) = AUDIO_SAMPLE_RATE(20000) | AUDIO_VOLUME(11);
+  for (int i = 0; i < 2000; ++i) {
+    while (IO_PORT(AUDIO_STREAM) < 8);
+    IO_PORT(AUDIO_STREAM) = 0x800800;
+    IO_PORT(AUDIO_STREAM) = 0xda8da8;
+    IO_PORT(AUDIO_STREAM) = 0xffffff;
+    IO_PORT(AUDIO_STREAM) = 0xda8da8;
+    IO_PORT(AUDIO_STREAM) = 0x800800;
+    IO_PORT(AUDIO_STREAM) = 0x257257;
+    IO_PORT(AUDIO_STREAM) = 0x000000;
+    IO_PORT(AUDIO_STREAM) = 0x257257;
+  }
+}

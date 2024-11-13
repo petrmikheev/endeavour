@@ -20,45 +20,81 @@ module AudioController (
 
   reg [15:0] divisor = 0;
   reg [15:0] counter = 0;
-  reg [3:0] target_volume = 4'd11;
+  reg [3:0] current_volume = 4'd15;
+  reg [3:0] target_volume = 4'd0;
 
   reg [23:0] fifo [0:FIFO_SIZE-1];
   reg [FIFO_BITS-1:0] ina, outa, remaining;
   reg sel_cfg, sel_stream;
   reg flush;
+  reg volume_initialized = 0;
+  reg volume_up;
+  reg [3:0] volume_delay = 4'd0;
 
-  assign apb_PREADY = 1'b1;
+  assign apb_PREADY = volume_initialized;
   assign apb_PRDATA = sel_cfg ? {12'b0, target_volume, divisor} : remaining;
 
-  localparam STATE_HALT = 3'd0;
-  localparam STATE_IDLE = 3'd1;
-  localparam STATE_ADDR = 3'd2;
-  localparam STATE_CFG  = 3'd3;
-  localparam STATE_DHI  = 3'd4;
-  localparam STATE_DLO  = 3'd5;
+  localparam STATE_HALT = 5'd0;
+  localparam STATE_IDLE = 5'd1;
+  localparam STATE_SL0  = 5'd2;
+  localparam STATE_SL1  = 5'd3;
+  localparam STATE_SL2  = 5'd4;
+  localparam STATE_SR0  = 5'd5;
+  localparam STATE_SR1  = 5'd6;
+  localparam STATE_SR2  = 5'd7;
+  localparam STATE_VV0  = 5'd8;
+  localparam STATE_VV1  = 5'd9;
+  localparam STATE_VV2  = 5'd10;
+  localparam STATE_VU0  = 5'd11;
+  localparam STATE_VU1  = 5'd12;
+  localparam STATE_VU2  = 5'd13;
+  localparam STATE_VD0  = 5'd14;
+  localparam STATE_VD1  = 5'd15;
+  localparam STATE_VD2  = 5'd16;
+  localparam STATE_HALTING = 5'd17;
 
-  reg [2:0] state = STATE_HALT;
+  reg [4:0] state = STATE_HALT;
   reg [23:0] value;
 
-`ifdef ENDEAVOUR_BOARD_VER1
-  assign shdn = ~(state == STATE_HALT && counter == 0);
-`else
-  assign shdn = state == STATE_HALT && counter == 0;
-`endif
+  assign shdn = state == STATE_HALT;
 
-  /*wire i2c_ready;
-  wire i2c_halted;
+  wire i2c_data_valid = state > STATE_IDLE;
+  wire i2c_data_ready;
+  reg [7:0] i2c_data;
+
+  always @(state) begin
+    case(state)
+      STATE_SL0: i2c_data = 8'b01000010; // channel B
+      STATE_SL1: i2c_data = {4'b0, value[11:8]};
+      STATE_SL2: i2c_data = value[7:0];
+      STATE_SR0: i2c_data = 8'b01000100; // channel C
+      STATE_SR1: i2c_data = {4'b0, value[23:20]};
+      STATE_SR2: i2c_data = value[19:12];
+      STATE_VV0: i2c_data = 8'b01000000; // channel A
+      STATE_VV1: i2c_data = volume_up ? 8'h0f : 8'h00;
+      STATE_VV2: i2c_data = volume_up ? 8'hff : 8'h00;
+      STATE_VU0: i2c_data = 8'b01000110; // channel D
+      STATE_VU1: i2c_data = 8'h0f;
+      STATE_VU2: i2c_data = 8'hff;
+      STATE_VD0: i2c_data = 8'b01000110; // channel D
+      STATE_VD1: i2c_data = 8'h0;
+      STATE_VD2: i2c_data = 8'h0;
+      default: i2c_data = 8'h0;
+    endcase
+  end
+
   I2C i2c(
-    .halt(shdn),
-    .halted(i2c_halted),
     .clk(clk),
-    .hs(1'b0),
-    .wr(1'b1),
-    .ready(i2c_ready),
-    .enable(|state[2:1]),
-    .din(state == STATE_ADDR ? {I2C_ADDR, 1'b0} :
-         state == STATE_DHI  ? {4'b0, ~value[11], value[10:8]} :
-         state == STATE_DLO  ? value[7:0] : 8'b0),
+
+    .cmd_high_speed(1'b1),
+    .cmd_addr(I2C_ADDR),
+    .cmd_read(1'b0),
+    .cmd_active(state != STATE_HALT),
+
+    .data_valid(i2c_data_valid),
+    .data_ready(i2c_data_ready),
+    .data_in(i2c_data),
+
     .i2c_scl(i2c_scl),
     .i2c_sda(i2c_sda)
   );
@@ -71,35 +107,56 @@ module AudioController (
       outa <= 0;
       remaining <= FIFO_BITS'(FIFO_SIZE - 1);
       state <= STATE_HALT;
+      current_volume <= 4'd15;
+      target_volume <= 4'd0;
+      volume_delay <= 0;
+      volume_initialized <= 0;
     end else begin
-      remaining <= FIFO_BITS'(ina - outa - 1'b1);
+      remaining <= FIFO_BITS'(outa - ina - 1'b1);
       sel_cfg <= apb_PSEL & ~apb_PADDR[2];
       sel_stream <= apb_PSEL & apb_PADDR[2];
-      if (apb_PENABLE & apb_PWRITE & sel_cfg) begin
+      if (apb_PENABLE & apb_PWRITE & sel_cfg & volume_initialized) begin
         divisor <= apb_PWDATA[15:0];
         target_volume <= apb_PWDATA[19:16];
         flush <= apb_PWDATA[31];
       end else
         flush <= 0;
-      if (apb_PENABLE & apb_PWRITE & sel_stream) begin
+      if (apb_PENABLE & apb_PWRITE & sel_stream & volume_initialized) begin
         fifo[ina] <= {apb_PWDATA[27:16], apb_PWDATA[11:0]};
         ina <= ina + 1'b1;
       end else if (flush)
         ina <= outa;
-      if (|counter)
+
+      if (counter != 0)
         counter <= counter - 1'b1;
-      else if (ina != outa) begin
-        counter <= divisor;
-        outa <= outa + 1'b1;
-        value <= fifo[outa];
-        if (state == STATE_HALT && i2c_halted) state <= STATE_ADDR;
-        if (state == STATE_IDLE) state <= STATE_DHI;
-      end else if (state == STATE_IDLE) state <= STATE_HALT;
-      if (state == STATE_ADDR && i2c_ready) state <= STATE_CFG;
-      if (state == STATE_CFG && i2c_ready) state <= STATE_DHI;
-      if (state == STATE_DHI && i2c_ready) state <= STATE_DLO;
-      if (state == STATE_DLO && i2c_ready) state <= STATE_IDLE;
+
+      if (state == STATE_HALT) begin
+        if (ina != outa || current_volume != target_volume) state <= STATE_IDLE;
+      end else if (state == STATE_HALTING) begin
+        if (counter == 0) state <= STATE_HALT;
+      end else if (state == STATE_IDLE) begin
+        if (current_volume != target_volume && (ina == outa || volume_delay == 0)) begin
+          volume_up <= target_volume > current_volume;
+          state <= STATE_VV0;
+          volume_delay <= 4'd15;
+        end else if (counter == 0 && ina != outa) begin
+          counter <= divisor;
+          outa <= outa + 1'b1;
+          value <= fifo[outa];
+          state <= STATE_SL0;
+          volume_delay <= volume_delay - 1'd1;
+        end
+        if (counter == 0 && ina == outa && current_volume == target_volume) begin
+          state <= STATE_HALTING;
+          counter <= 16'd1000;
+          volume_initialized <= 1'b1;
+        end
+      end else if (i2c_data_ready) begin
+        if (state == STATE_VD2) current_volume <= volume_up ? (current_volume + 1'b1) : (current_volume - 1'b1);
+        state <= (state == STATE_SR2 || state == STATE_VD2) ? STATE_IDLE : state + 1'b1;
+      end
+
     end
-  end*/
+  end
 
 endmodule
