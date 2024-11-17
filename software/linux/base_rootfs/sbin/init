@@ -7,5 +7,12 @@ export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/libexec/gcc/riscv32-unknown-linux
 export PS1='\u:\[\e[34m\]\w\[\e[m\]\$ '
 export LC_ALL=C.UTF-8
 export GROFF_TYPESETTER=ascii
+
+/usr/bin/textwm &
+sleep 0.5
+cat /etc/textwm.cfg > /dev/textwmcfg
+
+setsid sh -c 'exec sh </dev/ttyp0 >/dev/ttyp0 2>&1' &
+setsid sh -c 'exec sh </dev/ttyp1 >/dev/ttyp1 2>&1' &
+
 sh
-# setsid sh -c 'exec sh </dev/ttyp0 >/dev/ttyp0 2>&1'
