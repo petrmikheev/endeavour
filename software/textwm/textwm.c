@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <asm/termbits.h>
 #include <string.h>
+#include <errno.h>
 
 #include "utf8.h"
 #include "tty.h"
@@ -491,7 +492,7 @@ int main() {
   mkfifo(cfg_name, 0666);
   cfg_fd = open(cfg_name, O_RDONLY | O_NONBLOCK);
 
-  pfds[0].fd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
+  pfds[0].fd = -1;
   pfds[0].events = POLLIN;
   pfds[1].fd = cfg_fd;
   pfds[1].events = POLLIN;
@@ -506,6 +507,13 @@ int main() {
   static char buf[BUF_SIZE];
   int rsize;
   while (true) {
+    if (pfds[0].fd >= 0 && read(pfds[0].fd, buf, 0) < 0) {
+      close(pfds[0].fd);
+      pfds[0].fd = -1;
+    }
+    if (pfds[0].fd < 0) {
+      pfds[0].fd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
+    }
     poll(pfds, TTY_COUNT + 2, -1);
     if (pfds[0].revents & POLLIN) {
       while (true) {
