@@ -180,7 +180,7 @@ always @ (posedge clk)
                     burst_len <= {arw_len[6:0], 1'b1};
                     stat <= arw_write ? WPRE : RPRE;
                     bid <= arw_id;
-                    {next_ba, next_a, col_addr} <= arw_addr[ROW_BITS+COL_BITS+2:2];
+                    {next_ba, next_a, col_addr} <= {arw_addr[ROW_BITS+COL_BITS+2:3], 1'b0};
                 end
             end
             REFRESH: begin
