@@ -1,5 +1,6 @@
 *.bak
 *.vcd
+*.lxt2
 *.vvp
 *.elf
 *.bin
@@ -29,6 +30,7 @@ software/.clangd
 software/bios/ter*
 software/bootloader/*.packed
 software/bootloader/endeavour.dtb
+software/textwm/textwm
 software/*/build
 software/build
 README.html

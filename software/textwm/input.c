@@ -39,7 +39,7 @@ int alt = 0;
 int ctrl = 0;
 int caps = 0;
 
-char* with_shift = "\0\e!A#$%^&*()_+\b\tQWERTYUIOP{}\r\0ASDFGHJKL:\"~\0|ZXCVBNM<>?";
+char* with_shift = "\0\e!@#$%^&*()_+\b\tQWERTYUIOP{}\r\0ASDFGHJKL:\"~\0|ZXCVBNM<>?";
 char* without_shift = "\0\e1234567890-=\b\tqwertyuiop[]\r\0asdfghjkl;'`\0\\zxcvbnm,./";
 
 int parse_input_events(int fd, char* buf, int max_size) {
