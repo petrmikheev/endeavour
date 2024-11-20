@@ -8,6 +8,7 @@ module ApbClockBridge #(parameter AWIDTH)(
   input               input_PWRITE,
   input        [31:0] input_PWDATA,
   output reg   [31:0] input_PRDATA,
+  output reg          input_PSLVERROR,
 
   output reg [AWIDTH-1:0] output_PADDR,
   output reg              output_PSEL,
@@ -15,7 +16,8 @@ module ApbClockBridge #(parameter AWIDTH)(
   input                   output_PREADY,
   output reg              output_PWRITE,
   output reg       [31:0] output_PWDATA,
-  input            [31:0] output_PRDATA
+  input            [31:0] output_PRDATA,
+  input                   output_PSLVERROR
 );
 
   reg enable_buf;
@@ -32,6 +34,7 @@ module ApbClockBridge #(parameter AWIDTH)(
     if (output_PSEL & output_PENABLE & output_PREADY) begin
       ready1 <= 1;
       input_PRDATA <= output_PRDATA;
+      input_PSLVERROR <= output_PSLVERROR;
     end else if (~(output_PSEL & enable_buf))
       ready1 <= 0;
   end

@@ -1,7 +1,7 @@
 sources = start.S main.c util.c sdcard.c charmap.S
 
 TOOLCHAIN=riscv64-unknown-elf-
-OPTIONS=-march=rv32imc -mabi=ilp32 -nostdlib -ffreestanding -I../include -Os -Wl,--section-start=.text=0x40000000
+OPTIONS=-march=rv32imc -mabi=ilp32 -nostdlib -ffreestanding -I../include -Os -T bios.lds
 
 .PHONY: all
 all: bios.hex bios_sim.bin
@@ -43,6 +43,6 @@ charmap.S: ter-u16.bdf
 
 .PHONY: clean
 clean:
-	rm -f *.bin *.elf bios.hex terminus-font-* ter-u16.bdf charmap.S
+	rm -rf *.bin *.elf bios.hex terminus-font-* ter-u16.bdf charmap.S
 
 

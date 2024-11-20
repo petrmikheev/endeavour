@@ -72,6 +72,8 @@ static void run_command(char* cmd) {
     bios_sscanf(arg, "%dx%d", &w, &h);
     unsigned cfg = IO_PORT(VIDEO_CFG) & ~3;
     if (w == 640 && h == 480)
+      cfg |= 0;
+    else if (w == 800 && h == 600)
       cfg |= 1;
     else if (w == 1024 && h == 768)
       cfg |= 2;
@@ -124,7 +126,7 @@ int main() {
   run_kernel((void*)LOAD_ADDR);
   // no return
 #else
-  if (!init_ext2_reader(/*partition_start=*/2048)) bios_wait_reset();
+  if (!init_ext2_reader(/*partition_start=*/2048)) bios_uart_console();
   if (wait_for_user_interrupt()) goto console;
   struct Inode* conf_file;
   if ((conf_file = find_inode("/boot/conf")) && is_regular_file(conf_file)) {
@@ -190,7 +192,7 @@ console:
 void fatal_trap_handler(unsigned cause, unsigned tval, unsigned epc, unsigned sp, unsigned ra) {
   bios_printf("\n[SBI] TRAP\n\tcause = %8x\n\ttval  = %8x\n\tepc   = %8x\n\tsp\t= %8x\n\tra\t= %8x\n",
               cause, tval, epc, sp, ra);
-  bios_wait_reset();
+  bios_uart_console();
 }
 
 struct sbiret {
@@ -226,8 +228,8 @@ struct sbiret sbi_handler(int arg, int argh, int fn_id, int ext_id) {
   // Note: SBI_EXT_TIMER is handled in asm.S
   if (ext_id == SBI_EXT_RESET) {
 #ifdef SBI_DEBUG
-    bios_printf("[SBI] Reset requested. Send any byte to UART.\n");
-    bios_wait_reset();
+    bios_printf("[SBI] Reset requested. Return to BIOS UART console.\n");
+    bios_uart_console();
 #else
     bios_reset();
 #endif

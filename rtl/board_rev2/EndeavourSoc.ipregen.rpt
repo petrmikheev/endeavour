@@ -1,5 +1,5 @@
 IP Upgrade report for EndeavourSoc
-Wed Oct 30 01:33:36 2024
+Tue Nov 19 00:31:28 2024
 Quartus Prime Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
 
 
@@ -35,7 +35,7 @@ https://fpgasoftware.intel.com/eula.
 +----------------------------------------------------------------------------+
 ; IP Upgrade Summary                                                         ;
 +------------------------------+---------------------------------------------+
-; IP Components Upgrade Status ; Failed - Wed Oct 30 01:33:36 2024           ;
+; IP Components Upgrade Status ; Failed - Tue Nov 19 00:31:28 2024           ;
 ; Quartus Prime Version        ; 21.1.0 Build 842 10/21/2021 SJ Lite Edition ;
 ; Revision Name                ; EndeavourSoc                                ;
 ; Top-level Entity Name        ; EndeavourSoc                                ;
@@ -48,9 +48,9 @@ https://fpgasoftware.intel.com/eula.
 +---------------------+
 Info (23030): Evaluation of Tcl script /home/petya/intelFPGA_lite/21.1/quartus/common/tcl/internal/ip_regen/ip_regen.tcl was successful
 Info: Quartus Prime Shell was successful. 0 errors, 0 warnings
-    Info: Peak virtual memory: 637 megabytes
-    Info: Processing ended: Wed Oct 30 01:33:36 2024
-    Info: Elapsed time: 00:00:06
-    Info: Total CPU time (on all processors): 00:00:14
+    Info: Peak virtual memory: 635 megabytes
+    Info: Processing ended: Tue Nov 19 00:31:29 2024
+    Info: Elapsed time: 00:00:21
+    Info: Total CPU time (on all processors): 00:01:02
 
 

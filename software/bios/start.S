@@ -23,10 +23,9 @@ _start:
 .align 2
     j crc32_impl   # bios_crc32
 .align 2
-wait_reset:        # bios_wait_reset
+to_console:        # bios_uart_console
     jal uart_flush
-    jal uart_getc_with_blink
-    # continue to start (reset)
+    j uart_console
 start:
     csrci mstatus, 8
     li sp, BIOS_STACK_ADDR
@@ -42,7 +41,7 @@ trap:
     mv a5, ra
     li sp, BIOS_STACK_ADDR
     jal printf_impl
-    j wait_reset
+    j to_console
 
 .section .rodata
 

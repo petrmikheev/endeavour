@@ -55,60 +55,7 @@ int memtest() {
   return ok;
 }
 
-int main() {
-  IO_PORT(BOARD_LEDS) = 0x1;  // first LED on, means that bios has started
-#ifndef SIMULATION
-  IO_PORT(UART_CFG) = UART_BAUD_RATE(115200) | UART_PARITY_EVEN | UART_CSTOPB;
-#else
-  // Increase UART speed in simulation
-  IO_PORT(UART_CFG) = UART_BAUD_RATE(16000000) | UART_PARITY_EVEN | UART_CSTOPB;
-#endif
-  while (IO_PORT(UART_RX) >= 0);  // clear UART input buffer
-  IO_PORT(UART_RX) = 0;  // clear UART framing error flag
-
-  RAM_SIZE = 128 * 1024 * 1024;
-
-  init_text_mode();
-
-  bios_printf(
-      "\n\n"
-      "\t\t\tEndeavour\n"
-      "\t\t\t=========\n\n"
-  );
-  print_cpu_info();
-#ifndef SIMULATION
-  int memtest_ok = memtest();
-#else
-  int memtest_ok = (IO_PORT(BOARD_KEYS) & 1) || memtest();
-#endif
-  SDCARD_SECTOR_COUNT = init_sdcard();
-
-  if ((IO_PORT(BOARD_KEYS) & 2) || SDCARD_SECTOR_COUNT < 2) {
-    // don't boot from sdcard
-  } else if (bios_sdread((unsigned*)BIOS_RAM_ADDR, 0, 2) != 2) {
-    bios_printf("Failed to read SD boot sector\n");
-  } else if (*(unsigned*)(BIOS_RAM_ADDR + 0x3fc) != 0x405a0000) {
-    bios_printf("SD boot sector has no boot signature\n");
-  } else if (memtest_ok) {
-    bios_printf("Boot from SD card\n");
-    asm volatile("fence.i");
-    IO_PORT(BOARD_LEDS) = 0x2;
-    ((void (*)())BIOS_RAM_ADDR)();
-  }
-
-#ifndef SIMULATION
-  bios_printf(
-      "\nUART console. Commands:\n"
-      "\tW addr val\t\t\t- save 4B to RAM\n"
-      "\tR addr\t\t\t\t- load 4B from RAM\n"
-      "\tSD addr sector\t\t- load SD card sector to addr\n"
-      "\tUART addr size\t\t- receive size(decimal) bytes via UART\n"
-      "\tFUART addr size\t   - UART with baud rate 12Mhz\n"
-      "\tCRC32 addr size [expected] - calculate crc of data in RAM\n"
-      "\tJ addr\t\t\t\t- run code at addr\n\n"
-  );
-#endif
-
+void uart_console() {
   while (1) {
     bios_printf("> ");
     #define CMD_BUF_SIZE 64
@@ -171,9 +118,67 @@ int main() {
           continue;
         }
         break;
-      case '\n': break;
+      case '\n': continue;
     }
     bios_printf("Invalid command\n");
     uart_flush();
   }
+}
+
+int main() {
+  IO_PORT(BOARD_LEDS) = 0x1;  // first LED on, means that bios has started
+  IO_PORT(USB_OHCI_BASE + 0x4) = 0;  // switch USB hub to reset state
+#ifndef SIMULATION
+  IO_PORT(UART_CFG) = UART_BAUD_RATE(115200) | UART_PARITY_EVEN | UART_CSTOPB;
+#else
+  // Increase UART speed in simulation
+  IO_PORT(UART_CFG) = UART_BAUD_RATE(16000000) | UART_PARITY_EVEN | UART_CSTOPB;
+#endif
+  while (IO_PORT(UART_RX) >= 0);  // clear UART input buffer
+  IO_PORT(UART_RX) = 0;  // clear UART framing error flag
+
+  RAM_SIZE = 128 * 1024 * 1024;
+
+  init_text_mode();
+
+  bios_printf(
+      "\n\n"
+      "\t\t\tEndeavour\n"
+      "\t\t\t=========\n\n"
+  );
+  print_cpu_info();
+#ifndef SIMULATION
+  int memtest_ok = memtest();
+#else
+  int memtest_ok = (IO_PORT(BOARD_KEYS) & 1) || memtest();
+#endif
+  SDCARD_SECTOR_COUNT = init_sdcard();
+
+  if ((IO_PORT(BOARD_KEYS) & 2) || SDCARD_SECTOR_COUNT < 2) {
+    // don't boot from sdcard
+  } else if (bios_sdread((unsigned*)BIOS_RAM_ADDR, 0, 2) != 2) {
+    bios_printf("Failed to read SD boot sector\n");
+  } else if (*(unsigned*)(BIOS_RAM_ADDR + 0x3fc) != 0x405a0000) {
+    bios_printf("SD boot sector has no boot signature\n");
+  } else if (memtest_ok) {
+    bios_printf("Boot from SD card\n");
+    asm volatile("fence.i");
+    IO_PORT(BOARD_LEDS) = 0x2;
+    ((void (*)())BIOS_RAM_ADDR)();
+  }
+
+#ifndef SIMULATION
+  bios_printf(
+      "\nUART console. Commands:\n"
+      "\tW addr val\t\t\t- save 4B to RAM\n"
+      "\tR addr\t\t\t\t- load 4B from RAM\n"
+      "\tSD addr sector\t\t- load SD card sector to addr\n"
+      "\tUART addr size\t\t- receive size(decimal) bytes via UART\n"
+      "\tFUART addr size\t   - UART with baud rate 12Mhz\n"
+      "\tCRC32 addr size [expected] - calculate crc of data in RAM\n"
+      "\tJ addr\t\t\t\t- run code at addr\n\n"
+  );
+#endif
+
+  uart_console();
 }

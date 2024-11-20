@@ -13,7 +13,7 @@ class ApbClockBridge(awidth: Int) extends BlackBox {
   val apb_conf = Apb3Config(
     addressWidth  = awidth,
     dataWidth     = 32,
-    useSlaveError = false
+    useSlaveError = true
   )
   val io = new Bundle {
     val clk_input = in Bool()

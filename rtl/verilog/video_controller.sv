@@ -47,7 +47,7 @@ module VideoController(
   reg  [9:0] vSyncEnd;
   reg  [9:0] vLast;
 
-  reg [1:0] video_mode;
+  reg [1:0] video_mode = 2'd3;
   reg show_text = 0;
   reg show_graphic = 0;
   reg use_graphic_alpha = 0;
@@ -72,6 +72,8 @@ module VideoController(
 
   localparam PIXEL_DELAY = 2'd3;
 
+  localparam VALID_ADDR_PREFIX = 5'b10000; // RAM 0x80000000 - 0x87ffffff
+
   // *** APB interface
 
   assign video_mode_out = video_mode;
@@ -80,14 +82,13 @@ module VideoController(
   always @(posedge clk) begin
     apb_reg <= apb_PADDR[4:2];
     if (reset) begin
-      video_mode <= 2'd0;
       show_text <= 1'd0;
       show_graphic <= 1'd0;
     end else begin
       if (apb_PSEL & apb_PENABLE & apb_PWRITE) begin
         if (apb_reg == 3'd0) begin
           {use_graphic_alpha, font_width, font_height, show_graphic, show_text, video_mode} <= apb_PWDATA[11:0];
-          if (apb_PWDATA[1:0] == 2'd1) begin  // 640x480
+          if (apb_PWDATA[1:0] == 2'd0) begin  // 640x480
             hDrawEnd   <= 11'd640 + PIXEL_DELAY;
             hSyncStart <= 11'd656 + PIXEL_DELAY;
             hSyncEnd   <= 11'd752 + PIXEL_DELAY;
@@ -96,6 +97,16 @@ module VideoController(
             vSyncStart <= 10'd490;
             vSyncEnd   <= 10'd492;
             vLast      <= 10'd524;
+          end
+          if (apb_PWDATA[1:0] == 2'd1) begin  // 800x600
+            hDrawEnd   <= 11'd800 + PIXEL_DELAY;
+            hSyncStart <= 11'd824 + PIXEL_DELAY;
+            hSyncEnd   <= 11'd896 + PIXEL_DELAY;
+            hLast      <= 11'd1023;
+            vDrawEnd   <= 10'd600;
+            vSyncStart <= 10'd601;
+            vSyncEnd   <= 10'd603;
+            vLast      <= 10'd624;
           end
           if (apb_PWDATA[1:0] == 2'd2) begin  // 1024x768
             hDrawEnd   <= 11'd1024 + PIXEL_DELAY;
@@ -180,7 +191,7 @@ module VideoController(
     end else begin
       hCounter <= hCounter + 1'd1;
       if (show_graphic && hDraw && &hCounter[6:0] && vCounter < vDrawEnd) pixel_group_request_counter <= pixel_group_request_counter + 1'b1;
-      if (show_graphic && vDraw && hCounter == 1'd1 && |hOffset) pixel_new_line_parity <= ~pixel_new_line_parity;
+      if (show_graphic && vDraw && hCounter == 1'd1 && (|hOffset || video_mode == 2'd1)) pixel_new_line_parity <= ~pixel_new_line_parity;
       if (hCounter == hDrawStartO) hDraw <= 1;
       if (hCounter == hDrawEndO) begin
         hDraw <= 0;
@@ -255,7 +266,7 @@ module VideoController(
     end if (pixel_loading | text_loading) begin
       if (tl_bus_a_valid & tl_bus_a_ready) begin
         tl_request_count <= tl_request_count - 1'b1;
-        tl_bus_a_payload_address <= tl_bus_a_payload_address + 32'd64;
+        tl_bus_a_payload_address <= {VALID_ADDR_PREFIX, 27'(tl_bus_a_payload_address[26:0] + 32'd64)};
         tl_bus_a_payload_source <= tl_bus_a_payload_source + 1'b1;
         if (tl_request_count == 1'b1) tl_bus_a_valid <= 1'b0;
       end
@@ -278,10 +289,10 @@ module VideoController(
       pixel_new_line_done_parity <= ~pixel_new_line_done_parity;
       pixel_loading <= 1;
       tl_bus_a_valid <= 1'b1;
-      tl_request_count <= 3'd1;
-      tl_beat_count <= 6'd8;
+      tl_request_count <= (video_mode == 2'd1) ? 3'd2 : 3'd1;
+      tl_beat_count <= (video_mode == 2'd1) ? 6'd16 : 6'd8;
       tl_bus_a_payload_source <= 1'b0;
-      tl_bus_a_payload_address <= {graphic_addr[31:22], 14'(pixel_group_addr + 1'd1), graphic_addr[7:6], 6'd0};
+      tl_bus_a_payload_address <= {VALID_ADDR_PREFIX, graphic_addr[26:22], 14'(pixel_group_addr + 1'd1), graphic_addr[7:6], 6'd0};
     end else if (pixel_group_request_counter_buf != pixel_group_done_counter) begin
       pixel_group_done_counter <= pixel_group_done_counter + 1'b1;
       pixel_loading <= 1;
@@ -289,7 +300,7 @@ module VideoController(
       tl_request_count <= 3'd4; // 4 requests, 64 byte each
       tl_beat_count <= 6'd32; // 32*8 = 256 bytes
       tl_bus_a_payload_source <= 1'b0;
-      tl_bus_a_payload_address <= {graphic_addr[31:22], next_pixel_group_addr, graphic_addr[7:6], 6'd0};
+      tl_bus_a_payload_address <= {VALID_ADDR_PREFIX, graphic_addr[26:22], next_pixel_group_addr, graphic_addr[7:6], 6'd0};
       pixel_group_addr <= next_pixel_group_addr;
       if (pixel_new_line) begin
         pixel_load_y <= vCounter;
@@ -299,7 +310,7 @@ module VideoController(
       text_line_done_parity <= ~text_line_done_parity;
       if (char_npy < text_read_steps) begin
         text_loading <= 1;
-        tl_bus_a_payload_address <= {text_addr[31:16], next_text_addr_part, 6'd0};
+        tl_bus_a_payload_address <= {VALID_ADDR_PREFIX, text_addr[26:16], next_text_addr_part, 6'd0};
         tl_bus_a_payload_source <= 1'b0;
         tl_request_count <= 3'd2;
         tl_beat_count <= 6'd16;
@@ -401,7 +412,7 @@ module VideoController(
 
   reg [2:0] shift_counter = 3'd0;
   reg [9:0] tmds0_shift, tmds1_shift, tmds2_shift;
-  reg [7:0] tmds_buf;
+  reg [7:0] tmds_buf, tmds_buf2;
   reg tmdsC, tmdsC_next;
 
   always @(posedge tmds_x5_clk) begin
@@ -418,7 +429,8 @@ module VideoController(
     end
     tmdsC <= |shift_counter[2:1];
     tmdsC_next <= shift_counter[2] | &shift_counter[1:0];
-    tmds_buf <= {tmdsC_next, tmds2_shift[1], tmds1_shift[1], tmds0_shift[1], tmdsC, tmds2_shift[0], tmds1_shift[0], tmds0_shift[0]};
+    tmds_buf2 <= {tmdsC_next, tmds2_shift[1], tmds1_shift[1], tmds0_shift[1], tmdsC, tmds2_shift[0], tmds1_shift[0], tmds0_shift[0]};
+    tmds_buf <= tmds_buf2;
   end
 
   wire [3:0] pad_out_p;
@@ -465,10 +477,11 @@ module TMDS_encoder(
   wire [9:0] TMDS_data = {invert_q_m, q_m[8], q_m[7:0] ^ {8{invert_q_m}}};
   wire [9:0] TMDS_code = CD[1] ? (CD[0] ? 10'b1010101011 : 10'b0101010100) : (CD[0] ? 10'b0010101011 : 10'b1101010100);
 
-  reg [9:0] TMDS_buf = 0;
+  reg [9:0] TMDS_buf, TMDS_buf2 = 0;
   always @(posedge clk) begin
     TMDS_buf <= VDE ? TMDS_data : TMDS_code;
-    TMDS <= TMDS_buf;
+    TMDS_buf2 <= TMDS_buf;
+    TMDS <= TMDS_buf2;
     balance_acc <= VDE ? balance_acc_new : 4'h0;
   end
 endmodule

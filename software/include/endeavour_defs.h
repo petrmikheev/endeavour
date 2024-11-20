@@ -78,7 +78,8 @@
 #define AUDIO_FLUSH 0x80000000
 
 // VIDEO_CFG flags
-#define VIDEO_640x480     1
+#define VIDEO_640x480     0
+#define VIDEO_800x600     1
 #define VIDEO_1024x768    2
 #define VIDEO_1280x720    3
 #define VIDEO_TEXT_ON     4
@@ -124,7 +125,7 @@
 // bios_read_uart(dst, size, uart_divisor_override /* -1 - don't override */) -> ok
 #define bios_read_uart    ((int (*)(char*, int, int))                (BIOS_ROM_ADDR + 0x20))
 #define bios_crc32   ((unsigned (*)(const void*, int))               (BIOS_ROM_ADDR + 0x24))
-#define bios_wait_reset   ((void (*)())                              (BIOS_ROM_ADDR + 0x28))
+#define bios_uart_console ((void (*)())                              (BIOS_ROM_ADDR + 0x28))
 
 #endif  // ENDEAVOUR_DEFS_H
 

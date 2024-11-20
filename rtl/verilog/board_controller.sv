@@ -49,10 +49,12 @@ module BoardController(
   parameter PERIPHERAL_FREQ = 48_000_000;
   localparam PERIPHERAL_PERIOD = 1_000_000_000.0 / PERIPHERAL_FREQ;
 
-  parameter TMDS_FREQ_1 = 25_175_000; // 640x480
+  parameter TMDS_FREQ_0 = 25_175_000; // 640x480
+  parameter TMDS_FREQ_1 = 36_000_000; // 800x600
   parameter TMDS_FREQ_2 = 65_000_000; // 1024x768
   parameter TMDS_FREQ_3 = 74_250_000; // 1280x720
 
+  localparam TMDS_BIT_PERIOD_0 = 1_000_000_000.0 / (TMDS_FREQ_0 * 10);
   localparam TMDS_BIT_PERIOD_1 = 1_000_000_000.0 / (TMDS_FREQ_1 * 10);
   localparam TMDS_BIT_PERIOD_2 = 1_000_000_000.0 / (TMDS_FREQ_2 * 10);
   localparam TMDS_BIT_PERIOD_3 = 1_000_000_000.0 / (TMDS_FREQ_3 * 10);
@@ -138,6 +140,7 @@ module BoardController(
 
   reg tmds_bit_clk = 0;
 
+  always #(TMDS_BIT_PERIOD_0/2) if (video_mode == 2'd0) tmds_bit_clk = ~tmds_bit_clk;
   always #(TMDS_BIT_PERIOD_1/2) if (video_mode == 2'd1) tmds_bit_clk = ~tmds_bit_clk;
   always #(TMDS_BIT_PERIOD_2/2) if (video_mode == 2'd2) tmds_bit_clk = ~tmds_bit_clk;
   always #(TMDS_BIT_PERIOD_3/2) if (video_mode == 2'd3) tmds_bit_clk = ~tmds_bit_clk;

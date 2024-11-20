@@ -109,7 +109,7 @@ class EndeavourSoc(sim : Boolean = false) extends Component {
     val apb = Apb3(Apb3Config(
       addressWidth  = 14,
       dataWidth     = 32,
-      useSlaveError = false
+      useSlaveError = true
     ))
     val apbDecoder = Apb3Decoder(
       master = apb,

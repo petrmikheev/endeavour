@@ -133,6 +133,7 @@ set_max_delay -from clk48 -to clk_ram_bus 20.000
 set_max_delay -from clk_ram_bus -to clk48 20.000
 set_max_delay -from clk_cpu -to clk_tmds_pixel 30.000
 set_max_delay -from clk_tmds_pixel -to clk_cpu 30.000
+set_max_delay -from clk_tmds_pixel -to clk_tmds_x5 2.69
 
 set_min_delay -from [get_clocks clk_ram_bus] -to [get_ports {io_ddr_sdram_*}] 10
 set_max_delay -from [get_clocks clk_ram_bus] -to [get_ports {io_ddr_sdram_*}] 11
