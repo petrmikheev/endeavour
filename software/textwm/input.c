@@ -5,6 +5,7 @@
 #include <linux/input.h>
 
 #include "tty.h"
+#include "textwm.h"
 
 // `input_event` from <linux/input.h> has size 24 and doesn't match `input_event` in linux kernel (that has size 16).
 // I haven't managed to configure everything correctly, so using a custom struct.
@@ -38,6 +39,7 @@ int shift = 0;
 int alt = 0;
 int ctrl = 0;
 int caps = 0;
+int super = 0;
 
 char* with_shift = "\0\e!@#$%^&*()_+\b\tQWERTYUIOP{}\r\0ASDFGHJKL:\"~\0|ZXCVBNM<>?";
 char* without_shift = "\0\e1234567890-=\b\tqwertyuiop[]\r\0asdfghjkl;'`\0\\zxcvbnm,./";
@@ -64,6 +66,10 @@ int parse_input_events(int fd, char* buf, int max_size) {
       caps = ev->value;
       continue;
     }
+    if (ev->code == 125) {
+      super = ev->value;
+      continue;
+    }
     if (ev->value == 0) continue;
     if (alt) {
       if (ev->code >= 2 && ev->code < 2+TTY_COUNT) tty_set_active(ev->code - 2);
@@ -84,6 +90,30 @@ int parse_input_events(int fd, char* buf, int max_size) {
         default: continue;
       }
     }
+    if (super) {
+      struct TTY *tty = &ttys[active_tty];
+      switch (ev->code) {
+        case 9: tty->workspace = 0; break; // ws0
+        case 10: tty->workspace = 1; break; // ws1
+        case 11: tty->workspace = ~tty->workspace; break; // tws
+        case 17: case 103: if (shift) tty->window_height--; else tty->window_posy--; break; // up
+        case 30: case 105: if (shift) tty->window_width--; else tty->window_posx--; break; // left
+        case 31: case 108: if (shift) tty->window_height++; else tty->window_posy++; break; // down
+        case 32: case 106: if (shift) tty->window_width++; else tty->window_posx++; break; // right
+        default: continue;
+      }
+      if (shift && tty->workspace < 0) tty->workspace = ~tty->workspace;
+      if (tty->window_height < 2) tty->window_height = 2;
+      if (tty->window_width < 2) tty->window_width = 2;
+      if (tty->window_posx < 0) tty->window_posx = 0;
+      if (tty->window_posy < 0) tty->window_posy = 0;
+      if (tty->window_height > text_height) tty->window_height = text_height;
+      if (tty->window_width > text_width) tty->window_width = text_width;
+      if (tty->window_posx + tty->window_width > text_width) tty->window_posx = text_width - tty->window_width;
+      if (tty->window_posy + tty->window_height > text_height) tty->window_posy = text_height - tty->window_height;
+      resize_tty(active_tty);
+      continue;
+    }
     int c = 0;
     if (ev->code <= 53) {
       c = (shift ? with_shift : without_shift)[ev->code];
@@ -102,7 +132,6 @@ int parse_input_events(int fd, char* buf, int max_size) {
         // f1-f10  59-68
         // f11   87
         // f12   88
-        // win   125
         // menu  127
         default: printf("[textwm] keypress %d\n", ev->code);
       }

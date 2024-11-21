@@ -9,10 +9,9 @@ export LC_ALL=C.UTF-8
 export GROFF_TYPESETTER=ascii
 
 /usr/bin/textwm &
-sleep 0.5
-cat /etc/textwm.cfg > /dev/textwmcfg
+sleep 1
 
-setsid sh -c 'exec sh </dev/ttyp0 >/dev/ttyp0 2>&1' &
-setsid sh -c 'exec sh </dev/ttyp1 >/dev/ttyp1 2>&1' &
+twmrun 1 sh
+twmrun 2 sh
 
 sh

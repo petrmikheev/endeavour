@@ -64,5 +64,5 @@ cp terminus-font-4.49.1/ter-u{12,14,16}*.bdf rootfs/usr/share/fonts
 mkdir -p rootfs/usr/lib/locale
 cp -r /usr/lib/locale/C.UTF-8 rootfs/usr/lib/locale/
 
-cp -r $SCRIPT_DIR/../software/textwm/textwm rootfs/usr/bin/
+cp -r $SCRIPT_DIR/../software/textwm/{textwm,tmwrun} rootfs/usr/bin/
 cp -r $SCRIPT_DIR/../software/textwm/textwm.cfg rootfs/etc/

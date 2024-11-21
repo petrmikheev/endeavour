@@ -31,6 +31,7 @@ software/bios/ter*
 software/bootloader/*.packed
 software/bootloader/endeavour.dtb
 software/textwm/textwm
+software/linux/initrd.img
 software/*/build
 software/build
 README.html

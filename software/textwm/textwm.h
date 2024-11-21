@@ -6,6 +6,7 @@
 #define true 1
 
 void update_taddr(int tty_id);
+void resize_tty(int tty_id);
 
 extern char* display_data;
 extern int text_width, text_height;

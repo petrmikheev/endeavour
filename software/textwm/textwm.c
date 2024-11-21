@@ -17,7 +17,6 @@
 #include "tty.h"
 #include "input.h"
 
-int cfg_fd;
 int display_fd;
 char* display_data;
 
@@ -37,7 +36,8 @@ int winstyle = 0;
 #define IOCTL_SET_CHARMAP 0xaa6
 #define IOCTL_DISABLE_SBI_CONSOLE 0xaa7
 
-#define VIDEO_640x480     1
+#define VIDEO_640x480     0
+#define VIDEO_800x600     1
 #define VIDEO_1024x768    2
 #define VIDEO_1280x720    3
 #define VIDEO_TEXT_ON     4
@@ -53,16 +53,19 @@ bool read_display_cfg() {
   if (dcfg == display_cfg) return false;
   display_cfg = dcfg;
   switch (dcfg & 3) {
-    case 0:
-    case 1:
+    case VIDEO_640x480:
       display_width = 640;
       display_height = 480;
       break;
-    case 2:
+    case VIDEO_800x600:
+      display_width = 800;
+      display_height = 600;
+      break;
+    case VIDEO_1024x768:
       display_width = 1024;
       display_height = 768;
       break;
-    case 3:
+    case VIDEO_1280x720:
       display_width = 1280;
       display_height = 720;
       break;
@@ -71,8 +74,8 @@ bool read_display_cfg() {
   font_width = ((dcfg >> 8) & 7) + 1;
   if (font_height < 6) font_height = 6;
   if (font_width < 6) font_width = 6;
-  text_width = (display_width + font_width - 1) / font_width;
-  text_height = (display_height + font_height - 1) / font_height;
+  text_width = display_width / font_width;
+  text_height = display_height / font_height;
   return true;
 }
 
@@ -89,18 +92,19 @@ void init_ttys() {
     tty->fd = open(path, O_RDWR);
     ioctl(tty->fd, TIOCSWINSZ, &ws);
     tty->frame = display_data + (i << 16);
-    tty->width = text_width;
-    tty->height = text_height;
+    tty->width = tty->window_width = text_width;
+    tty->height = tty->window_height = text_height;
     tty->state = 0;
     if (i == 0) {
       int v;
       ioctl(display_fd, IOCTL_GET_TEXT_ADDR, &v);
       tty->frame_start = v & 0xffff;
-      tty->cursor = (tty->frame_start + (tty->height << 9) - 512) & 0xffff;
+      tty->line = tty->height - 1;
     } else {
-      tty->frame_start = tty->cursor = 0;
+      tty->frame_start = 0;
+      tty->line = 0;
     }
-    tty->frame_end = (tty->frame_start + (tty->height << 9)) & 0xffff;
+    tty->column = 0;
     tty->window_posx = tty->window_posy = 0;
     tty->workspace = -1;
     tty->style = 0x7;
@@ -112,25 +116,6 @@ void init_ttys() {
     pfds[i + 2].fd = tty->fd;
     pfds[i + 2].events = POLLIN;
   }
-}
-
-char swap_fg_bg(char style) {
-  int bg = 8 | (style & 7);
-  int fg = (style & 0x80) ? ((style >> 4) & 7) : 0;
-  return (style & 8) | fg | (bg << 4);
-}
-
-void hide_cursor(struct TTY *tty) {
-  if (!tty->cursor_visible) return;
-  tty->frame[tty->cursor + 1] = tty->style_at_cursor;
-  tty->cursor_visible = false;
-}
-
-void show_cursor(struct TTY *tty) {
-  if (tty->cursor_visible) return;
-  tty->style_at_cursor = tty->frame[tty->cursor + 1];
-  tty->frame[tty->cursor + 1] = swap_fg_bg(tty->style_at_cursor);
-  tty->cursor_visible = true;
 }
 
 void set_charmap(unsigned i, unsigned value) {
@@ -177,32 +162,27 @@ void update_taddr(int tty_id) {
 
 void resize_tty(int tty_id) {
   struct TTY *tty = &ttys[tty_id];
-  int prev_height = ((tty->frame_end - tty->frame_start) & 0xffff) >> 9;
-  int new_height = tty->workspace < 0 ? text_height : tty->height;
-  int cpos = ((tty->cursor - tty->frame_start) & 0xffff) >> 1;
-  int col = cpos & 0xff;
-  int line = cpos >> 8;
+  struct winsize new_size;
+  new_size.ws_row = tty->workspace < 0 ? text_height : tty->window_height;
+  new_size.ws_col = tty->workspace < 0 ? text_width : tty->window_width;
+  int prev_height = tty->height;
   int fill = 0x0f000f00;
-  if (line >= prev_height - 1 || line >= new_height - 1) {
-    line = new_height - 1;
-    tty->frame_start = (tty->frame_end - (new_height << 9)) & 0xffff;
-    for (int i = 0; i < new_height - prev_height; ++i) {
+  if (tty->line >= prev_height - 1 || tty->line >= new_size.ws_row - 1) {
+    tty->line = new_size.ws_row - 1;
+    tty->frame_start = (tty->frame_start + ((prev_height - new_size.ws_row) << 9)) & 0xffff;
+    for (int i = 0; i < new_size.ws_row - prev_height; ++i) {
       int* lp = (int*)(tty->frame + ((tty->frame_start + (i<<9)) & 0xffff));
       for (int j = 0; j < 128; ++j) lp[j] = fill;
     }
   } else {
-    tty->frame_end = (tty->frame_start + (new_height << 9)) & 0xffff;
-    for (int i = prev_height; i < new_height; ++i) {
+    for (int i = prev_height; i < new_size.ws_row + 1; ++i) {
       int* lp = (int*)(tty->frame + ((tty->frame_start + (i<<9)) & 0xffff));
       for (int j = 0; j < 128; ++j) lp[j] = fill;
     }
   }
-  struct winsize ws;
-  ws.ws_row = new_height;
-  ws.ws_col = tty->workspace < 0 ? text_width : tty->width;
-  if (col >= ws.ws_col) col = ws.ws_col - 1;
-  tty->cursor = (tty->frame_start + (line << 9) + (col << 1)) & 0xffff;
-  ioctl(tty->fd, TIOCSWINSZ, &ws);
+  tty->height = new_size.ws_row;
+  tty->width = new_size.ws_col;
+  ioctl(tty->fd, TIOCSWINSZ, &new_size);
   update_taddr(tty_id);
 }
 
@@ -267,10 +247,10 @@ void set_font(const char* arg, bool bold) {
 
 void set_resolution(int w, int h) {
   int mode;
-  if (w == 640 && h == 480) mode = 0;
-  else if (w == 800 && h == 600) mode = 1;
-  else if (w == 1024 && h == 768) mode = 2;
-  else if (w == 1280 && h == 720) mode = 3;
+  if (w == 640 && h == 480) mode = VIDEO_640x480;
+  else if (w == 800 && h == 600) mode = VIDEO_800x600;
+  else if (w == 1024 && h == 768) mode = VIDEO_1024x768;
+  else if (w == 1280 && h == 720) mode = VIDEO_1280x720;
   else {
     printf("[textwm] Invalid resolution %dx%d. Supported: 640x480 / 800x600 / 1024x768 / 1280x720\n", w, h);
     return;
@@ -329,8 +309,8 @@ void command(const char* cmd) {
     if (rcount == 6) {
       tty->window_posx = x;
       tty->window_posy = y;
-      tty->width = w;
-      tty->height = h;
+      tty->window_width = w;
+      tty->window_height = h;
     }
     resize_tty(i);
   } else if (strncmp(cmd, "winstyle ", 9) == 0) {
@@ -480,6 +460,12 @@ void initialize_timer(void) {
   timer_settime(timerId, 0, &its, NULL);
 }
 
+#define DEV_CFG "/dev/textwmcfg"
+#define DEV_INPUT "/dev/input/event0"
+
+static int open_cfg() { return open(DEV_CFG, O_RDONLY | O_NONBLOCK); }
+static int open_input() { return open(DEV_INPUT, O_RDONLY | O_NONBLOCK); }
+
 int main() {
   printf("textwm started\n");
   display_fd = open("/dev/display", O_RDWR);
@@ -491,11 +477,10 @@ int main() {
 
   const char* cfg_name = "/dev/textwmcfg";
   mkfifo(cfg_name, 0666);
-  cfg_fd = open(cfg_name, O_RDONLY | O_NONBLOCK);
 
-  pfds[0].fd = -1;
+  pfds[0].fd = open_input();
   pfds[0].events = POLLIN;
-  pfds[1].fd = cfg_fd;
+  pfds[1].fd = open_cfg();
   pfds[1].events = POLLIN;
 
   read_display_cfg();
@@ -504,18 +489,28 @@ int main() {
 
   initialize_timer();
 
+  FILE* init_cfg = fopen("/etc/textwm.cfg", "r");
+  if (init_cfg) {
+    int c;
+    while ((c = fgetc(init_cfg)) >= 0) cfg_handler(c);
+    fclose(init_cfg);
+  }
+
 #define BUF_SIZE 64
   static char buf[BUF_SIZE];
   int rsize;
   while (true) {
-    if (pfds[0].fd >= 0 && read(pfds[0].fd, buf, 0) < 0) {
-      close(pfds[0].fd);
-      pfds[0].fd = -1;
-    }
     if (pfds[0].fd < 0) {
-      pfds[0].fd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
+      pfds[0].fd = open_input();
+      if (pfds[0].fd >= 0) printf("[textwm] " DEV_INPUT " reopenned\n");
     }
-    poll(pfds, TTY_COUNT + 2, -1);
+    int poll_st = poll(pfds, TTY_COUNT + 2, -1);
+    if (poll_st < 0) {
+      if (errno != EINTR)
+        printf("[textwm] Error in poll: %d %d\n", poll_st, errno);
+      continue;
+    }
+    //printf("poll %x %x %x\n", pfds[0].revents, pfds[1].revents, pfds[2].revents);
     if (pfds[0].revents & POLLIN) {
       while (true) {
         rsize = parse_input_events(pfds[0].fd, buf, BUF_SIZE);
@@ -531,9 +526,17 @@ int main() {
       }
       blink_counter = 0;
     }
+    if (pfds[0].revents & (POLLHUP|POLLERR)) {
+      close(pfds[0].fd);
+      pfds[0].fd = -1;
+    }
     if (pfds[1].revents & POLLIN) {
       rsize = read(pfds[1].fd, buf, BUF_SIZE);
       for (int j = 0; j < rsize; ++j) cfg_handler(buf[j]);
+    }
+    if (pfds[1].revents & POLLHUP) {
+      close(pfds[1].fd);
+      pfds[1].fd = open_cfg();
     }
     for (int i = 0; i < TTY_COUNT; ++i) {
       if (pfds[i + 2].revents & POLLIN) {

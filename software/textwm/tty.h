@@ -9,20 +9,20 @@
 struct TTY {
   int fd;
   char* frame;
-  int frame_start, frame_end;
-  int cursor;
+  int frame_start;
+  int line, column;
   int width, height;
-  int window_posx, window_posy;
+  int window_posx, window_posy, window_width, window_height;
   int workspace;
+  unsigned ucode, ucount;
+  int csi_len;
+  char csi[CSI_MAX_LEN];
   char style;
   char style_at_cursor;
   char state;
   bool cursor_visible;
   bool cursor_blink;
   bool bold;
-  unsigned ucode, ucount;
-  char csi[CSI_MAX_LEN];
-  int csi_len;
   //char in_fifo[IN_FIFO_SIZE];
   //int in_start, in_end;
 };
@@ -33,7 +33,9 @@ extern struct TTY ttys[TTY_COUNT];
 extern int active_tty;
 
 void tty_handler(int tty_id, char c);
-
 void tty_set_active(int tty_id);
+
+void hide_cursor(struct TTY *tty);
+void show_cursor(struct TTY *tty);
 
 #endif // TEXTWM_TTY

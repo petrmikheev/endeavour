@@ -8,13 +8,35 @@
 
 struct TTY ttys[TTY_COUNT];
 
+static char* tty_cursor_ptr(struct TTY* tty) {
+  return tty->frame + ((tty->frame_start + (tty->line << 9) | (tty->column << 1)) & 0xffff);
+}
+
+static void maybe_scroll(struct TTY *tty) {
+  if (tty->column >= tty->width) {
+    tty->column -= tty->width;
+    tty->line++;
+  }
+  while (tty->line >= tty->height) {
+    tty->line--;
+    int v = ((int)(tty->style|8) << 8) | ((int)(tty->style|8) << 24);
+    int* line = (int*)(tty->frame + ((tty->frame_start + (tty->height<<9)) & 0xffff));
+    for (int i = 0; i < 128; ++i) line[i] = v;
+    line = (int*)(tty->frame + ((tty->frame_start + (tty->height<<9) + 512) & 0xffff));
+    tty->frame_start = (tty->frame_start + 512) & 0xffff;
+    for (int i = 0; i < 128; ++i) line[i] = v;
+    update_taddr(tty - ttys);
+  }
+}
+
 static void tty_print(struct TTY *tty, unsigned ucode) {
-  char* cursor = tty->frame + tty->cursor;
+  maybe_scroll(tty);
+  char* cursor = tty_cursor_ptr(tty);
   int c = from_utf(ucode, tty->bold);
   if (c < 0) c = '?';
   cursor[0] = c & 0xff;
   cursor[1] = tty->style | (8 & ~(c >> 5));
-  tty->cursor += 2;
+  tty->column += 1;
 }
 
 static void tty_sgr(struct TTY *tty) {
@@ -43,7 +65,7 @@ static void tty_csi(int tty_id) {
   struct TTY *tty = &ttys[tty_id];
   tty->csi[tty->csi_len] = 0;
   if (tty->csi_len == 0) goto err;
-  //printf("[textwm] CSI: %s\n", tty->csi);
+  //printf("[textwm] %d:%d CSI: %s\n", tty->line, tty->column, tty->csi);
   if (strcmp(tty->csi, "?1049h") == 0) {
     tty->frame = display_data + ((tty_id + TTY_COUNT) << 16);
     update_taddr(tty_id);
@@ -54,57 +76,57 @@ static void tty_csi(int tty_id) {
     update_taddr(tty_id);
     return;
   }
-  int cpos = ((tty->cursor - tty->frame_start) & 0xffff) >> 1;
-  int col = cpos & 0xff;
-  int line = cpos >> 8;
+  if (tty->column >= tty->width) {
+    tty->column -= tty->width;
+    tty->line++;
+  }
   int n = 1, m = 1;
   switch (tty->csi[tty->csi_len - 1]) {
     case 'F':
-      col = 0;
+      tty->column = 0;
     case 'A':
       sscanf(tty->csi, "%d", &n);
-      line -= n;
+      tty->line -= n;
       break;
     case 'E':
-      col = 0;
+      tty->column = 0;
     case 'B':
       sscanf(tty->csi, "%d", &n);
-      line += n;
+      tty->line += n;
       break;
     case 'b': {
       sscanf(tty->csi, "%d", &n);
       m = (unsigned)(tty->style | 8) << 8;
-      int to = (tty->cursor + (n<<1)) & 0xffff;
-      for (int i = tty->cursor; i != to; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
-      col += n;
+      int cpos = (tty->frame_start + (tty->line << 9) | (tty->column << 1)) & 0xffff;
+      int to = (cpos + (n<<1)) & 0xffff;
+      for (int i = cpos; i != to; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
+      tty->column += n;
       break;
     }
     case 'P': {
       sscanf(tty->csi, "%d", &n);
-      //m = (unsigned)(tty->style | 8) << 8;
-      int line_end = (tty->cursor + 512) & ~511;
+      char* cur = tty_cursor_ptr(tty);
+      char* line_end = (char*)((long)(cur + 512) & ~511);
       n <<= 1;
-      if (tty->cursor + n > line_end) n = line_end - tty->cursor;
-      for (int i = tty->cursor; i < line_end - n; ++i) tty->frame[i] = tty->frame[i + n];
-      //int to = (tty->cursor + (n<<1)) & 0xffff;
-      //for (int i = tty->cursor; i != to; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
+      if (cur + n > line_end) n = line_end - cur;
+      for (char* p = cur; p < line_end - n; ++p) *p = p[n];
       break;
     }
     case 'C':
       sscanf(tty->csi, "%d", &n);
-      col += n;
+      tty->column += n;
       break;
     case 'D':
       sscanf(tty->csi, "%d", &n);
-      col -= n;
+      tty->column -= n;
       break;
     case 'G':
       sscanf(tty->csi, "%d", &n);
-      col = n - 1;
+      tty->column = n - 1;
       break;
     case 'd':
       sscanf(tty->csi, "%d", &n);
-      line = n - 1;
+      tty->line = n - 1;
       break;
     case 'f':
     case 'H':
@@ -112,8 +134,8 @@ static void tty_csi(int tty_id) {
         sscanf(tty->csi, "%d", &m);
       else
         sscanf(tty->csi, "%d;%d", &n, &m);
-      line = n - 1;
-      col = m - 1;
+      tty->line = n - 1;
+      tty->column = m - 1;
       break;
     case 'm':
       tty_sgr(tty);
@@ -122,25 +144,28 @@ static void tty_csi(int tty_id) {
       n = 0;
       sscanf(tty->csi, "%d", &n);
       m = (unsigned)(tty->style | 8) << 8;
+      int cpos = (tty->frame_start + (tty->line << 9) | (tty->column << 1)) & 0xffff;
+      int frame_end = (tty->frame_start + (tty->height << 9)) & 0xffff;
       if (n == 0) {
-        for (int i = tty->cursor; i != tty->frame_end; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
+        for (int i = cpos; i != frame_end; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
       } else if (n == 1) {
-        for (int i = tty->frame_start; i != tty->cursor; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
+        for (int i = tty->frame_start; i != cpos; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
       } else if (n == 2) {
-        for (int i = tty->frame_start; i != tty->frame_end; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
+        for (int i = tty->frame_start; i != frame_end; i = (i + 2) & 0xffff) *(short*)(tty->frame + i) = m;
       }
       break;
     case 'K': {
       n = 0;
       sscanf(tty->csi, "%d", &n);
-      int from = tty->cursor, to = tty->cursor;
+      int cpos = (tty->frame_start + (tty->line << 9) | (tty->column << 1)) & 0xffff;
+      int from = cpos, to = cpos;
       if (n == 0) {
-        to = (tty->cursor + 0x200) & ~0x1ff;
+        to = (cpos + 0x200) & ~0x1ff;
       } else if (n == 1) {
-        from = tty->cursor & ~0x1ff;
+        from = cpos & ~0x1ff;
       } else if (n == 2) {
-        from = tty->cursor & ~0x1ff;
-        to = (tty->cursor + 0x200) & ~0x1ff;
+        from = cpos & ~0x1ff;
+        to = (cpos + 0x200) & ~0x1ff;
       }
       unsigned v = (unsigned)(tty->style | 8) << 8;
       for (char* p = tty->frame + from; p != tty->frame + to; p += 2) *(short*)p = v;
@@ -150,25 +175,23 @@ static void tty_csi(int tty_id) {
       sscanf(tty->csi, "%d", &n);
       n = n << 9;
       tty->frame_start = (tty->frame_start - n) & 0xffff;
-      tty->frame_end = (tty->frame_end - n) & 0xffff;
       update_taddr(tty_id);
       break;
     case 'T':
       sscanf(tty->csi, "%d", &n);
       n = n << 9;
       tty->frame_start = (tty->frame_start + n) & 0xffff;
-      tty->frame_end = (tty->frame_end + n) & 0xffff;
       update_taddr(tty_id);
       break;
     default: goto err;
   }
-  if (line < 0) line = 0;
-  if (col < 0) col = 0;
-  int rh = tty->workspace < 0 ? text_height : tty->height;
-  int rw = tty->workspace < 0 ? text_width : tty->width;
-  if (line >= rh) line = rh - 1;
-  if (col >= rw) col = rw - 1;
-  tty->cursor = (tty->frame_start + (line << 9) | (col << 1)) & 0xffff;
+  if (tty->line < 0) tty->line = 0;
+  if (tty->column < 0) tty->column = 0;
+  while (tty->column >= tty->width) {
+    tty->column -= tty->width;
+    tty->line++;
+  }
+  if (tty->line >= tty->height) tty->line = tty->height - 1;
   return;
 err:
   printf("[textwm] Can't process CSI: %s\n", tty->csi);
@@ -177,7 +200,43 @@ err:
 void tty_handler(int tty_id, char c) {
   struct TTY *tty = &ttys[tty_id];
   //printf("TTY%d %d frame_start=%d cursor=%d frame_end=%d\n", tty_id, c, tty->frame_start, tty->cursor, tty->frame_end);
-  if (tty->state == 'e') {
+  if (tty->state == 0) {
+    switch (c) {
+      case 7: break; // beep
+      case 0xc: tty->line = tty->column = 0; break;
+      case 0x1b: tty->state = 'e'; break; // start escape
+      case '\r': tty->column = 0; break;
+      case '\n':
+        tty->line++;
+        maybe_scroll(tty);
+        break;
+      case '\t': tty->column = (tty->column + 7) & ~7; break;
+      case '\b':
+        if (tty->column > 0) {
+          tty->column--;
+        } else if (tty->line > 0) {
+          tty->line--;
+          tty->column = tty->width - 1;
+        }
+        break;
+      default:
+        if (c & 128) {
+          tty->state = 'u'; // utf8
+          if ((c & 32) == 0) {
+            tty->ucount = 2;
+            tty->ucode = c & 31;
+          } else if ((c & 16) == 0) {
+            tty->ucount = 3;
+            tty->ucode = c & 15;
+          } else {
+            tty->ucount = 4;
+            tty->ucode = c & 7;
+          }
+        } else {
+          tty_print(tty, c);
+        }
+    }
+  } else if (tty->state == 'e') {
     tty->csi_len = 0;
     switch (c) {
       case '[':
@@ -210,58 +269,7 @@ void tty_handler(int tty_id, char c) {
       tty_csi(tty_id);
     }
   } else {
-    switch (c) {
-      case 7: break; // beep
-      case 0xc: tty->cursor = tty->frame_start; break;
-      case 0x1b: tty->state = 'e'; break; // start escape
-      case '\r': {
-        //char* to = tty->frame + tty->frame_start + ((tty->cursor + 511) & ~511);
-        //for (char* p = tty->frame + tty->frame_start + tty->cursor; p != to; p += 2) *(short*)p = (unsigned)tty->style << 8;
-        tty->cursor &= ~511;
-        break;
-      }
-      case '\n':
-        tty->cursor += 512;
-        break;
-      case '\t':
-        tty->cursor = (tty->cursor + 15) & ~15;
-        break;
-      case '\b':
-        if (tty->cursor & 511) {
-          tty->cursor -= 2;
-          //char* p = tty->frame + tty->cursor;
-          //p[0] = 0;
-          //p[1] = tty->style;
-        } else if (tty->cursor != tty->frame_start) {
-          tty->cursor = tty->cursor - 512 + ((tty->width - 1) << 1);
-        }
-        break;
-      default:
-        if (c & 128) {
-          tty->state = 'u'; // utf8
-          if ((c & 32) == 0) {
-            tty->ucount = 2;
-            tty->ucode = c & 31;
-          } else if ((c & 16) == 0) {
-            tty->ucount = 3;
-            tty->ucode = c & 15;
-          } else {
-            tty->ucount = 4;
-            tty->ucode = c & 7;
-          }
-        } else {
-          tty_print(tty, c);
-        }
-    }
-  }
-  tty->cursor &= 0xffff;
-  if ((tty->cursor & ~511) == tty->frame_end) {
-    int* line = (int*)(tty->frame + tty->cursor);
-    int v = ((int)(tty->style|8) << 8) | ((int)(tty->style|8) << 24);
-    for (int i = 0; i < 128; ++i) line[i] = v;
-    tty->frame_start = (tty->frame_start + 512) & 0xffff;
-    tty->frame_end = (tty->frame_end + 512) & 0xffff;
-    update_taddr(tty_id);
+    printf("[textwm] Invalid state %c\n", tty->state);
   }
 }
 
@@ -273,4 +281,24 @@ void tty_set_active(int tty_id) {
     active_tty = tty_id;
     update_taddr(active_tty);
   }
+}
+
+static char swap_fg_bg(char style) {
+  int bg = 8 | (style & 7);
+  int fg = (style & 0x80) ? ((style >> 4) & 7) : 0;
+  return (style & 8) | fg | (bg << 4);
+}
+
+void hide_cursor(struct TTY *tty) {
+  if (!tty->cursor_visible) return;
+  tty_cursor_ptr(tty)[1] = tty->style_at_cursor;
+  tty->cursor_visible = false;
+}
+
+void show_cursor(struct TTY *tty) {
+  if (tty->cursor_visible) return;
+  char* cursor = tty_cursor_ptr(tty);
+  tty->style_at_cursor = cursor[1];
+  cursor[1] = swap_fg_bg(tty->style_at_cursor);
+  tty->cursor_visible = true;
 }
