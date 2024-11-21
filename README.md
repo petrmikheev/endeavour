@@ -124,7 +124,7 @@ Used open source IP cores:
 - [VexiiRiscv](https://github.com/SpinalHDL/VexiiRiscv/) - RISC-V core written in SpinalHDL. Special thanks to Dolu1990, the author of SpinalHDL and VexiiRiscv, for patiently answering my questions.
 - A few components distributed with [SpinalHDL](https://github.com/SpinalHDL/SpinalHDL): Tilelink interconnect, APB3 and AXI4 bridges, USB OHCI controller, Plic Mapper.
 - [ZipCPU/sdspi SD-Card controller](https://github.com/ZipCPU/sdspi) with minor tweaks needed to use it with Intel/Altera FPGAs. In theory it requires 96-104 MHz base clock, but in my setup it couldn't work on such frequency, so I use it with 48 Mhz clock (same as for USB) and in software setup frequency with x2 coefficient. Data transfer speed is up to 24 MB/s.
-- DDR1 sdram controller in my SoC is based on [FPGA-DDR-SDRAM by WangXuan95](https://github.com/WangXuan95/FPGA-DDR-SDRAM). I switched it to DDIO IO primitives, added `wstrb` support, changed bus width to 64 bit, and optimized some parts for better fMax. On my FPGA board it works stable at frequency up to 100 MHz (i.e. upper bound for throughput is 400 MB/s). At higher frequency memtest sometimes fails.
+- DDR1 sdram controller in my SoC is based on [FPGA-DDR-SDRAM by WangXuan95](https://github.com/WangXuan95/FPGA-DDR-SDRAM). I switched it to DDIO IO primitives, added `wstrb` support, changed bus width to 64 bit, and optimized some parts for better fMax. On my FPGA board it works stable at frequency up to 90 MHz (i.e. upper bound for throughput is 360 MB/s). At higher frequency memtest sometimes fails.
 - Also in testbench I used [USB CDC Device](https://github.com/ultraembedded/core_usb_cdc) written by ultraembedded as a model of a connected USB device.
 
 Components designed from scratch:
@@ -137,7 +137,7 @@ Components designed from scratch:
 
 There are several clock domains in the design:
 
-- 100 Mhz and second 100 Mhz with 2.5ns delay - RAM
+- 90 Mhz and additional 90 Mhz with 2.7ns delay - RAM
 - 60 MHz - VexiiRiscv core, Tilelink hub, video DMA, USB OHCI
 - 48 MHz - UART controller, audio controller, sdcard controller, USB phy, timer
 - pixel clock (from 25.175 to 74.25 MHz depending on resolution)
