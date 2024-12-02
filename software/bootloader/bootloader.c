@@ -13,7 +13,7 @@ static bool wait_for_user_interrupt() {
     if (IO_PORT(BOARD_KEYS) || IO_PORT(UART_RX) >= 0) return 1;
     unsigned current;
     asm volatile("csrr %0, time" : "=r" (current));
-    if (current - start > 1000000) return 0;
+    if (current - start > 2000000) return 0;
   }
 }
 

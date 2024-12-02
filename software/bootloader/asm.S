@@ -2,6 +2,16 @@
 
 #define STACK_ADDR 0x40002400
 
+.section .text.bootsector
+    li a0, 0x40002400 # destination address
+    li a1, 2  # first sector
+    li a2, 12 # sector count (6KB)
+    jal 0x40000010 # bios_sdread
+    j _start
+
+.section .data.bootsign
+    .word 0x405a0000
+
 .section .text.startup
 .global _start
 _start:

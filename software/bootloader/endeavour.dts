@@ -11,8 +11,8 @@
     //bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi debug root=/dev/mmcblk0p1";
     bootargs = "console=ttyS0,sbi:115200e earlycon=endeavour_sbi root=/dev/mmcblk0p1";
     //bootargs = "console=ttyS0,sbi:115200e root=/dev/ram";
-    linux,initrd-start = <0x87000000>;
-    linux,initrd-end   = <0x87400000>;
+    //linux,initrd-start = <0x87000000>;
+    //linux,initrd-end   = <0x87400000>;
   };
 
   cpus {
@@ -84,12 +84,6 @@
     #address-cells = <1>;
     #size-cells = <1>;
     ranges;
-    /*ohci_dma: ohci_dma@41000 {
-      compatible = "shared-dma-pool";
-      reusable;
-      reg = <0x41000 0x1000>;
-      linux,cma-default;
-    };*/
     framebuffer@80000000 {
       no-map;
       reg = <0x80000000 0x400000>;
