@@ -5,6 +5,7 @@ module I2C (
   input       cmd_high_speed,
   input [6:0] cmd_addr,
   input       cmd_read,
+  input       read_nack,
   output reg  addr_err,
 
   input            data_valid,
@@ -28,7 +29,7 @@ module I2C (
 
   parameter CLK_FREQ = 48_000_000;
   localparam DIVISOR_400K = CLK_FREQ / (400_000 * 4) - 1;  // 29
-  localparam DIVISOR_HS = CLK_FREQ / (3_000_000 * 4) - 1;  // 2
+  localparam DIVISOR_HS = CLK_FREQ / (3_000_000 * 4) - 1;  // 3
 
   reg [5:0] clk_counter = 0;
   reg [1:0] q = 0;
@@ -60,17 +61,33 @@ module I2C (
         if (|bit_counter) begin
           bit_counter <= bit_counter - 1'b1;
           if (~cmd_read || state != DATA_TRANSFER) {sda, data} <= {data, 1'b1};
-          else if (bit_counter == 4'd1) sda <= 0;
+          else sda <= bit_counter == 4'd1 ? read_nack : 1'b1;
         end else sda <= 0;
-      end else if (q == 2'd2 && state == HALT) begin
-        if (~sda)
-          sda <= 1;
-        else if (cmd_active) begin
-          sda <= 0;
-          state <= cmd_high_speed ? SWITCH_TO_HS : SEND_ADDR;
-          data  <= cmd_high_speed ? 8'h08 : {cmd_addr, cmd_read};
-          bit_counter <= 4'd9;
-        end
+      end else if (q == 2'd2) begin
+        case (state)
+          HALT: begin
+            if (~sda)
+              sda <= 1;
+            else if (cmd_active) begin
+              sda <= 0;
+              state <= cmd_high_speed ? SWITCH_TO_HS : SEND_ADDR;
+              data  <= cmd_high_speed ? 8'h08 : {cmd_addr, cmd_read};
+              bit_counter <= 4'd9;
+            end
+          end
+          SWITCH_TO_HS:
+            if (bit_counter == 4'd0) sda <= 0;
+          SEND_ADDR:
+            if (bit_counter == 4'd0) addr_err <= sda_in;
+          DATA_TRANSFER: begin
+            if (cmd_read) data <= {data[6:0], sda_in};
+            if (bit_counter == 4'd0) begin
+              if (~data_ready) data_ready <= 1;
+              data_out <= data;
+              if (~cmd_read) data_err <= sda_in;
+            end
+          end
+        endcase
       end else if (q == 2'd3) begin
         case (state)
           SWITCH_TO_HS:
@@ -80,11 +97,8 @@ module I2C (
               bit_counter <= 4'd9;
               hs_state <= 1;
             end
-          SEND_ADDR:
-            if (bit_counter == 4'd0) begin
-              state <= DATA_IDLE;
-              addr_err <= sda_in;
-            end
+          SEND_ADDR, DATA_TRANSFER:
+            if (bit_counter == 4'd0) state <= DATA_IDLE;
           DATA_IDLE:
             if (halt_required) begin
               state <= HALT;
@@ -94,15 +108,81 @@ module I2C (
               data <= data_in;
               bit_counter <= 4'd9;
             end
-          DATA_TRANSFER: begin
-            if (cmd_read) data <= {data[6:0], sda_in};
-            if (bit_counter == 4'd0) begin
-              state <= DATA_IDLE;
-              if (~data_ready) data_ready <= 1;
-              data_out <= data;
-              if (~cmd_read) data_err <= sda_in;
-            end
-          end
+        endcase
+      end
+    end
+  end
+
+endmodule
+
+// Not used in the SoC. Was added for debugging only.
+module I2C_APB(
+  input clk,
+  input reset,
+
+  input       [3:0] apb_PADDR,
+  input             apb_PSEL,
+  input             apb_PENABLE,
+  output            apb_PREADY,
+  input             apb_PWRITE,
+  input      [31:0] apb_PWDATA,
+  output reg [31:0] apb_PRDATA,
+
+  output i2c_scl,
+  inout i2c_sda
+);
+
+  reg [6:0] cmd_addr;
+  reg cmd_active, cmd_high_speed, cmd_read, read_nack;
+  reg has_data;
+  wire addr_err, data_err, data_ready;
+  reg [7:0] data_in;
+  wire [7:0] data_out;
+
+  I2C i2c(
+    .clk(clk),
+
+    .cmd_active(cmd_active),
+    .cmd_high_speed(cmd_high_speed),
+    .cmd_addr(cmd_addr),
+    .cmd_read(cmd_read),
+    .addr_err(addr_err),
+    .read_nack(read_nack),
+
+    .data_valid(has_data ^ cmd_read),
+    .data_ready(data_ready),
+    .data_in(data_in),
+    .data_out(data_out),
+    .data_err(data_err),
+
+    .i2c_scl(i2c_scl),
+    .i2c_sda(i2c_sda)
+  );
+
+  assign apb_PREADY = 1'b1;
+
+  always @(posedge clk) begin
+    if (reset) begin
+      cmd_addr <= 7'd0;
+      {read_nack, cmd_active, cmd_high_speed, cmd_read} <= 3'd0;
+      has_data <= 0;
+    end else begin
+      if (cmd_read) begin
+        if (~has_data & data_ready & cmd_active) has_data <= 1;
+      end else begin
+        if (has_data & data_ready) has_data <= 0;
+      end
+      if (apb_PSEL & ~apb_PWRITE) begin
+        case (apb_PADDR)
+          4'd0: apb_PRDATA <= {25'd0, cmd_addr};
+          4'd4: apb_PRDATA <= {26'd0, has_data, addr_err, data_err, read_nack, cmd_active, cmd_high_speed, cmd_read};
+          4'd8: begin apb_PRDATA <= {24'd0, data_out}; if (has_data) has_data <= 0; end
+        endcase
+      end else if (apb_PSEL & apb_PENABLE & apb_PWRITE) begin
+        case (apb_PADDR)
+          4'd0: cmd_addr <= apb_PWDATA[6:0];
+          4'd4: begin {read_nack, cmd_active, cmd_high_speed, cmd_read} <= apb_PWDATA[3:0]; has_data <= 0; end
+          4'd8: if (~has_data & ~cmd_read) begin has_data <= 1'd1; data_in <= apb_PWDATA[7:0]; end
         endcase
       end
     end

@@ -27,12 +27,13 @@ module AudioController (
   reg [FIFO_BITS-1:0] ina, outa, remaining;
   reg sel_cfg, sel_stream;
   reg flush;
+  reg no_sleep = 0;
   reg volume_initialized = 0;
   reg volume_up;
   reg [3:0] volume_delay = 4'd0;
 
   assign apb_PREADY = volume_initialized;
-  assign apb_PRDATA = sel_cfg ? {12'b0, target_volume, divisor} : remaining;
+  assign apb_PRDATA = sel_cfg ? {state == STATE_HALT, 10'b0, no_sleep, target_volume, divisor} : remaining;
 
   localparam STATE_HALT = 5'd0;
   localparam STATE_IDLE = 5'd1;
@@ -56,7 +57,7 @@ module AudioController (
   reg [4:0] state = STATE_HALT;
   reg [23:0] value;
 
-  assign shdn = state == STATE_HALT;
+  assign shdn = (state == STATE_HALT) & ~no_sleep;
 
   wire i2c_data_valid = state > STATE_IDLE;
   wire i2c_data_ready;
@@ -90,6 +91,7 @@ module AudioController (
     .cmd_addr(I2C_ADDR),
     .cmd_read(1'b0),
     .cmd_active(state != STATE_HALT),
+    .read_nack(1'b0),
 
     .data_valid(i2c_data_valid),
     .data_ready(i2c_data_ready),
@@ -111,6 +113,7 @@ module AudioController (
       target_volume <= 4'd0;
       volume_delay <= 0;
       volume_initialized <= 0;
+      no_sleep = 0;
     end else begin
       remaining <= FIFO_BITS'(outa - ina - 1'b1);
       sel_cfg <= apb_PSEL & ~apb_PADDR[2];
@@ -118,6 +121,7 @@ module AudioController (
       if (apb_PENABLE & apb_PWRITE & sel_cfg & volume_initialized) begin
         divisor <= apb_PWDATA[15:0];
         target_volume <= apb_PWDATA[19:16];
+        no_sleep <= apb_PWDATA[20];
         flush <= apb_PWDATA[31];
       end else
         flush <= 0;
