@@ -1,3 +1,5 @@
+`ifndef MINIMAL
+
 module Ram_1wrs(
   input clk,
   input en,
@@ -68,3 +70,5 @@ OnChipRAM internal_ram(
 `endif
 
 endmodule
+
+`endif

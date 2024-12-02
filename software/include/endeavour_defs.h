@@ -75,7 +75,8 @@
 #define AUDIO_SAMPLE_RATE(X) (48000000 / (X) - 1)
 #define AUDIO_VOLUME(X) (((unsigned)(X)&15) << 16)
 #define AUDIO_MAX_VOLUME 15
-#define AUDIO_FLUSH 0x80000000
+#define AUDIO_NO_SLEEP 0x00100000
+#define AUDIO_EMPTY    0x80000000
 
 // VIDEO_CFG flags
 #define VIDEO_640x480     0
@@ -126,6 +127,6 @@
 #define bios_read_uart    ((int (*)(char*, int, int))                (BIOS_ROM_ADDR + 0x20))
 #define bios_crc32   ((unsigned (*)(const void*, int))               (BIOS_ROM_ADDR + 0x24))
 #define bios_uart_console ((void (*)())                              (BIOS_ROM_ADDR + 0x28))
+#define bios_beep    ((void (*)(int /*volume 0-256*/, int /*cnt*/))  (BIOS_ROM_ADDR + 0x2C))
 
 #endif  // ENDEAVOUR_DEFS_H
-

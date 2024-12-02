@@ -1,0 +1,11 @@
+
+
+/home/petya/endeavour/rtl/board_rev1/DDR_IO8.v
+
+Apr 15 10PM:08:29>: Megafunction GPIO Lite Intel FPGA IP v21.1 is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+/home/petya/endeavour/rtl/board_rev1/DDR_IO8.v
+
+Apr 15 10PM:08:41>: Megafunction GPIO Lite Intel FPGA IP v21.1 is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted

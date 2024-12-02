@@ -63,7 +63,7 @@ module BoardController(
   initial reset_cpu = 1'b1;
   initial reset_ram = 1'b1;
 
-  parameter RESET_DELAY = PERIPHERAL_FREQ / 2; // 500ms
+  parameter RESET_DELAY = PERIPHERAL_FREQ; // 1 second
 
   reg [$clog2(RESET_DELAY)-1:0] reset_counter = $clog2(RESET_DELAY)'(RESET_DELAY);
 
@@ -109,7 +109,7 @@ module BoardController(
   reg [17:0] ram_freq = RAM_FREQ / 1024;
 `else
   reg [17:0] cpu_freq, ram_freq, ram_freq_b;
-  FrequencyCounter cpu_freq_counter(.clk(clk_cpu), .utime(utime[9:0]), .freq_khz(cpu_freq));
+  FrequencyCounter cpu_freq_counter(.clk(plla_clk2), .utime(utime[9:0]), .freq_khz(cpu_freq));
   FrequencyCounter ram_freq_counter(.clk(clk_ram_bus), .utime(utime_value[9:0]), .freq_khz(ram_freq_b));
 
   always @(posedge clk_peripheral) ram_freq <= ram_freq_b;
@@ -119,7 +119,7 @@ module BoardController(
   parameter CPU_FREQ = 60_000_000;
   localparam CPU_PERIOD = 1_000_000_000.0 / CPU_FREQ;
 
-  parameter RAM_FREQ = 100_000_000;
+  parameter RAM_FREQ = 90_000_000;
   localparam RAM_PERIOD = 1_000_000_000.0 / RAM_FREQ;
 
   initial begin
@@ -168,6 +168,8 @@ module BoardController(
   assign clk_ram_bus = clk_cpu;
 `endif
 `ifdef ENDEAVOUR_BOARD_VER2
+
+`ifndef MINIMAL
   wire pll_areset;
   wire pll_configupdate;
   wire pll_scanclk;
@@ -243,11 +245,16 @@ module BoardController(
     .rden(vrom_en),
     .q(vrom_data)
   );
+`endif
 
   assign clk_peripheral = clk_in;
   assign clk_ram_bus = plla_clk0;
   assign clk_ram = plla_clk1;
+`ifndef MINIMAL
   assign clk_cpu = plla_clk2;
+`else
+  assign clk_cpu = clk_in;
+`endif
 `endif
 
   reg [2:0] leds_normalized;

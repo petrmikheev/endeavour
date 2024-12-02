@@ -1,0 +1,2 @@
+SDR_IO1_sim/SDR_IO1.v
+SDR_IO1_sim/altera_gpio_lite/altera_gpio_lite.sv

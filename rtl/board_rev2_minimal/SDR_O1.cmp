@@ -1,0 +1,8 @@
+	component SDR_O1 is
+		port (
+			outclock : in  std_logic                    := 'X';             -- export
+			din      : in  std_logic_vector(0 downto 0) := (others => 'X'); -- export
+			pad_out  : out std_logic_vector(0 downto 0)                     -- export
+		);
+	end component SDR_O1;
+

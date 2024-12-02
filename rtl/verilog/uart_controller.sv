@@ -101,6 +101,9 @@ module UartController (
         if (apb_PWRITE & apb_PENABLE) begin
           fifo_tx[tx_ina] <= apb_PWDATA[7:0];
           tx_ina <= tx_ina + 1'b1;
+`ifdef IVERILOG
+          $write("%c", apb_PWDATA[7:0]);
+`endif
         end
       end
 
@@ -147,9 +150,6 @@ module UartController (
           uart_tx <= 0;
           write_state <= divisor;
           write_bit_num <= 4'd9 + use_parity + cstopb;
-`ifdef IVERILOG
-  $write("%c", tx_outv);
-`endif
         end else uart_tx <= 1;
       end
 

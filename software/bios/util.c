@@ -1,5 +1,6 @@
 #include <endeavour_defs.h>
 
+#ifndef NO_DISPLAY
 static inline unsigned text_height(int video_mode) {
   switch (video_mode) {
     case VIDEO_640x480: return 30;
@@ -35,6 +36,7 @@ void init_text_mode() {
   IO_PORT(VIDEO_TEXT_OFFSET) = 0;
   IO_PORT(VIDEO_CFG) = video_mode | VIDEO_TEXT_ON | VIDEO_FONT_WIDTH(8) | VIDEO_FONT_HEIGHT(16);
 }
+#endif
 
 static void uart_putc(char c) {
   while (IO_PORT(UART_TX) < 0);
@@ -42,6 +44,7 @@ static void uart_putc(char c) {
 }
 
 void putc_impl(char c) {
+#ifndef NO_DISPLAY
   unsigned cursor_pos = BIOS_CURSOR_POS;
   char* cursor = (char*)(BIOS_TEXT_BUFFER_ADDR + cursor_pos);
   if (c == '\n') {
@@ -71,6 +74,7 @@ void putc_impl(char c) {
     for (int i = 0; i < 128; ++i) line[i] = (BIOS_DEFAULT_TEXT_STYLE << 8) | (BIOS_DEFAULT_TEXT_STYLE << 24);
   }
   BIOS_CURSOR_POS = cursor_pos;
+#endif
   uart_putc(c);
 }
 
@@ -183,6 +187,7 @@ void uart_flush() {
 
 static int uart_getc_with_blink() {
   int x;
+#ifndef NO_DISPLAY
   char* cursor = (char*)(BIOS_TEXT_BUFFER_ADDR + BIOS_CURSOR_POS);
   cursor[1] = BIOS_TEXT_STYLE;
   do {
@@ -192,6 +197,9 @@ static int uart_getc_with_blink() {
     x = IO_PORT(UART_RX);
   } while (x < 0);
   cursor[0] = 0;
+#else
+  do { x = IO_PORT(UART_RX); } while (x < 0);
+#endif
   if (x > 0xff) IO_PORT(BOARD_LEDS) |= 0x4;  // third LED means UART error
   return x;
 }
@@ -263,4 +271,16 @@ unsigned crc32_impl(const char* data, int size) {
     ncrc = (ncrc>>4) ^ table[(c^ncrc) & 0xf];
   }
   return ~ncrc;
+}
+
+static const unsigned short beep_data[8] = {0x800, 0xda8, 0xfff, 0xda8, 0x800, 0x257, 0x0, 0x257};
+
+void beep_impl(unsigned volume, int periods) {
+  for (int i = 0; i < periods; ++i) {
+    while (IO_PORT(AUDIO_STREAM) < 8);
+    for (int j = 0; j < 8; ++j) {
+      unsigned v = (((unsigned)beep_data[j] * volume) >> 8) & 0xfff;
+      IO_PORT(AUDIO_STREAM) = v | (v << 16);
+    }
+  }
 }

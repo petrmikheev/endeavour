@@ -1,5 +1,14 @@
 #include "../include/endeavour_defs.h"
 
+#ifdef NO_DISPLAY
+#define charmap 0
+#endif
+
+#ifdef NO_SDCARD
+#define sdread_impl start
+#define sdwrite_impl start
+#endif
+
 .section .text.startup
 .global _start
 _start:
@@ -23,9 +32,9 @@ _start:
 .align 2
     j crc32_impl   # bios_crc32
 .align 2
-to_console:        # bios_uart_console
-    jal uart_flush
-    j uart_console
+    j uart_console # bios_uart_console
+.align 2
+    j beep_impl    # bios_beep
 start:
     csrci mstatus, 8
     li sp, BIOS_STACK_ADDR
@@ -41,7 +50,8 @@ trap:
     mv a5, ra
     li sp, BIOS_STACK_ADDR
     jal printf_impl
-    j to_console
+    jal uart_flush
+    j uart_console
 
 .section .rodata
 

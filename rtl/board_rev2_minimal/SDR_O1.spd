@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="SDR_O1_sim/altera_gpio_lite/altera_gpio_lite.sv"
+   type="SYSTEM_VERILOG"
+   library="SDR_O1" />
+ <file path="SDR_O1_sim/SDR_O1.v" type="VERILOG" />
+ <topLevel name="SDR_O1" />
+ <deviceFamily name="max10" />
+</simPackage>
