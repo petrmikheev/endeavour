@@ -90,6 +90,21 @@ class VideoController extends BlackBox {
   mapClockDomain(clock=io.clk, reset=io.reset)
 }
 
+class I2C_APB extends BlackBox {
+  val io = new Bundle {
+    val clk = in Bool()
+    val reset = in Bool()
+    val i2c = I2C()
+    val apb = slave(Apb3(Apb3Config(
+      addressWidth  = 4,
+      dataWidth     = 32,
+      useSlaveError = false
+    )))
+  }
+  noIoPrefix()
+  mapClockDomain(clock=io.clk, reset=io.reset)
+}
+
 class UartController extends BlackBox {
   val io = new Bundle {
     val clk = in Bool()
