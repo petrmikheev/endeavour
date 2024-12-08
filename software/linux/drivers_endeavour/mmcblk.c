@@ -18,11 +18,12 @@ static unsigned mmc_rca;
 
 static unsigned* receive_sector(unsigned* ptr, unsigned port) {
   unsigned* end = ptr + 128;
+  const void __iomem * addr = mmc_membase + port;
   while (ptr < end) {
-    ptr[0] = ioread32(mmc_membase + port);
-    ptr[1] = ioread32(mmc_membase + port);
-    ptr[2] = ioread32(mmc_membase + port);
-    ptr[3] = ioread32(mmc_membase + port);
+    ptr[0] = ioread32(addr);
+    ptr[1] = ioread32(addr);
+    ptr[2] = ioread32(addr);
+    ptr[3] = ioread32(addr);
     ptr += 4;
   }
   return ptr;
@@ -30,11 +31,12 @@ static unsigned* receive_sector(unsigned* ptr, unsigned port) {
 
 static const unsigned* send_sector(const unsigned* ptr, unsigned port) {
   const unsigned* end = ptr + 128;
+  void __iomem * addr = mmc_membase + port;
   while (ptr < end) {
-    iowrite32(ptr[0], mmc_membase + port);
-    iowrite32(ptr[1], mmc_membase + port);
-    iowrite32(ptr[2], mmc_membase + port);
-    iowrite32(ptr[3], mmc_membase + port);
+    iowrite32(ptr[0], addr);
+    iowrite32(ptr[1], addr);
+    iowrite32(ptr[2], addr);
+    iowrite32(ptr[3], addr);
     ptr += 4;
   }
   return ptr;
@@ -71,7 +73,6 @@ static unsigned sdread_impl(unsigned* dst, unsigned sector, unsigned sector_coun
   if (sector_count == 0) return 0;
   command(SDIO_CMD | SDIO_R1 | SDIO_MEM | 17, sector);
   unsigned fifo = SDIO_FIFO;
-  unsigned cmd;
   for (unsigned b = 0; b < sector_count - 1; ++b) {
     if (ioread32(mmc_membase + SDCARD_CMD) & SDIO_ERR) {
       return b;
@@ -79,7 +80,7 @@ static unsigned sdread_impl(unsigned* dst, unsigned sector, unsigned sector_coun
     iowrite32(++sector, mmc_membase + SDCARD_DATA);
     iowrite32((SDIO_CMD | SDIO_R1 | SDIO_MEM | 17) | fifo, mmc_membase + SDCARD_CMD);
     dst = receive_sector(dst, fifo ? SDCARD_FIFO0_LE : SDCARD_FIFO1_LE);
-    while ((cmd=ioread32(mmc_membase + SDCARD_CMD)) & SDIO_BUSY);
+    while (ioread32(mmc_membase + SDCARD_CMD) & SDIO_BUSY);
     fifo ^= SDIO_FIFO;
   }
   if (ioread32(mmc_membase + SDCARD_CMD) & SDIO_ERR) return sector_count - 1;
