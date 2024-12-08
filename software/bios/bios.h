@@ -12,4 +12,7 @@ unsigned init_sdcard();
 void uart_console();
 extern const char* console_help_msg;
 
+// main.c
+int memtest();
+
 #endif // BIOS_H

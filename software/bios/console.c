@@ -10,6 +10,7 @@ const char* console_help_msg =
       "\tUART addr size\t\t- receive size(decimal) bytes via UART\n"
       "\tFUART addr size\t   - UART with baud rate 12Mhz\n"
       "\tCRC32 addr size [expected] - calculate crc of data in RAM\n"
+      "\tMEMTEST\t\t\t   - rerun memtest\n"
       "\tJ addr\t\t\t\t- run code at addr\n\n";
 
 void uart_console() {
@@ -67,6 +68,9 @@ void uart_console() {
           continue;
         }
         break;
+      case 'M':
+        memtest();
+        continue;
       case 'J':
         if (bios_sscanf(cmd, "J %x", &addr) == 1) {
           asm volatile("fence.i");
@@ -75,6 +79,9 @@ void uart_console() {
           continue;
         }
         break;
+      case 'h':
+      case 'H':
+        bios_printf(console_help_msg);
       case '\n': continue;
     }
     bios_printf("Invalid command\n");

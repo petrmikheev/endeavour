@@ -34,20 +34,30 @@ int memtest() {
     }
     bios_putc('.');
   }
-  int ok = 1;
+  int check_count = 0;
+  int err_count = 0;
   i = 8192, j = 8192;
   for (int b = 0; b < 4; ++b, j -= batch_size) {
     const int step = base_step + (b & 1);
-    for (; j < batch_size; j += step, i += step) {
+    for (; j < batch_size; j += step, i += step, check_count++) {
       char* ptr = ram + (i << 2);
       unsigned expected = (i | (i << 25)) ^ 0xff00;
-      ok = ok && (*(ptr + 3) == (expected >> 24));  // test 1 byte read
-      ok = ok && (*(int*)ptr == expected);  // test 4 byte read
+      unsigned actual = *(unsigned*)ptr;
+      if (*(ptr + 3) != (expected >> 24)  // test 1 byte read
+          || actual != expected) {    // test 4 byte read
+        if (++err_count <= 8) {
+          bios_printf("\n\tmem[%8x] = %8x, expected %8x", i << 2, actual, expected);
+        }
+      }
     }
     bios_putc('.');
   }
-  bios_printf(ok ? " OK\n" : " FAILED\n");
-  return ok;
+  if (err_count) {
+    bios_printf("\nFAILED %u/%u errors\n", err_count, check_count);
+  } else {
+    bios_printf(" OK\n");
+  }
+  return err_count == 0;
 }
 
 int main() {

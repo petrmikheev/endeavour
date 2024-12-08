@@ -2,6 +2,8 @@
 
 #include "bios.h"
 
+int memtest() { return 1; }
+
 int main() {
   int sim = (IO_PORT(BOARD_KEYS) & 2);
   IO_PORT(BOARD_LEDS) = 0x1;  // first LED on, means that bios has started

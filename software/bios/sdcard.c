@@ -165,7 +165,6 @@ unsigned sdread_impl(unsigned* dst, unsigned sector, unsigned sector_count) {
   if (sector_count == 0) return 0;
   command(SDIO_CMD | SDIO_R1 | SDIO_MEM | 17, sector);
   unsigned fifo = SDIO_FIFO;
-  unsigned cmd;
   for (unsigned b = 0; b < sector_count - 1; ++b) {
     if (IO_PORT(SDCARD_CMD) & SDIO_ERR) {
       return b;
@@ -173,7 +172,7 @@ unsigned sdread_impl(unsigned* dst, unsigned sector, unsigned sector_count) {
     IO_PORT(SDCARD_DATA) = ++sector;
     IO_PORT(SDCARD_CMD) = (SDIO_CMD | SDIO_R1 | SDIO_MEM | 17) | fifo;
     dst = receive_sector(dst, fifo ? SDCARD_FIFO0_LE : SDCARD_FIFO1_LE);
-    while ((cmd=IO_PORT(SDCARD_CMD)) & SDIO_BUSY);
+    while (IO_PORT(SDCARD_CMD) & SDIO_BUSY);
     fifo ^= SDIO_FIFO;
   }
   if (IO_PORT(SDCARD_CMD) & SDIO_ERR) return sector_count - 1;
