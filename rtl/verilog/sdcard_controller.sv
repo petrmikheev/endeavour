@@ -13,11 +13,11 @@ module SdcardController (
   input         apb_PWRITE,
   input  [31:0] apb_PWDATA,
   output [31:0] apb_PRDATA,
+  output        apb_PSLVERROR,
 
   output        interrupt
 );
 
-  wire stall;
   reg stb_done = 0;
   wire stb = apb_PENABLE & apb_PSEL & ~stb_done;
   always @(posedge clk) begin
@@ -57,7 +57,7 @@ module SdcardController (
     .i_wb_data(inverse ? {apb_PWDATA[7:0], apb_PWDATA[15:8], apb_PWDATA[23:16], apb_PWDATA[31:24]} : apb_PWDATA),
     .o_wb_data(rdata_be),
     .o_wb_ack(apb_PREADY),
-    .o_wb_stall(stall),
+    .o_wb_stall(apb_PSLVERROR),
     .i_wb_we(apb_PWRITE),
     .i_wb_cyc(apb_PENABLE & apb_PSEL),
     .i_wb_stb(stb),
