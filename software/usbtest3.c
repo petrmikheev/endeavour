@@ -1,18 +1,10 @@
 #include <endeavour_defs.h>
 
-void wait(int microseconds) {
-  unsigned time, start_time;
-  asm volatile("csrr %0, time" : "=r" (start_time));
-  do {
-    asm volatile("csrr %0, time" : "=r" (time));
-  } while (time - start_time < microseconds);
-}
-
 static void* next_alloc = (void*)0x80500000;
 
 void* malloc(unsigned long size) {
   void* res = next_alloc;
-  next_alloc += size;
+  next_alloc += (size + 3) & ~3;
   return res;
 }
 
@@ -59,7 +51,7 @@ struct ED {
 };
 
 struct HCCA {
-  struct ED *interrupt_table[32];
+  unsigned interrupt_table[32];
   short frame_number;
   short pad1;
   int done_head;
@@ -73,50 +65,101 @@ struct UsbRequest {
   uint16_t wLength;
 };
 
+#pragma pack(1)
 struct UsbDeviceDescriptor {
-    uint8_t bLength;
-    uint8_t bDescriptorType;
-    uint16_t bcdUSB;
-    uint8_t bDeviceClass;
-    uint8_t bDeviceSubClass;
-    uint8_t bDeviceProtocol;
-    uint8_t bMaxPacketSize0;
-    uint16_t idVendor;
-    uint16_t idProduct;
-    uint16_t bcdDevice;
-    uint8_t iManufacturer;
-    uint8_t iProduct;
-    uint8_t iSerialNumber;
-    uint8_t bNumConfigurations;
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  uint16_t bcdUSB;
+  uint8_t bDeviceClass;
+  uint8_t bDeviceSubClass;
+  uint8_t bDeviceProtocol;
+  uint8_t bMaxPacketSize0;
+  uint16_t idVendor;
+  uint16_t idProduct;
+  uint16_t bcdDevice;
+  uint8_t iManufacturer;
+  uint8_t iProduct;
+  uint8_t iSerialNumber;
+  uint8_t bNumConfigurations;
 };
+
+struct UsbConfigurationDescriptor {
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  uint16_t wTotalLength;
+  uint8_t bNumInterfaces;
+  uint8_t bConfigurationValue;
+  uint8_t iConfiguration;
+  uint8_t bmAttributes;
+  uint8_t bMaxPower;
+};
+
+struct UsbInterfaceDescriptor {
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  uint8_t bInterfaceNumber;
+  uint8_t bAlternateSetting;
+  uint8_t bNumEndpoints;
+  uint8_t bInterfaceClass;
+  uint8_t bInterfaceSubClass;
+  uint8_t bInterfaceProtocol;
+  uint8_t iInterface;
+};
+
+struct UsbEndpointDescriptor {
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  uint8_t bEndpointAddress;
+  uint8_t bmAttributes;
+  uint16_t wMaxPacketSize;
+  uint8_t bInterval;
+};
+#pragma pack()
 
 volatile static struct OHCICtrl* ctrl = (void*)USB_OHCI_BASE;
 volatile static struct HCCA* hcca;
-volatile static struct ED* default_ed;
+volatile static struct ED *default_ed, *end_ed;
 volatile static struct TD* default_tds;
 
+void wait(int microseconds) {
+  unsigned time, start_time;
+  asm volatile("csrr %0, time" : "=r" (start_time));
+  do {
+    ctrl->HcInterruptStatus = -1;
+    asm volatile("csrr %0, time" : "=r" (time));
+  } while (time - start_time < microseconds);
+}
+
 void init_hub() {
-  ctrl->HcControl = 0x0;  // reset hub
+  ctrl->HcControl = 0x0;  // reset hub 50 ms
+  wait(50000);
 
-  ctrl->HcFmInterval = (1<<31 /*FIT=1*/) | (0x2000 << 16 /*FSLargestDataPackage=1KB*/) | (0x2edf /*FrameInterval for 1ms frame*/);
-  ctrl->HcPeriodicStart = 0x2a2f; // 90% of FrameInterval
-  ctrl->HcInterruptEnable = 0x80000000; // disable all
-
+  const unsigned frame_interval = 11999; // 1ms frame
+  ctrl->HcFmInterval = (1<<31 /*FIT=1*/) | (10000 << 16 /*FSLargestDataPackage*/) | frame_interval;
+  //ctrl->HcFmInterval = (1<<31 /*FIT=1*/) | (((frame_interval-210)*6/7) << 16 /*FSLargestDataPackage*/) | frame_interval;
+  ctrl->HcPeriodicStart = 10799; // 90% of FrameInterval
+  ctrl->HcInterruptDisable = -1; // disable all
+bios_printf("C\n");
   hcca = malloc(256);
-  for (int i = 0; i < 32; ++i) hcca->interrupt_table[i] = 0;
-  ctrl->HcHCCA = (long)hcca;
 
   default_ed = malloc(16);
-  default_tds = malloc(16 * 3);
+  end_ed = malloc(16);
+  default_tds = malloc(16 * 4);
+
+  end_ed->flags = 1 << 14;
+  end_ed->nextED = 0;
+  end_ed->head = end_ed->tail = (long)&default_tds[2];
+
+  for (int i = 0; i < 32; ++i) hcca->interrupt_table[i] = 0;//(long)end_ed;
+  ctrl->HcHCCA = (long)hcca;
 
   default_ed->head = default_ed->tail = (long)default_tds;
   default_ed->nextED = 0;
 
   ctrl->HcControlHeadED = (long)default_ed;
+  ctrl->HcBulkHeadED = (long)end_ed;
 
-  wait(50000);  // reset for 50ms
-
-  ctrl->HcControl = 0x80 + (1<<4);  // operational state, allow only control transfers
+  ctrl->HcControl = 0x80 | (1<<4) /*| (1<<3) | (1<<2)*/;  // operational state, allow only control transfers
 
   wait(1000);  // wait 1ms to update port connection status
 
@@ -131,7 +174,7 @@ int usb_request(volatile struct ED* ed, const volatile struct UsbRequest* reques
   default_tds[0].buf_start = (void*)request;
   default_tds[0].buf_end = (char*)request + sizeof(struct UsbRequest)-1;
 
-  int read = request->bmRequestType & 0x80;
+  int read = (request->bmRequestType & 0x80) || data == 0;
   default_tds[1].flags = 0xf3040000 | (read ? 2<<19 : 1<<19);
   default_tds[1].nextTD = (void*)&default_tds[2];
   default_tds[1].buf_start = (void*)data;
@@ -140,15 +183,47 @@ int usb_request(volatile struct ED* ed, const volatile struct UsbRequest* reques
   ed->head = (long)&default_tds[0];
   ed->tail = (long)&default_tds[2];
 
+  //ctrl->HcDoneHead = (long)&default_tds[2];
+  //hcca->done_head = (long)&default_tds[2];
   ctrl->HcCommandStatus = 2;
-  wait(100000);
 
-  if (ctrl->HcCommandStatus == 0 && (ed->head & 1) == 0 && (default_tds[0].flags>>28) == 0 && (default_tds[0].flags>>28) == 0) {
+  wait(100000);
+  //while ((ctrl->HcDoneHead != (long)&default_tds[1] && hcca->done_head != (long)&default_tds[1]) || ctrl->HcCommandStatus != 0) wait(10);
+
+  if ((ctrl->HcCommandStatus&0xffff) == 0 && (ed->head & 1) == 0 && (default_tds[0].flags>>28) == 0 && (default_tds[1].flags>>28) == 0) {
     return 0;
   }
 
-  bios_printf("ERROR\nHcCommandStatus: 0x%x\n", ctrl->HcCommandStatus);
-  bios_printf("ed.flags=%8x %d td[0].flags=%8x td[1].flags=%8x\n", ed->flags, (unsigned)ed->head&3, default_tds[0].flags, default_tds[1].flags);
+  bios_printf("ERR cstatus=%x ed.flags=%8x %d td[0].flags=%8x td[1].flags=%8x\n", ctrl->HcCommandStatus, ed->flags, (unsigned)ed->head&3, default_tds[0].flags, default_tds[1].flags);
+  return -1;
+}
+
+int get_report(volatile struct ED* ed, volatile void* data) {
+  default_tds[3].flags = 0xf2000000 | (2<<19);
+  default_tds[3].nextTD = (void*)&default_tds[2];
+  default_tds[3].buf_start = (void*)data;
+  default_tds[3].buf_end = (void*)data + 7;
+
+  ed->nextED = 0;//(void*)end_ed;
+  ed->head = (long)&default_tds[3];
+  ed->tail = (long)&default_tds[2];
+
+  //for (int i=0;i<32;++i) hcca->interrupt_table[i] = (long)ed;
+  ctrl->HcControlHeadED = (long)ed;
+  ctrl->HcCommandStatus = 2;
+  //hcca->interrupt_table[0] = (long)ed;
+  //ctrl->HcHCCA = (long)hcca;
+  //while ((default_tds[0].flags>>28) == 0xf) wait(10);
+wait(1000000);
+  /*ctrl->HcDoneHead = (long)&default_tds[2];
+  hcca->done_head = (long)&default_tds[2];
+  ctrl->HcCommandStatus = 2;
+  while ((ctrl->HcDoneHead != (long)&default_tds[0] && hcca->done_head != (long)&default_tds[0]) || ctrl->HcCommandStatus != 0) wait(10);*/
+
+  /*if ((ed->head & 1) == 0 && (default_tds[0].flags>>28) == 0) {
+    return 0;
+  }*/
+  bios_printf("R cstatus=%x ed.flags=%8x head=%8x tail=%8x td.flags=%8x\n", ctrl->HcCommandStatus, ed->flags, ed->head, ed->tail, default_tds[3].flags);
   return -1;
 }
 
@@ -192,10 +267,23 @@ int main() {
       bios_printf("not connected\n");
       continue;
     }
-    if (reset_port(port) < 0) goto test_port_error;
+
+    if (reset_port(port) < 0) {
+      goto test_port_error;
+    }
 
     struct UsbRequest request;
     struct UsbDeviceDescriptor ddev;
+
+    request.bmRequestType = 0x0;
+    request.bRequest = 5; // SET_ADDRESS
+    request.wValue = 1; // new address
+    request.wIndex = 0;
+    request.wLength = 0;
+
+    if (usb_request(default_ed, &request, 0) < 0) goto test_port_error;
+
+    default_ed->flags |= 1; // new address
 
     request.bmRequestType = 0x80;
     request.bRequest = 6; // GET_DESCRIPTOR
@@ -223,6 +311,113 @@ int main() {
     for (int i = 2; i < request.wLength; i += 2) bios_putc(dstr[i]);
     bios_putc('\n');
 
+    bios_printf("bDeviceClass=%02x bDeviceSubClass=%02x bDeviceProtocol=%02x bNumConf=%02x\n", ddev.bDeviceClass, ddev.bDeviceSubClass, ddev.bDeviceProtocol, ddev.bNumConfigurations);
+
+    struct UsbConfigurationDescriptor dconf;
+
+    request.bmRequestType = 0x80;
+    request.bRequest = 6; // GET_DESCRIPTOR
+    request.wValue = (2 << 8 /* configuration*/);
+    request.wIndex = 0;
+    request.wLength = sizeof(struct UsbConfigurationDescriptor);
+
+    if (usb_request(default_ed, &request, &dconf) < 0) goto test_port_error;
+
+    bios_printf("len=%d wTotalLength=%d bNumInterfaces=%d bConfVal=%d iConf=%d\n", dconf.bLength, dconf.wTotalLength, dconf.bNumInterfaces, dconf.bConfigurationValue, dconf.iConfiguration);
+    bios_printf("bmAttributes=0x%02x bMaxPower=%d ma\n", dconf.bmAttributes, dconf.bMaxPower * 2);
+
+    request.wLength = dconf.wTotalLength;
+    char* cdata = malloc(dconf.wTotalLength);
+    if (usb_request(default_ed, &request, cdata) < 0) goto test_port_error;
+
+    for (int i = 0; i < dconf.wTotalLength; ++i) {
+      bios_printf("%02x ", cdata[i]);
+      if ((i&7)==7) bios_putc('\n');
+    }
+    bios_putc('\n');
+
+    char* cend = cdata + dconf.wTotalLength;
+    cdata += dconf.bLength;
+
+    for (int infid=0; infid<dconf.bNumInterfaces; ++infid) {
+      while (cdata < cend && cdata[1] != 4) {
+        bios_printf("Unknown size=%d dt=%d\n", cdata[0], cdata[1]);
+        cdata += cdata[0];
+      }
+      if (cdata >= cend) break;
+      struct UsbInterfaceDescriptor* inf = (void*)cdata;
+      bios_printf("\tInterface %d: len=%d dt=%d class=%d:%d protocol=%d str=%d\n", infid, inf->bLength, inf->bDescriptorType, inf->bInterfaceClass, inf->bInterfaceSubClass, inf->bInterfaceProtocol, inf->iInterface);
+      cdata += inf->bLength;
+
+      for (int ei=0; ei<inf->bNumEndpoints; ++ei) {
+        while (cdata < cend && cdata[1] != 5) {
+          bios_printf("\t\tUnknown size=%d dt=%d\n", cdata[0], cdata[1]);
+          cdata += cdata[0];
+        }
+        struct UsbEndpointDescriptor* enp = (void*)cdata;
+        bios_printf("\t\tEndpoint %d: len=%d dt=%d eaddr=%d psize=%d attrs=0x%02x interval=%d\n", ei, enp->bLength, enp->bDescriptorType, enp->bEndpointAddress, enp->wMaxPacketSize, enp->bmAttributes, enp->bInterval);
+        cdata += enp->bLength;
+      }
+    }
+bios_printf("set_conf\n");
+    request.bmRequestType = 0x0;
+    request.bRequest = 9; // SET_CONFIGURATION
+    request.wValue = dconf.bConfigurationValue; // new configuration
+    request.wIndex = 0;
+    request.wLength = 0;
+
+    if (usb_request(default_ed, &request, 0) < 0) goto test_port_error;
+bios_printf("set_protocol\n");
+    request.bmRequestType = 0x21;
+    request.bRequest = 0xb; // SET_PROTOCOL
+    request.wValue = 0; // boot protocol
+    request.wIndex = 0;
+    request.wLength = 0;
+
+    if (usb_request(default_ed, &request, 0) < 0) goto test_port_error;
+
+    /*request.bmRequestType = 0xa1;
+    request.bRequest = 0x2; // GET_IDLE
+    request.wValue = 0;
+    request.wIndex = 0;
+    request.wLength = 1;
+    unsigned char idle_rate;
+
+    if (usb_request(default_ed, &request, &idle_rate) < 0) goto test_port_error;
+    bios_printf("idle rate: %u\n", idle_rate);*/
+
+    request.bmRequestType = 0x21;
+    request.bRequest = 0xa; // SET_IDLE
+    request.wValue = 0x100; // 4ms
+    request.wIndex = 0;
+    request.wLength = 0;
+    if (usb_request(default_ed, &request, 0) < 0) goto test_port_error;
+
+    request.bmRequestType = 0xa1;
+    request.bRequest = 1; // GET_REPORT
+    request.wValue = 0x100;//0x101;
+    request.wIndex = 0;
+    request.wLength = 8;
+bios_printf("get report\n");
+#if 1
+wait(1000000);
+    volatile struct ED* in_ed = malloc(sizeof(struct ED));
+    in_ed->flags = (8 << 16/*max 8 bytes*/) /*| (2<<11)*/ | (default_ed->flags & (1 << 13)/*speed*/) | 1 /*addr*/ | (1 << 7 /*endpoint 1*/);
+    volatile char report[8];
+    for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 8; ++j) report[j] = 0xff;
+      //get_report(in_ed, report);
+      wait(1000000);
+
+      if (usb_request(in_ed, &request, report) < 0) goto test_port_error;
+      //get_report(in_ed, report);// == 0 || 1) {
+        for (int j = 0; j < 8; ++j) {
+          bios_printf("%02x ", report[j]);
+        }
+        bios_putc('\n');
+      //}
+    }
+#endif
     goto test_port_ok;
 test_port_error:
     bios_printf("error\n");
