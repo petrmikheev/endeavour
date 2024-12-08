@@ -33,7 +33,7 @@ module AudioController (
   reg [3:0] volume_delay = 4'd0;
 
   assign apb_PREADY = volume_initialized;
-  assign apb_PRDATA = sel_cfg ? {state == STATE_HALT, 10'b0, no_sleep, target_volume, divisor} : remaining;
+  assign apb_PRDATA = sel_cfg ? {ina == outa, 10'b0, no_sleep, target_volume, divisor} : remaining;
 
   localparam STATE_HALT = 5'd0;
   localparam STATE_IDLE = 5'd1;
@@ -134,10 +134,9 @@ module AudioController (
       if (counter != 0)
         counter <= counter - 1'b1;
 
-      if (state == STATE_HALT) begin
+      if (state == STATE_HALT || state == STATE_HALTING) begin
         if (ina != outa || current_volume != target_volume) state <= STATE_IDLE;
-      end else if (state == STATE_HALTING) begin
-        if (counter == 0) state <= STATE_HALT;
+        else if (counter == 0 && state == STATE_HALTING) state <= STATE_HALT;
       end else if (state == STATE_IDLE) begin
         if (current_volume != target_volume && (ina == outa || volume_delay == 0)) begin
           volume_up <= target_volume > current_volume;
