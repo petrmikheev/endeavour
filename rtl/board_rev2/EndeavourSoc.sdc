@@ -60,6 +60,7 @@ create_clock -name {clk_cpu}     -period 16.666 -waveform { 0.0   8.333 } [get_p
 #create_clock -name {io_pllb_clk1} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk1}]
 #create_clock -name {io_pllb_clk2} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk2}]
 
+create_clock -name {jtag_tck}       -period 50.0 -waveform { 0.0  25.0 } [get_ports {io_jtag_tck}]
 
 #**************************************************************
 # Create Generated Clock

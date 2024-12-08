@@ -86,7 +86,7 @@ class EndeavourMinimalSoc extends Component {
         uart_ctrl.io.apb     -> (0x1000, 16),
         //audio_ctrl.io.apb    -> (0x2000, 8),
         //i2c.io.apb          -> (0xb000, 16),
-        board_ctrl.io.apb    -> (0x8000, 32)
+        board_ctrl.io.apb    -> (0x4000, 64)
       )
     )
   }

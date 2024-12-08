@@ -25,12 +25,12 @@ module testbench;
     .io_nreset(1'b1),
     .io_keys(keys),
     .io_leds(leds),
-    .io_uart_rx(uart_rx),
-    .io_uart_tx(uart_tx),
     .io_plla_i2c_scl(PLLA_SCL),
     .io_plla_i2c_sda(PLLA_SDA),
-    .io_audio_i2c_scl(AUDIO_SCL),
-    .io_audio_i2c_sda(AUDIO_SDA)
+    //.io_audio_i2c_scl(AUDIO_SCL),
+    //.io_audio_i2c_sda(AUDIO_SDA),
+    .io_uart_rx(uart_rx),
+    .io_uart_tx(uart_tx)
   );
 
   wire cpu_clk = testbench.system.board_ctrl.clk_cpu;

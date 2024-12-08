@@ -41,6 +41,8 @@ class EndeavourSoc(sim : Boolean = false) extends Component {
     val ddr_sdram = DDR_SDRAM(14)
     val usb1 = USB()
     val usb2 = USB()
+
+    val jtag = slave(new com.jtag.Jtag())
   }
 
   val board_ctrl = new BoardController()
@@ -107,7 +109,7 @@ class EndeavourSoc(sim : Boolean = false) extends Component {
     sdcard_ctrl.io.sdcard <> io.sdcard
 
     val apb = Apb3(Apb3Config(
-      addressWidth  = 14,
+      addressWidth  = 15,
       dataWidth     = 32,
       useSlaveError = true
     ))
@@ -116,11 +118,12 @@ class EndeavourSoc(sim : Boolean = false) extends Component {
       slaves = List(
         uart_ctrl.io.apb     -> (0x1000, 16),
         audio_ctrl.io.apb    -> (0x2000, 8),
-        sdcard_ctrl.io.apb   -> (0x3000, 32)
+        sdcard_ctrl.io.apb   -> (0x3000, 32),
+        board_ctrl.io.apb    -> (0x4000, 64)
       )
     )
   }
-  val peripheral_apb_bridge = new ApbClockBridge(14)
+  val peripheral_apb_bridge = new ApbClockBridge(15)
   peripheral_apb_bridge.io.clk_output <> board_ctrl.io.clk_peripheral
   peripheral_apb_bridge.io.output <> peripheral.apb
 
@@ -145,7 +148,7 @@ class EndeavourSoc(sim : Boolean = false) extends Component {
     targets = List(plic_target)
   )
 
-  val cpu = new VexiiCore(resetVector=internalRamBaseAddr, sim=sim)
+  val cpu = new VexiiCore(resetVector=internalRamBaseAddr, sim=sim, jtag=Option(io.jtag))
 
   cpu.utime := board_ctrl.io.utime
   cpu.interrupts.timer := board_ctrl.io.timer_interrupt
@@ -164,8 +167,7 @@ class EndeavourSoc(sim : Boolean = false) extends Component {
     val apbDecoder = Apb3Decoder(
       master = toApb.down.get,
       slaves = List(
-        peripheral_apb_bridge.io.input -> (0x0, 0x4000),
-        board_ctrl.io.apb  -> (0x8000, 32),
+        peripheral_apb_bridge.io.input -> (0x0, 0x8000),
         video_ctrl.io.apb  -> (0x9000, 32),
         usb_ctrl.apb_ctrl  -> (0xA000, 0x1000),
         plic_apb           -> (plicAddr, plicSize)

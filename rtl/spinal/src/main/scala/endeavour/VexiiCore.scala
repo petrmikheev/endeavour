@@ -38,9 +38,9 @@ class VexiiCore(resetVector: Long, sim: Boolean = false, jtag: Option[Jtag] = No
   param.privParam.withUser = true
   param.privParam.withRdTime = true
 
-  /*param.withRvf = true
+  param.withRvf = true
   param.fpuFmaFullAccuracy = false
-  param.fpuIgnoreSubnormal = true*/
+  param.fpuIgnoreSubnormal = true
 
   // Performance optimization
   param.decoders = 2

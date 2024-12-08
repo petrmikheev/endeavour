@@ -42,12 +42,17 @@
 #define SDCARD_FIFO0_LE 0x3018  // FIFO0 with big-endian -> little-endian conversion
 #define SDCARD_FIFO1_LE 0x301C  // FIFO1 with big-endian -> little-endian conversion
 
-#define BOARD_LEDS     0x8000
-#define BOARD_KEYS     0x8004
-#define BOARD_CPU_FREQ 0x8008
-#define BOARD_RAM_FREQ 0x800C
-#define BOARD_TIMECMP  0x8010
-#define BOARD_TIMECMPH 0x8014
+#define BOARD_LEDS     0x4000
+#define BOARD_KEYS     0x4004
+#define BOARD_CPU_FREQ 0x4008
+#define BOARD_RAM_FREQ 0x400C
+#define BOARD_TIMECMP  0x4010
+#define BOARD_TIMECMPH 0x4014
+#define BOARD_RESET    0x4018
+#define BOARD_REG_INDEX 0x401C
+#define BOARD_REG_VALUE 0x4020
+#define BOARD_PLLA_CONF 0x4024
+#define BOARD_PLLB_CONF 0x4028
 
 #define VIDEO_CFG           0x9000
 #define VIDEO_TEXT_ADDR     0x9004

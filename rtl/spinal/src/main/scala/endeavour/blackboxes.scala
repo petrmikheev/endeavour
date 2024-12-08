@@ -51,7 +51,7 @@ class BoardController extends BlackBox {
     val keys = in Bits(2 bits)
 
     val apb = slave(Apb3(Apb3Config(
-      addressWidth  = 5,
+      addressWidth  = 6,
       dataWidth     = 32,
       useSlaveError = false
     )))
@@ -130,7 +130,7 @@ class SdcardController extends BlackBox {
     val apb = slave(Apb3(Apb3Config(
       addressWidth  = 5,
       dataWidth     = 32,
-      useSlaveError = false
+      useSlaveError = true
     )))
   }
   noIoPrefix()

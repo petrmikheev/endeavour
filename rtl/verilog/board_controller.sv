@@ -34,17 +34,14 @@ module BoardController(
 
   input [1:0] video_mode,
 
-  input   [4:0] apb_PADDR,
-  input         apb_PSEL,
-  input         apb_PENABLE,
-  output        apb_PREADY,
-  input         apb_PWRITE,
-  input  [31:0] apb_PWDATA,
-  output [31:0] apb_PRDATA
+  input       [5:0] apb_PADDR,
+  input             apb_PSEL,
+  input             apb_PENABLE,
+  output            apb_PREADY,
+  input             apb_PWRITE,
+  input      [31:0] apb_PWDATA,
+  output reg [31:0] apb_PRDATA
 );
-
-  assign pllb_i2c_scl = 1'bz;
-  assign pllb_i2c_sda = 1'bz;
 
   parameter PERIPHERAL_FREQ = 48_000_000;
   localparam PERIPHERAL_PERIOD = 1_000_000_000.0 / PERIPHERAL_FREQ;
@@ -89,6 +86,7 @@ module BoardController(
       utime_value <= utime_value + 1'b1;
     end else
       utime_counter <= utime_counter + 1'd1;
+    timer_interrupt <= utime_value >= utime_cmp;
   end
 
   reg tih, tihe, til;
@@ -96,10 +94,6 @@ module BoardController(
   always @(posedge clk_cpu) begin
     reset_cpu <= reset_peripheral;
     if (utime_read_allowed) utime <= utime_value;
-    tih <= utime[63:32] > utime_cmp[63:32];
-    tihe <= utime[63:32] == utime_cmp[63:32];
-    til <= utime[31:0] >= utime_cmp[31:0];
-    timer_interrupt <= tih | (tihe & til);
   end
 
   always @(posedge clk_ram_bus) reset_ram <= reset_peripheral;
@@ -109,7 +103,7 @@ module BoardController(
   reg [17:0] ram_freq = RAM_FREQ / 1024;
 `else
   reg [17:0] cpu_freq, ram_freq, ram_freq_b;
-  FrequencyCounter cpu_freq_counter(.clk(plla_clk2), .utime(utime[9:0]), .freq_khz(cpu_freq));
+  FrequencyCounter cpu_freq_counter(.clk(clk_cpu), .utime(utime_value[9:0]), .freq_khz(cpu_freq));
   FrequencyCounter ram_freq_counter(.clk(clk_ram_bus), .utime(utime_value[9:0]), .freq_khz(ram_freq_b));
 
   always @(posedge clk_peripheral) ram_freq <= ram_freq_b;
@@ -250,11 +244,7 @@ module BoardController(
   assign clk_peripheral = clk_in;
   assign clk_ram_bus = plla_clk0;
   assign clk_ram = plla_clk1;
-`ifndef MINIMAL
   assign clk_cpu = plla_clk2;
-`else
-  assign clk_cpu = clk_in;
-`endif
 `endif
 
   reg [2:0] leds_normalized;
@@ -273,27 +263,7 @@ module BoardController(
 `endif
 `endif
 
-  reg [2:0] addr;
-  assign apb_PRDATA = addr == 3'd0 ? {29'b0, leds_normalized}  :
-                      addr == 3'd1 ? {30'b0, keys_normalized}  :
-                      addr == 3'd2 ? {4'h0, cpu_freq, 10'h3ff} :
-                      addr == 3'd3 ? {4'h0, ram_freq, 10'h3ff} :
-                      addr == 3'd4 ? utime_cmp[31:0] : utime_cmp[63:32];
-  assign apb_PREADY = 1'b1;
-
-  always @(posedge clk_cpu) begin
-    addr <= apb_PADDR[4:2];
-    if (reset_cpu) begin
-      leds_normalized <= 3'b0;
-      utime_cmp <= '1;
-    end else if (apb_PSEL & apb_PENABLE & apb_PWRITE) begin
-      if (addr == 3'd0) leds_normalized <= apb_PWDATA[2:0];
-      if (addr == 3'd4) utime_cmp[31:0] <= apb_PWDATA;
-      if (addr == 3'd5) utime_cmp[63:32] <= apb_PWDATA;
-    end
-  end
-
-  reg [15:0] pll_conf [0:188];
+  reg [15:0] pll_conf [0:511];
   initial begin
     $readmemh("../verilog/pll_conf.mem", pll_conf);
   end
@@ -302,45 +272,123 @@ module BoardController(
   //parameter PLL_CONF_FROM = 8'd63;  // 100mhz ram, 60mhz cpu
   parameter PLL_CONF_FROM = 8'd126;   // 90mhz ram, 60mhz cpu
 
-  parameter PLL_CONF_TO = PLL_CONF_FROM + 8'd63;
+  reg [8:0] plla_conf_from = PLL_CONF_FROM;
+  reg [8:0] plla_conf_to = PLL_CONF_FROM + 8'd63;
+  reg [8:0] pllb_conf_from = 9'b0, pllb_conf_to = 9'b0;
 
-  reg [7:0] pll_cid = PLL_CONF_FROM;
-  reg [1:0] pll_cstate = 2'd0;
+  localparam PSTATE_A    = 3'd0;
+  localparam PSTATE_AREG = 3'd1;
+  localparam PSTATE_AVAL = 3'd2;
+  localparam PSTATE_B    = 3'd3;
+  localparam PSTATE_BREG = 3'd4;
+  localparam PSTATE_BVAL = 3'd5;
+  localparam PSTATE_END  = 3'd6;
+
+  reg [2:0] pll_state = PSTATE_A;
+
+  reg [8:0] pll_cid = PLL_CONF_FROM;
   reg [7:0] pll_reg, pll_value, pll_din;
-  wire pll_i2c_ready;
-  wire pll_data_err, pll_addr_err;
-
-  always @(posedge clk_peripheral) begin
-    if (pll_cid == PLL_CONF_TO) begin
-      pll_initialized <= 1;
-    end else begin
-      if (pll_cstate == 2'd0) begin
-        pll_cstate <= 2'd2;
-        {pll_reg, pll_value} <= pll_conf[pll_cid];
-      end else if (pll_i2c_ready) begin
-        {pll_cid, pll_cstate} <= {pll_cid, pll_cstate} + 1'd1;
-      end
-    end
-  end
+  wire plla_i2c_ready, pllb_i2c_ready;
 
   I2C plla_i2c(
     .clk(clk_peripheral),
 
-    .cmd_active(pll_cstate[1]),
+    .cmd_active(pll_state == PSTATE_AREG || pll_state == PSTATE_AVAL),
     .cmd_high_speed(1'b0),
     .cmd_addr(7'h60),
     .cmd_read(1'b0),
 
-    .data_valid(pll_cstate[1]),
-    .data_ready(pll_i2c_ready),
-    .data_in(pll_cstate[0] ? pll_value : pll_reg),
-
-    .addr_err(pll_addr_err),
-    .data_err(pll_data_err),
+    .data_valid(pll_state == PSTATE_AREG || pll_state == PSTATE_AVAL),
+    .data_ready(plla_i2c_ready),
+    .data_in(pll_state == PSTATE_AVAL ? pll_value : pll_reg),
 
     .i2c_scl(plla_i2c_scl),
     .i2c_sda(plla_i2c_sda)
   );
+
+`ifdef WITH_PLLB
+  I2C pllb_i2c(
+    .clk(clk_peripheral),
+
+    .cmd_active(pll_state == PSTATE_BREG || pll_state == PSTATE_BVAL),
+    .cmd_high_speed(1'b0),
+    .cmd_addr(7'h60),
+    .cmd_read(1'b0),
+
+    .data_valid(pll_state == PSTATE_BREG || pll_state == PSTATE_BVAL),
+    .data_ready(pllb_i2c_ready),
+    .data_in(pll_state == PSTATE_BVAL ? pll_value : pll_reg),
+
+    .i2c_scl(pllb_i2c_scl),
+    .i2c_sda(pllb_i2c_sda)
+  );
+`else
+  assign pllb_i2c_ready = 1'b1;
+`endif
+
+  assign apb_PREADY = 1'b1;
+
+  reg [8:0] conf_index;
+
+  always @(posedge clk_peripheral) begin
+    if (pll_state == PSTATE_A || pll_state == PSTATE_B) {pll_reg, pll_value} <= pll_conf[pll_cid];
+    case (pll_state)
+      PSTATE_A: if (pll_cid == plla_conf_to) begin
+        pll_state <= PSTATE_B;
+        pll_cid <= pllb_conf_from;
+      end else pll_state <= PSTATE_AREG;
+      PSTATE_B: pll_state <= pll_cid == pllb_conf_to ? PSTATE_END : PSTATE_BREG;
+      PSTATE_AREG: if (plla_i2c_ready) pll_state <= PSTATE_AVAL;
+      PSTATE_BREG: if (pllb_i2c_ready) pll_state <= PSTATE_BVAL;
+      PSTATE_AVAL: if (plla_i2c_ready) begin
+        pll_state <= PSTATE_A;
+        pll_cid <= pll_cid + 1'b1;
+      end
+      PSTATE_BVAL: if (pllb_i2c_ready) begin
+        pll_state <= PSTATE_B;
+        pll_cid <= pll_cid + 1'b1;
+      end
+      PSTATE_END: if (~pll_initialized) pll_initialized <= 1;
+    endcase
+
+    if (reset_peripheral) begin
+      leds_normalized <= 3'b0;
+      utime_cmp <= '1;
+    end else if (apb_PSEL) begin
+      case (apb_PADDR)
+        6'h0: begin
+          apb_PRDATA <= {29'b0, leds_normalized};
+          if (apb_PWRITE & apb_PENABLE) leds_normalized <= apb_PWDATA[2:0];
+        end
+        6'h4: apb_PRDATA <= {30'b0, keys_normalized};
+        6'h8: apb_PRDATA <= {4'h0, cpu_freq, 10'h3ff};
+        6'hC: apb_PRDATA <= {4'h0, ram_freq, 10'h3ff};
+        6'h10: begin
+          apb_PRDATA <= utime_cmp[31:0];
+          if (apb_PWRITE & apb_PENABLE) utime_cmp[31:0] <= apb_PWDATA;
+        end
+        6'h14: begin
+          apb_PRDATA <= utime_cmp[63:32];
+          if (apb_PWRITE & apb_PENABLE) utime_cmp[63:32] <= apb_PWDATA;
+        end
+        6'h18: if (pll_state == PSTATE_END) begin  // reset
+          pll_initialized <= 0;
+          pll_state <= PSTATE_A;
+          pll_cid <= plla_conf_from;
+        end
+        6'h1C: if (apb_PWRITE & apb_PENABLE) conf_index <= apb_PWDATA[8:0];
+        6'h20: if (apb_PWRITE & apb_PENABLE) pll_conf[conf_index] <= apb_PWDATA[15:0];
+        6'h24: begin
+          apb_PRDATA <= {7'b0, plla_conf_from, 7'b0, plla_conf_to};
+          if (apb_PWRITE & apb_PENABLE) {plla_conf_from, plla_conf_to} <= {apb_PWDATA[24:16], apb_PWDATA[8:0]};
+        end
+        6'h28: begin
+          apb_PRDATA <= {7'b0, pllb_conf_from, 7'b0, pllb_conf_to};
+          if (apb_PWRITE & apb_PENABLE) {pllb_conf_from, pllb_conf_to} <= {apb_PWDATA[24:16], apb_PWDATA[8:0]};
+        end
+      endcase
+    end
+  end
 
 endmodule
 
