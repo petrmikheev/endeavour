@@ -43,6 +43,32 @@ static int load_file(const char* path) {
   return inode->size_lo;
 }
 
+static void set_wallpaper(char* path) {
+  if (!*path) {
+    IO_PORT(VIDEO_CFG) &= ~VIDEO_GRAPHIC_ON;
+    return;
+  }
+  int size = load_file(path);
+  const char* wallpaper_bmp = LOAD_ADDR;
+  unsigned short bitmap_offset = *(unsigned short*)(wallpaper_bmp + 10);
+  unsigned short width = *(unsigned short*)(wallpaper_bmp + 18);
+  unsigned short height = *(unsigned short*)(wallpaper_bmp + 22);
+  unsigned short bits_per_pixel = *(unsigned short*)(wallpaper_bmp + 28);
+  unsigned bytes_per_line = (width * 2 + 3) & ~3;
+  if (size != bitmap_offset + bytes_per_line * height || bits_per_pixel != 16) {
+    bios_printf("[BOOT] Usupported wallpaper. Expected RGB565 BMP without color table.\n");
+    return;
+  }
+  char* frame_buffer  = (char*)RAM_ADDR + 0x100000;
+  IO_PORT(VIDEO_GRAPHIC_ADDR) = (long)frame_buffer;
+  for (int j = 0; j < height; ++j) {
+    const char* src = wallpaper_bmp + bitmap_offset + (height-j-1) * bytes_per_line;
+    char* dst = frame_buffer + j * (1024*4);
+    for (int i = 0; i < bytes_per_line; ++i) dst[i] = src[i];
+  }
+  IO_PORT(VIDEO_CFG) |= VIDEO_GRAPHIC_ON;
+}
+
 static void run_command(char* cmd) {
   char* arg = cmd;
   while (*arg != 0 && *arg != ' ') arg++;
@@ -95,24 +121,9 @@ static void run_command(char* cmd) {
     IO_PORT(VIDEO_REG_INDEX) = VIDEO_COLORMAP_FG(15);
     IO_PORT(VIDEO_REG_VALUE) = fg;
   } else if (strcmp(cmd, "wallpaper") == 0) {
-    if (!*arg) {
-      IO_PORT(VIDEO_CFG) &= ~VIDEO_GRAPHIC_ON;
-      return;
-    }
-    int size = load_file(arg);
-    if (size != 70 + 2 * 720 * 1280) {  // TODO: Add proper BMP parsing
-      if (size) bios_printf("[BOOT] Usupported wallpaper. Expected 1280x720 RGB565 BMP.\n");
-      return;
-    }
-    char* frame_buffer  = (char*)RAM_ADDR + 0x100000;
-    const char* wallpaper_bmp = LOAD_ADDR;
-    IO_PORT(VIDEO_GRAPHIC_ADDR) = (long)frame_buffer;
-    for (int j = 0; j < 720; ++j) {
-      const char* src = wallpaper_bmp + 70 + (720-j-1) * (1280 * 2);
-      char* dst = frame_buffer + j * (1024*4);
-      for (int i = 0; i < 1280*2; ++i) dst[i] = src[i];
-    }
-    IO_PORT(VIDEO_CFG) |= VIDEO_GRAPHIC_ON;
+    set_wallpaper(arg);
+  } else if (strcmp(cmd, "exit") == 0) {
+    bios_uart_console();
   } else
     bios_printf("[BOOT] Invalid command\n");
 }
@@ -165,7 +176,8 @@ console:
     "\tls   <path>\t\t\t- show files in a dir\n"
     "\toptions <any string>   - set linux kernel arguments\n"
     "\ttextstyle <fg> <bg>\t- set text/background RGBA color. Default: FFFFFF40 00000000\n"
-    "\twallpaper <path>   \t- load bmp file as a wallpaper\n\n"
+    "\twallpaper <path>   \t- load bmp file as a wallpaper\n"
+    "\texit   \t\t\t\t- exit to BIOS console\n\n"
   );
   while (1) {
     bios_printf("> ");
