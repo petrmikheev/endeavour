@@ -268,9 +268,9 @@ module BoardController(
     $readmemh("../verilog/pll_conf.mem", pll_conf);
   end
 
-  //parameter PLL_CONF_FROM = 8'd0;   // 120mhz ram, 60mhz cpu
-  //parameter PLL_CONF_FROM = 8'd63;  // 100mhz ram, 60mhz cpu
-  parameter PLL_CONF_FROM = 8'd126;   // 90mhz ram, 60mhz cpu
+  //parameter PLL_CONF_FROM = 8'd0;   // 90mhz ram, 60mhz cpu
+  parameter PLL_CONF_FROM = 8'd63;   // 100mhz ram, 60mhz cpu
+  //parameter PLL_CONF_FROM = 8'd126; // 110mhz ram, 60mhz cpu
 
   reg [8:0] plla_conf_from = PLL_CONF_FROM;
   reg [8:0] plla_conf_to = PLL_CONF_FROM + 8'd63;

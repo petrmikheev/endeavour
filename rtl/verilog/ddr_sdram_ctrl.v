@@ -7,7 +7,8 @@ module DDRSdramController #(
     parameter       ID_WIDTH  = 1,
     parameter [9:0] tREFC     = 10'd600,
     parameter [7:0] tW2I      = 8'd2,
-    parameter [7:0] tR2I      = 8'd2
+    parameter [7:0] tR2I      = 8'd2,
+    parameter   ABOVE_110MHZ  = 1'b0
 ) (
     input clk,
     input clk_shifted,  // should be same rate as `clk` with 1/4 period delay
@@ -168,7 +169,6 @@ always @ (posedge clk)
                 endcase
             end
             IDLE: begin
-                cnt <= 8'd0;
                 if (ref_real != ref_idle) begin
                     ref_real <= ref_real + 3'd1;
                     stat <= REFRESH;
@@ -181,7 +181,9 @@ always @ (posedge clk)
                     stat <= arw_write ? WPRE : RPRE;
                     bid <= arw_id;
                     {next_ba, next_a, col_addr} <= {arw_addr[ROW_BITS+COL_BITS+2:3], 1'b0};
-                end
+                    cnt <= ABOVE_110MHZ ? 8'd1 : 8'd0;
+                end else
+                    cnt <= 8'd0;
             end
             REFRESH: begin
                 cnt <= cnt + 8'd1;
@@ -193,16 +195,19 @@ always @ (posedge clk)
                 endcase
             end
             WPRE: begin
-                // Note: if clk>110mhz then second NOP is needed
-                {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // controlled in new_rcw_n assignment
+                if (~cnt[0]) begin
+                    {next_ras_n, next_cas_n, next_we_n} <= 3'b111; // controlled in new_rcw_n assignment
+                    stat <= WRITE;
+                    wready32 <= 1;
+                end
                 cnt <= 8'd0;
-                stat <= WRITE;
-                wready32 <= 1;
             end
             RPRE: begin
-                {next_ras_n, next_cas_n, next_we_n} <= 3'b101; // READ    Note: if clk>110mhz then second NOP is needed
+                if (~cnt[0]) begin
+                    {next_ras_n, next_cas_n, next_we_n} <= 3'b101; // READ
+                    stat <= READ;
+                end
                 cnt <= 8'd0;
-                stat <= READ;
             end
             WRITE: begin
                 if(wvalid) begin

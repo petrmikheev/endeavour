@@ -245,7 +245,7 @@ set_location_assignment PIN_29 -to io_sdcard_ndetect
 set_global_assignment -name SMART_RECOMPILE OFF
 set_global_assignment -name PHYSICAL_SYNTHESIS_ASYNCHRONOUS_SIGNAL_PIPELINING ON
 set_global_assignment -name ROUTER_CLOCKING_TOPOLOGY_ANALYSIS ON
-set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
+set_global_assignment -name FITTER_EFFORT "AUTO FIT"
 set_global_assignment -name CYCLONEII_OPTIMIZATION_TECHNIQUE SPEED
 set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
 set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION ON
@@ -300,4 +300,53 @@ set_global_assignment -name REMOVE_REDUNDANT_LOGIC_CELLS ON
 set_global_assignment -name AUTO_RAM_TO_LCELL_CONVERSION ON
 set_global_assignment -name SYNTH_GATED_CLOCK_CONVERSION ON
 set_global_assignment -name PRE_MAPPING_RESYNTHESIS ON
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[13]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[12]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[11]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[10]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[9]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[8]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[7]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[6]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[5]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[4]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[3]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_a
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_ba[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_ba[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_ba
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_cas_n
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_ck_n
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_ck_p
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_cke
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dm[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dm[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dm
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[15]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[14]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[13]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[12]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[11]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[10]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[9]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[8]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[7]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[6]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[5]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[4]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[3]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dq
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dqs[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dqs[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_dqs
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_ras_n
+set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to io_ddr_sdram_we_n
+set_global_assignment -name VCCA_USER_VOLTAGE 3.3V
+set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 3.3V
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

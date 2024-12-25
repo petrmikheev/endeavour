@@ -54,6 +54,10 @@
 #define BOARD_PLLA_CONF 0x4024
 #define BOARD_PLLB_CONF 0x4028
 
+#define PLL_CONF_90_60 0x3f
+#define PLL_CONF_100_60 0x3f007e
+#define PLL_CONF_110_60 0x7300bd
+
 #define VIDEO_CFG           0x9000
 #define VIDEO_TEXT_ADDR     0x9004
 #define VIDEO_GRAPHIC_ADDR  0x9008

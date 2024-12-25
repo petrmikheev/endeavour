@@ -30,6 +30,14 @@ write_flash:
 	sleep 0.5
 	../../scripts/setup_uart.sh
 
+.PHONY: write_custom
+write_custom:
+	sudo rmmod ftdi_sio
+	sudo ../../mbftdi/mbftdi ${CUSTOM_SVF}
+	sudo modprobe ftdi_sio
+	sleep 0.5
+	../../scripts/setup_uart.sh
+
 .PHONY: clean
 clean:
 	rm -f endeavour.svf endeavour_flash.svf

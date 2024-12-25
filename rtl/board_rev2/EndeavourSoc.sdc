@@ -42,8 +42,8 @@ set_time_format -unit ns -decimal_places 3
 create_clock -name {clk48}       -period 20.833 -waveform { 0.0  10.416 } [get_ports {io_clk_in}]
 
 # RAM 100 Mhz
-create_clock -name {clk_ram_bus} -period 10.000 -waveform { 0.0  5.000 }  [get_ports {io_plla_clk0}]
-create_clock -name {clk_ram}     -period 10.000 -waveform { 2.5  7.5 }    [get_ports {io_plla_clk1}]
+#create_clock -name {clk_ram_bus} -period 10.000 -waveform { 0.0  5.000 }  [get_ports {io_plla_clk0}]
+#create_clock -name {clk_ram}     -period 10.000 -waveform { 2.5  7.5 }    [get_ports {io_plla_clk1}]
 
 # RAM 110 MHz
 #create_clock -name {clk_ram_bus} -period 9.09   -waveform { 0.0   4.545 } [get_ports {io_plla_clk0}]
@@ -53,14 +53,16 @@ create_clock -name {clk_ram}     -period 10.000 -waveform { 2.5  7.5 }    [get_p
 #create_clock -name {clk_ram_bus} -period 8.333  -waveform { 0.0   4.167 } [get_ports {io_plla_clk0}]
 #create_clock -name {clk_ram}     -period 8.333  -waveform { 2.083 6.250 } [get_ports {io_plla_clk1}]
 
+# RAM 125 MHz (100 MHz + gap)
+create_clock -name {clk_ram_bus}  -period 8.0   -waveform { 0.0   4.0  } [get_ports {io_plla_clk0}]
+create_clock -name {clk_ram}      -period 8.0   -waveform { 2.0   6.0  } [get_ports {io_plla_clk1}]
+
 # CPU 60 Mhz
 create_clock -name {clk_cpu}     -period 16.666 -waveform { 0.0   8.333 } [get_ports {io_plla_clk2}]
 
 #create_clock -name {io_pllb_clk0} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk0}]
 #create_clock -name {io_pllb_clk1} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk1}]
 #create_clock -name {io_pllb_clk2} -period 10.000 -waveform { 0.000 5.000 } [get_ports {io_pllb_clk2}]
-
-create_clock -name {jtag_tck}       -period 50.0 -waveform { 0.0  25.0 } [get_ports {io_jtag_tck}]
 
 #**************************************************************
 # Create Generated Clock
@@ -151,7 +153,15 @@ set_max_delay -from [get_clocks clk48] -to [get_ports {io_sdcard_clk io_sdcard_c
 set_min_delay -from clk_cpu -to clk48 -5.000
 set_min_delay -from clk48 -to clk_cpu -5.000
 set_min_delay -from clk48 -to clk_ram_bus -5.000
+set_min_delay -from clk_cpu -to clk_tmds_pixel -15.000
+set_min_delay -from clk_tmds_pixel -to clk_cpu -15.000
 
 #**************************************************************
 # Set Input Transition
 #**************************************************************
+
+# JTAG
+
+create_clock -name {jtag_tck}       -period 50.0 -waveform { 0.0  25.0 } [get_ports {io_jtag_tck}]
+set_input_delay -clock {jtag_tck} -15.0 [get_ports {io_jtag_tdi io_jtag_tms}]
+set_output_delay -clock {jtag_tck} 0 [get_ports {io_jtag_tdo}]
