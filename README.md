@@ -23,6 +23,8 @@ What are the practical uses of the device? No practical use. It is a hobby proje
 
 Initially I planned to make a video game optimized specifically for this FPGA board. But now I am considering to skip this step and try to design a more advanced FPGA board.
 
+**This project is no longer maintained, superseded by [endeavour2](https://github.com/petrmikheev/endeavour2).**
+
 ## Hardware
 
 ### Components
